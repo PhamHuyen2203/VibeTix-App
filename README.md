@@ -230,9 +230,3 @@ Run
 13. Build reports and statistics
 
 ---
-
-## Team Members
-
-| Name | Role |
-|---|---|
-| Pham Huyen | Android Developer |
