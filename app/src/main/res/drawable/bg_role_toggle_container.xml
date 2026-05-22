@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Outer pill container for the User/Organizer segmented toggle -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#EBF0FF" />
+    <corners android:radius="12dp" />
+</shape>

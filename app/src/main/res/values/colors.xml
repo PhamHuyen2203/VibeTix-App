@@ -1,5 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary -->
+    <color name="clr_primary_blue">#226CEB</color>
+    <color name="clr_primary_pest">#48C5E9</color>
+
+    <!-- Secondary -->
+    <color name="clr_btn_blue">#236DEC</color>
+    <color name="clr_dark_blue_1">#0957DE</color>
+    <color name="clr_dark_blue_2">#2C67CC</color>
+    <color name="clr_dark_blue_3">#0C419D</color>
+    <color name="clr_grey_1">#808E92</color>
+    <color name="clr_grey_2">#A2A2A6</color>
+    <color name="clr_yellow">#FFB823</color>
+    <color name="clr_green">#5FC78B</color>
+    <color name="clr_red">#FF4848</color>
+
+    <!-- Text -->
+    <color name="clr_text_black">#1C1B1B</color>
+    <color name="clr_text_white">#FFFFFF</color>
+    <color name="clr_text_secondary">#808E92</color>
+
+    <!-- Background -->
+    <color name="clr_bg_light">#FCF9F8</color>
+    <color name="clr_bg_white">#FFFFFF</color>
+    <color name="clr_bg_section">#F0F4FF</color>
+
+    <!-- State -->
+    <color name="clr_info">#2F80ED</color>
+    <color name="clr_success">#27AE60</color>
+    <color name="clr_warning">#E6B93E</color>
+    <color name="clr_error">#EB5757</color>
+
+    <!-- Bottom Nav -->
+    <color name="clr_nav_active">#226CEB</color>
+    <color name="clr_nav_inactive">#808E92</color>
+
+    <!-- Resale Banner -->
+    <color name="clr_resale_bg">#0957DE</color>
+
+    <!-- Divider -->
+    <color name="clr_divider">#E8ECF0</color>
+
+    <!-- Category chip icon backgrounds (ERD: CATEGORY) -->
+    <color name="clr_cat_music">#E91E63</color>
+    <color name="clr_cat_arts">#9C27B0</color>
+    <color name="clr_cat_workshop">#FF9800</color>
+    <color name="clr_cat_tour">#4CAF50</color>
+    <color name="clr_cat_sports">#F44336</color>
+    <color name="clr_cat_festival">#00BCD4</color>
+
+    <!-- Banner Dots -->
+    <color name="clr_dot_active">#0059B8</color>
+    <color name="clr_dot_inactive">#C1C6D6</color>
+
+    <!-- Legacy (keep for system) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

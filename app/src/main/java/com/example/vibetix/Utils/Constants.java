@@ -1,9 +1,22 @@
 package com.example.vibetix.Utils;
 
 public class Constants {
+    // User roles (match ERD: USER.role)
+    public static final String ROLE_CUSTOMER  = "customer";
+    public static final String ROLE_ORGANIZER = "organizer";
+    public static final String ROLE_ADMIN     = "admin";
+    /** @deprecated Use ROLE_CUSTOMER instead */
     public static final String ROLE_USER = "USER";
-    public static final String ROLE_ORGANIZER = "ORGANIZER";
-    public static final String ROLE_ADMIN = "ADMIN";
+
+    // SharedPreferences — auth state (temporary until Firebase Auth is integrated)
+    public static final String PREFS_AUTH         = "vibetix_auth";
+    public static final String KEY_IS_LOGGED_IN   = "is_logged_in";
+    public static final String KEY_USER_EMAIL     = "user_email";
+    public static final String KEY_USER_NAME      = "user_name";
+    public static final String KEY_USER_PHONE     = "user_phone";
+    public static final String KEY_USER_ROLE      = "user_role";
+    public static final String KEY_REMEMBER_ME    = "remember_me";
+    public static final String KEY_USER_ORG_NAME  = "user_org_name";
 
     public static final String EVENT_STATUS_DRAFT = "DRAFT";
     public static final String EVENT_STATUS_PENDING = "PENDING";

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: Banner — rounded-[12dp], shadow, gradient overlay bottom, title 16sp white -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="@dimen/card_radius"
+    app:cardElevation="3dp"
+    app:cardPreventCornerOverlap="true">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imvBanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/str_cd_event_image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
+
+        <!-- Gradient overlay at bottom — rgba(0,0,0,0.8) to transparent -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_banner_overlay" />
+
+        <!-- Status badge top-left -->
+        <TextView
+            android:id="@+id/txtBannerStatusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/spacing_base"
+            android:background="@drawable/bg_status_badge_ongoing"
+            android:paddingBottom="4dp"
+            android:paddingEnd="@dimen/spacing_sm"
+            android:paddingStart="@dimen/spacing_sm"
+            android:paddingTop="4dp"
+            android:text="@string/str_status_ongoing"
+            android:textColor="@color/clr_text_white"
+            android:textSize="@dimen/text_xs"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <!-- Event info overlay at bottom -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_base">
+
+            <TextView
+                android:id="@+id/txtBannerTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Event Title"
+                android:textColor="@color/clr_text_white"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtBannerDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="01/01/2025"
+                    android:textColor="@color/clr_text_white"
+                    android:textSize="@dimen/text_sm" />
+
+                <View
+                    android:layout_width="4dp"
+                    android:layout_height="4dp"
+                    android:layout_marginEnd="@dimen/spacing_xs"
+                    android:layout_marginStart="@dimen/spacing_xs"
+                    android:alpha="0.6"
+                    android:background="@color/clr_text_white" />
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_location_small"
+                    android:tint="@color/clr_text_white" />
+
+                <TextView
+                    android:id="@+id/txtBannerCity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="TP.HCM"
+                    android:textColor="@color/clr_text_white"
+                    android:textSize="@dimen/text_sm" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

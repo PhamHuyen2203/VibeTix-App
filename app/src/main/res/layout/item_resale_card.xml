@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Resale ticket card — used exclusively in the Resale Ticket section.
+  Sits inside the blue gradient band; white card background gives contrast.
+  RE-SALE badge overlaid on top-right of image.
+-->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="148dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/spacing_sm"
+    android:layout_marginTop="@dimen/spacing_xs"
+    android:layout_marginBottom="@dimen/spacing_xs"
+    app:cardBackgroundColor="@color/clr_bg_white"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Image + RE-SALE badge overlay -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="108dp">
+
+            <ImageView
+                android:id="@+id/imvResaleImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/str_cd_event_image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background" />
+
+            <!-- RE-SALE badge — top right, blue gradient -->
+            <TextView
+                android:id="@+id/txtResaleBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_resale_badge"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="@string/str_resale_badge"
+                android:textColor="@color/clr_text_white"
+                android:textSize="@dimen/text_xs"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Card info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_sm">
+
+            <!-- Event title — max 2 lines -->
+            <TextView
+                android:id="@+id/txtResaleTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Event Title"
+                android:textColor="@color/clr_text_black"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+
+            <!-- Date row: calendar icon + date -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_calendar_small" />
+
+                <TextView
+                    android:id="@+id/txtResaleDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="01/01/2025"
+                    android:textColor="@color/clr_grey_1"
+                    android:textSize="@dimen/text_xs" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

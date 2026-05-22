@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Grid variant of item_event_card: layout_width=match_parent for 2-column GridLayoutManager -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardBackgroundColor="@color/clr_bg_white"
+    app:cardCornerRadius="@dimen/card_radius"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="110dp">
+
+            <ImageView
+                android:id="@+id/imvEventImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/str_cd_event_image"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background" />
+
+            <TextView
+                android:id="@+id/txtOngoingBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="@dimen/spacing_xs"
+                android:background="@drawable/bg_status_badge_ongoing"
+                android:paddingEnd="@dimen/spacing_xs"
+                android:paddingStart="@dimen/spacing_xs"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="@string/str_status_ongoing"
+                android:textColor="@color/clr_text_white"
+                android:textSize="@dimen/text_xs"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/txtSoldOutBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/spacing_xs"
+                android:background="@color/clr_red"
+                android:paddingEnd="@dimen/spacing_xs"
+                android:paddingStart="@dimen/spacing_xs"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="@string/str_sold_out"
+                android:textColor="@color/clr_text_white"
+                android:textSize="@dimen/text_xs"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_sm">
+
+            <TextView
+                android:id="@+id/txtEventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:minLines="2"
+                android:text="Event Title"
+                android:textColor="@color/clr_text_black"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtEventDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="01/01/2025"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="@dimen/text_xs" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_location_small" />
+
+                <TextView
+                    android:id="@+id/txtEventCity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="TP.HCM"
+                    android:textColor="@color/clr_grey_1"
+                    android:textSize="@dimen/text_xs" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/txtEventPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:background="@drawable/bg_price_tag"
+                android:paddingEnd="@dimen/spacing_xs"
+                android:paddingStart="@dimen/spacing_xs"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="Từ 200.000đ"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="@dimen/text_xs"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

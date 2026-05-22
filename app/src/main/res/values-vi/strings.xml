@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VibeTix</string>
+
+    <!-- Bottom Navigation -->
+    <string name="str_nav_home">Trang chủ</string>
+    <string name="str_nav_my_tickets">Vé của tôi</string>
+    <string name="str_nav_profile">Hồ sơ</string>
+
+    <!-- Home Header -->
+    <string name="str_search_hint">Tìm kiếm sự kiện, nghệ sĩ…</string>
+    <string name="str_notification">Thông báo</string>
+
+    <!-- Home Sections -->
+    <string name="str_featured_stars">Nghệ sĩ nổi bật</string>
+    <string name="str_featured_events">Sự kiện đặc biệt</string>
+    <string name="str_trending_events">Sự kiện xu hướng</string>
+    <string name="str_resale_ticket">Vé Resale</string>
+    <string name="str_resale_ticket_subtitle">Tìm vé resale cho sự kiện đã bán hết</string>
+    <string name="str_live_music">Nhạc sống</string>
+    <string name="str_stage_arts">Sân khấu &amp; Nghệ thuật</string>
+    <string name="str_workshop">Hội thảo &amp; Workshop</string>
+    <string name="str_tour_experience">Tham quan &amp; Trải nghiệm</string>
+    <string name="str_sports">Thể thao</string>
+    <string name="str_popular_destinations">Điểm đến phổ biến</string>
+    <string name="str_see_more">Xem thêm</string>
+
+    <!-- Promo Banner -->
+    <string name="str_promo_discount">Giảm đến 30%</string>
+    <string name="str_promo_subtitle">Dành riêng cho bạn</string>
+    <string name="str_promo_buy_now">Mua ngay</string>
+
+    <!-- Event Card -->
+    <string name="str_from_price">Từ %s</string>
+    <string name="str_free">Miễn phí</string>
+    <string name="str_sold_out">Đã hết vé</string>
+
+    <!-- Auth -->
+    <string name="str_login">Đăng nhập</string>
+    <string name="str_register">Đăng ký</string>
+    <string name="str_email">Email</string>
+    <string name="str_password">Mật khẩu</string>
+    <string name="str_full_name">Họ và tên</string>
+    <string name="str_phone">Số điện thoại</string>
+    <string name="str_forgot_password">Quên mật khẩu?</string>
+    <string name="str_no_account">Chưa có tài khoản? Đăng ký</string>
+    <string name="str_have_account">Đã có tài khoản? Đăng nhập</string>
+
+    <!-- Profile -->
+    <string name="str_profile">Hồ sơ</string>
+    <string name="str_my_orders">Đơn hàng của tôi</string>
+    <string name="str_settings">Cài đặt</string>
+    <string name="str_logout">Đăng xuất</string>
+
+    <!-- My Tickets -->
+    <string name="str_my_tickets">Vé của tôi</string>
+    <string name="str_ticket_active">Còn hiệu lực</string>
+    <string name="str_ticket_used">Đã dùng</string>
+    <string name="str_ticket_expired">Hết hạn</string>
+    <string name="str_show_qr">Hiển thị mã QR</string>
+
+    <!-- Common -->
+    <string name="str_loading">Đang tải…</string>
+    <string name="str_error_generic">Đã có lỗi xảy ra. Vui lòng thử lại.</string>
+    <string name="str_no_data">Không có dữ liệu</string>
+    <string name="str_cancel">Hủy</string>
+    <string name="str_confirm">Xác nhận</string>
+    <string name="str_ok">OK</string>
+    <string name="str_back">Quay lại</string>
+
+    <!-- Categories -->
+    <string name="str_cat_festival">Lễ hội</string>
+    <string name="str_browse_categories">Danh mục</string>
+
+    <!-- Event card extras -->
+    <string name="str_interest_count">%d quan tâm</string>
+    <string name="str_status_ongoing">Đang diễn ra</string>
+    <string name="str_by_organizer">Bởi %s</string>
+
+    <!-- Accessibility -->
+    <string name="str_cd_app_logo">Logo VibeTix</string>
+    <string name="str_cd_search">Tìm kiếm</string>
+    <string name="str_cd_notification">Chuông thông báo</string>
+    <string name="str_cd_event_image">Ảnh sự kiện</string>
+    <string name="str_cd_star_avatar">Ảnh đại diện nghệ sĩ</string>
+</resources>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Root FrameLayout matches the CardView height.
+  clipChildren="false" keeps the left translationX bleed visible.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="280dp"
+    android:layout_height="158dp"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:layout_marginEnd="10dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp">
+
+    <!-- ── Landscape event card ── -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <ImageView
+            android:id="@+id/imvTrendingImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/str_cd_event_image"
+            android:scaleType="centerCrop" />
+
+        <!-- Bottom-to-top dark gradient overlay -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_trending_gradient_overlay" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!--
+      Rank number sits ON TOP of the card image at bottom-start.
+      translationX="-4dp" lets it bleed slightly past the card left edge.
+      Blue gradient applied programmatically in TrendingEventAdapter.
+    -->
+    <TextView
+        android:id="@+id/txtTrendingRank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="8dp"
+        android:translationX="-4dp"
+        android:translationZ="8dp"
+        android:fontFamily="sans-serif-black"
+        android:includeFontPadding="false"
+        android:shadowColor="#66000000"
+        android:shadowDx="2"
+        android:shadowDy="3"
+        android:shadowRadius="8"
+        android:textColor="#226CEB"
+        android:textSize="72sp"
+        android:textStyle="bold" />
+
+</FrameLayout>

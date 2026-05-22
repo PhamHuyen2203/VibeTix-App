@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: Section header — title 18sp bold #1C1B1B, px=20dp, pt=16dp, pb=8dp -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/spacing_sm"
+    android:paddingEnd="@dimen/spacing_lg"
+    android:paddingStart="@dimen/spacing_lg"
+    android:paddingTop="@dimen/spacing_base">
+
+    <TextView
+        android:id="@+id/txtSectionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Section Title"
+        android:textColor="@color/clr_text_black"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtSeeMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/str_see_more"
+        android:textColor="@color/clr_primary_blue"
+        android:textSize="@dimen/text_sm" />
+
+</LinearLayout>

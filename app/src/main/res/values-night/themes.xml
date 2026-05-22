@@ -1,7 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.VibeTix" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/clr_primary_blue</item>
+        <item name="colorOnPrimary">@color/clr_text_white</item>
+        <item name="colorSecondary">@color/clr_primary_pest</item>
+        <item name="colorOnSecondary">@color/clr_text_white</item>
+        <item name="bottomNavigationStyle">@style/Style.VibeTix.BottomNav</item>
     </style>
 </resources>

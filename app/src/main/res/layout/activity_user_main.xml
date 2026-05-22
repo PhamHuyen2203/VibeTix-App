@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Fragment container -->
+    <FrameLayout
+        android:id="@+id/frameContainerMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/clr_divider" />
+
+    <!--
+      Bottom Navigation — EdgeToEdge notes:
+        • layout_height="wrap_content"  → Material3 auto-sizes for labeled mode (~80dp)
+        • fitsSystemWindows="true"      → Material3 BottomNavigationView automatically
+          applies paddingBottom = navigation-bar height, so icons/labels sit ABOVE the
+          gesture-bar area and the white background extends behind it (correct E2E look)
+    -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavCustomer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_white"
+        android:fitsSystemWindows="true"
+        app:itemIconSize="20dp"
+        app:itemIconTint="@drawable/selector_nav_icon"
+        app:itemTextColor="@drawable/selector_nav_icon"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/menu_customer_bottom_nav" />
+
+</LinearLayout>

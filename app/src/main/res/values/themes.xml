@@ -1,9 +1,54 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.VibeTix" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.VibeTix" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/clr_primary_blue</item>
+        <item name="colorPrimaryVariant">@color/clr_dark_blue_1</item>
+        <item name="colorOnPrimary">@color/clr_text_white</item>
+        <item name="colorSecondary">@color/clr_primary_pest</item>
+        <item name="colorOnSecondary">@color/clr_text_white</item>
+        <item name="android:colorBackground">@color/clr_bg_light</item>
+        <item name="colorSurface">@color/clr_bg_white</item>
+        <item name="colorOnSurface">@color/clr_text_black</item>
+        <item name="bottomNavigationStyle">@style/Style.VibeTix.BottomNav</item>
     </style>
 
     <style name="Theme.VibeTix" parent="Base.Theme.VibeTix" />
+
+    <!-- Bottom Navigation -->
+    <style name="Style.VibeTix.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/selector_nav_icon</item>
+        <item name="itemTextColor">@color/selector_nav_icon</item>
+        <item name="backgroundTint">@color/clr_bg_white</item>
+    </style>
+
+    <!-- Base TextAppearance -->
+    <style name="TextAppearance.VibeTix" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/clr_text_black</item>
+    </style>
+
+    <!-- Section Title -->
+    <style name="TextAppearance.VibeTix.SectionTitle">
+        <item name="android:textSize">@dimen/text_lg</item>
+        <item name="android:textColor">@color/clr_text_black</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- See More -->
+    <style name="TextAppearance.VibeTix.SeeMore">
+        <item name="android:textSize">@dimen/text_sm</item>
+        <item name="android:textColor">@color/clr_primary_blue</item>
+    </style>
+
+    <!-- Event Price -->
+    <style name="TextAppearance.VibeTix.Price">
+        <item name="android:textSize">@dimen/text_sm</item>
+        <item name="android:textColor">@color/clr_primary_blue</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="Style.VibeTix.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">@color/clr_bg_white</item>
+    </style>
 </resources>

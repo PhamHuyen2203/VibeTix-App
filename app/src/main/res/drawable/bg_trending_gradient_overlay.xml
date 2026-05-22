@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom-to-top gradient overlay for trending ranked cards.
+     Transparent at top → semi-black at bottom so the rank number is readable. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="90"
+        android:endColor="#00000000"
+        android:startColor="#CC000000" />
+</shape>

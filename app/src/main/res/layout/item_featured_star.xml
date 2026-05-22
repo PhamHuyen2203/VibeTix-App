@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/star_item_width"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_xs">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imvStarAvatar"
+        android:layout_width="@dimen/star_avatar_size"
+        android:layout_height="@dimen/star_avatar_size"
+        android:contentDescription="@string/str_cd_star_avatar"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Rounded.Full"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+    <TextView
+        android:id="@+id/txtStarName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:gravity="center"
+        android:maxLines="2"
+        android:text="Artist Name"
+        android:textColor="@color/clr_text_black"
+        android:textSize="@dimen/text_xs" />
+
+</LinearLayout>

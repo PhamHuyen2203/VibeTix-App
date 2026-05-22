@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_auth_header">
+
+    <!-- ══════════ COMPACT BLUE HEADER ══════════
+         FrameLayout so back button floats over centred logo
+         without eating into the logo's vertical space.          -->
+    <FrameLayout
+        android:id="@+id/layoutRegisterHeader"
+        android:layout_width="match_parent"
+        android:layout_height="230dp">
+
+        <!-- Logo + tagline: perfectly centred in full header area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/str_cd_app_logo"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_vibetix_logo_full" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/str_auth_tagline"
+                android:textColor="#CCE8F4"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Back button: absolutely positioned top-start.
+             marginTop is set programmatically to account for status-bar inset,
+             so it is NEVER squished by padding changes on a parent row. -->
+        <ImageView
+            android:id="@+id/btnRegisterBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:padding="10dp"
+            android:background="@drawable/bg_back_btn"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/str_back" />
+
+    </FrameLayout>
+
+    <!-- ══════════ WHITE FORM CARD (scrollable) ══════════ -->
+    <!-- marginTop=196dp → overlaps header by 34dp -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="196dp"
+        android:background="@drawable/bg_form_card"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="32dp">
+
+            <!-- Title + subtitle -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_register_title"
+                android:textColor="@color/clr_text_black"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/str_register_subtitle"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="13sp" />
+
+            <!-- ══════════ ROLE TOGGLE (TOP) ══════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_role_toggle_container"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <!-- Người dùng (Customer) — default selected -->
+                <LinearLayout
+                    android:id="@+id/btnRoleCustomer"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_role_active"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/icRoleCustomer"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_role_person"
+                        android:tint="@color/clr_text_white"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/txtRoleCustomer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/str_role_customer"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Ban tổ chức (Organizer) -->
+                <LinearLayout
+                    android:id="@+id/btnRoleOrganizer"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/icRoleOrganizer"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_role_building"
+                        android:tint="@color/clr_primary_blue"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/txtRoleOrganizer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/str_role_organizer"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════ USER FIELDS ══════════ -->
+            <!-- Họ và tên — only visible when Customer is selected -->
+            <LinearLayout
+                android:id="@+id/sectionUserName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/str_full_name"
+                    android:textColor="@color/clr_text_black"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/containerFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_auth_person"
+                        android:contentDescription="@null" />
+
+                    <EditText
+                        android:id="@+id/etFullName"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="@string/str_hint_full_name"
+                        android:inputType="textPersonName|textCapWords"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/clr_text_black"
+                        android:textColorHint="@color/clr_grey_2"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════ ORGANIZER FIELDS ══════════ -->
+            <!-- Tên tổ chức — only visible when Organizer is selected -->
+            <LinearLayout
+                android:id="@+id/sectionOrgName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/str_org_name"
+                    android:textColor="@color/clr_text_black"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/containerOrgName"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input_normal"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_auth_person"
+                        android:contentDescription="@null" />
+
+                    <EditText
+                        android:id="@+id/etOrgName"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="@string/str_hint_org_name"
+                        android:inputType="textCapWords"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/clr_text_black"
+                        android:textColorHint="@color/clr_grey_2"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ══════════ COMMON FIELDS (both roles) ══════════ -->
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/str_email"
+                android:textColor="@color/clr_text_black"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/containerRegEmail"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_normal"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_auth_email"
+                    android:contentDescription="@null" />
+
+                <EditText
+                    android:id="@+id/etRegEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/str_hint_email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/clr_text_black"
+                    android:textColorHint="@color/clr_grey_2"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Số điện thoại -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/str_phone"
+                android:textColor="@color/clr_text_black"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/containerPhone"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_normal"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_auth_phone"
+                    android:contentDescription="@null" />
+
+                <EditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/str_hint_phone"
+                    android:inputType="phone"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/clr_text_black"
+                    android:textColorHint="@color/clr_grey_2"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Mật khẩu -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/str_password"
+                android:textColor="@color/clr_text_black"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/containerRegPassword"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_normal"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_auth_lock"
+                    android:contentDescription="@null" />
+
+                <EditText
+                    android:id="@+id/etRegPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/str_hint_password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/clr_text_black"
+                    android:textColorHint="@color/clr_grey_2"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btnToggleRegPassword"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_auth_eye_off"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- Xác nhận mật khẩu -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/str_confirm_password"
+                android:textColor="@color/clr_text_black"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/containerConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_normal"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="10dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_auth_lock"
+                    android:contentDescription="@null" />
+
+                <EditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/str_hint_confirm_password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/clr_text_black"
+                    android:textColorHint="@color/clr_grey_2"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btnToggleConfirmPassword"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_auth_eye_off"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <!-- ══════════ TERMS & CONDITIONS ══════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cbTerms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/clr_primary_blue"
+                    android:padding="0dp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_terms_agree_prefix"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtTermsLink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:layout_marginEnd="3dp"
+                        android:text="@string/str_terms_link"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_terms_of_suffix"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Error message -->
+            <TextView
+                android:id="@+id/txtRegisterError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/clr_error"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <!-- Đăng ký button -->
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_btn_primary"
+                android:text="@string/str_register"
+                android:textColor="@color/clr_text_white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:stateListAnimator="@null" />
+
+            <!-- Đã có tài khoản? -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/str_have_account_prefix"
+                    android:textColor="@color/clr_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/txtGoToLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/str_login"
+                    android:textColor="@color/clr_primary_blue"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

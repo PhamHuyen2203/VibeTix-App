@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: Homepage — bg #FCF9F8, sections separated by 24dp gap -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/clr_bg_light"
+    android:orientation="vertical">
+
+    <!-- Fixed Header -->
+    <include
+        android:id="@+id/headerHome"
+        layout="@layout/include_home_header" />
+
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/spacing_xl">
+
+            <!-- ===== BANNER VIEWPAGER ===== -->
+            <!-- Figma: px-[20dp], gap-[12dp] between carousel and dots -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/spacing_xs"
+                android:paddingTop="@dimen/spacing_base">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/vpBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/banner_height"
+                    android:layout_marginEnd="@dimen/spacing_lg"
+                    android:layout_marginStart="@dimen/spacing_lg" />
+
+                <!-- Dots Indicator — below banner, centered -->
+                <LinearLayout
+                    android:id="@+id/layoutBannerDots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:gravity="center"
+                    android:orientation="horizontal" />
+            </LinearLayout>
+
+            <!-- Categories section removed to match Figma (Featured Stars follows banner directly) -->
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== FEATURED STARS ===== -->
+            <!-- Figma: pt-[8dp], title 18sp bold, px-[20dp] -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/spacing_base">
+
+                <TextView
+                    android:id="@+id/txtFeaturedStarsTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/spacing_sm"
+                    android:paddingEnd="@dimen/spacing_lg"
+                    android:paddingStart="@dimen/spacing_lg"
+                    android:paddingTop="@dimen/spacing_sm"
+                    android:text="@string/str_featured_stars"
+                    android:textColor="@color/clr_text_black"
+                    android:textSize="@dimen/text_lg"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvFeaturedStars"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== FEATURED EVENTS (Sự kiện đặc biệt) ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerFeaturedEvents"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvFeaturedEvents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== TRENDING EVENTS (Sự kiện xu hướng) ===== -->
+            <!-- clipChildren="false" on both LinearLayout and RecyclerView so the      -->
+            <!-- rank numbers (which bleed below card bounds) are not clipped.          -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:clipChildren="false"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerTrendingEvents"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTrendingEvents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== RESALE TICKET SECTION =====
+                 Figma: one horizontal blue-gradient band.
+                 Left panel  → title "Resale Ticket" + "VÉ BÁN LẠI" badge
+                               + "Xem thêm ›" link + mascot image.
+                 Right panel → horizontal RecyclerView of resale cards.
+                 android:clipToOutline clips content to the 12 dp rounded corners
+                 of bg_resale_banner so cards don't bleed outside the pill.
+            -->
+            <LinearLayout
+                android:id="@+id/layoutResaleBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/spacing_base"
+                android:layout_marginStart="@dimen/spacing_base"
+                android:background="@drawable/bg_resale_banner"
+                android:clipToOutline="true"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_base">
+
+                <!-- ── LEFT: info panel ── -->
+                <LinearLayout
+                    android:layout_width="110dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/spacing_sm"
+                    android:orientation="vertical">
+
+                    <!-- "Resale Ticket" title — wraps to 2 lines naturally at 110dp -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_resale_ticket"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="@dimen/text_xl"
+                        android:textStyle="bold"
+                        android:lineSpacingMultiplier="1.1" />
+
+                    <!-- "VÉ BÁN LẠI" badge -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_resale_label"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/str_resale_label"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="@dimen/text_xs"
+                        android:textStyle="bold" />
+
+                    <!-- "Xem thêm ›" link -->
+                    <TextView
+                        android:id="@+id/txtResaleSeeMore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/str_resale_see_more"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="@dimen/text_xs" />
+
+                    <!-- Spacer pushes mascot to bottom of the panel -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <!-- Mascot image -->
+                    <ImageView
+                        android:id="@+id/imvResaleMascot"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/str_cd_app_logo"
+                        android:scaleType="fitEnd"
+                        android:src="@drawable/img_vibetix_mascot" />
+                </LinearLayout>
+
+                <!-- ── RIGHT: horizontal RecyclerView of resale cards ── -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvResaleEvents"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingEnd="@dimen/spacing_xs"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== PROMO BANNER (30% OFF) ===== -->
+            <ImageView
+                android:id="@+id/imvPromoBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/str_promo_discount"
+                android:layout_marginEnd="@dimen/spacing_base"
+                android:layout_marginStart="@dimen/spacing_base"
+                android:scaleType="fitXY"
+                android:src="@drawable/banner_promo_30off" />
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== LIVE MUSIC (Nhạc sống) ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerLiveMusic"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvLiveMusic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== STAGE & ARTS (Sân khấu & Nghệ thuật) ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerStageArts"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvStageArts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== WORKSHOP ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerWorkshop"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvWorkshop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== TOUR & EXPERIENCE ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerTourExperience"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTourExperience"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== SPORTS ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerSports"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvSports"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 24dp section gap -->
+            <View android:layout_width="match_parent" android:layout_height="@dimen/spacing_section" />
+
+            <!-- ===== POPULAR DESTINATIONS ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/clr_bg_white"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/headerDestinations"
+                    layout="@layout/include_section_header" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvDestinations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/spacing_base"
+                    android:paddingEnd="@dimen/spacing_base"
+                    android:paddingStart="@dimen/spacing_base"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>
