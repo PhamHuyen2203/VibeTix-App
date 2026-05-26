@@ -43,15 +43,15 @@ public class DestinationAdapter extends RecyclerView.Adapter<DestinationAdapter.
     public void onBindViewHolder(@NonNull DestinationViewHolder holder, int position) {
         Destination destination = danhSachDestination.get(position);
         holder.txtDestinationName.setText(destination.getName());
-        if (destination.getLocalImageResId() != 0) {
-            holder.imvDestinationImage.setImageResource(destination.getLocalImageResId());
-        } else {
-            Glide.with(context)
-                    .load(destination.getImageUrl())
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imvDestinationImage);
-        }
+        Object imageSource = destination.getLocalImageResId() != 0
+                ? destination.getLocalImageResId()
+                : destination.getImageUrl();
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.imvDestinationImage);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

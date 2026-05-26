@@ -60,15 +60,15 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
             holder.txtBannerStatusBadge.setVisibility(View.GONE);
         }
 
-        if (event.getLocalImageResId() != 0) {
-            holder.imvBanner.setImageResource(event.getLocalImageResId());
-        } else {
-            Glide.with(context)
-                    .load(event.getImageUrl())
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imvBanner);
-        }
+        Object imageSource = event.getLocalImageResId() != 0
+                ? event.getLocalImageResId()
+                : event.getImageUrl();
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.imvBanner);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -28,14 +28,18 @@ import com.example.vibetix.Adapters.FeaturedEventAdapter;
 import com.example.vibetix.Adapters.FeaturedStarAdapter;
 import com.example.vibetix.Adapters.ResaleEventAdapter;
 import com.example.vibetix.Adapters.TrendingEventAdapter;
+import com.example.vibetix.Fragments.User.EventDetailFragment;
 import com.example.vibetix.Models.Category;
 import com.example.vibetix.Models.Destination;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.Models.FeaturedStar;
+import com.example.vibetix.Models.Ticket;
 import com.example.vibetix.R;
+import com.example.vibetix.Repositories.TicketRepository;
 import com.example.vibetix.Utils.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -97,6 +101,9 @@ public class HomeFragment extends Fragment {
     ArrayList<Event> danhSachTour = new ArrayList<>();
     ArrayList<Event> danhSachSports = new ArrayList<>();
     ArrayList<Destination> danhSachDestination = new ArrayList<>();
+
+    // Repositories
+    private final TicketRepository ticketRepository = new TicketRepository();
 
     // Banner auto-scroll
     Handler bannerHandler = new Handler(Looper.getMainLooper());
@@ -510,6 +517,7 @@ public class HomeFragment extends Fragment {
         setupAdapters();
         setupBannerDots();
         startBannerAutoScroll();
+        fetchLiveResaleTickets();
     }
 
     private void setupAdapters() {
@@ -621,8 +629,43 @@ public class HomeFragment extends Fragment {
     }
 
     private void onEventClick(Event event) {
-        // TODO: navigate to EventDetailFragment and pass event.getId()
-        Toast.makeText(requireContext(), event.getTitle(), Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(event.getId()))
+                    .addToBackStack("home")
+                    .commit();
+        }
+    }
+
+    private void fetchLiveResaleTickets() {
+        ticketRepository.getAllResellingTickets(new TicketRepository.OnTicketsLoadedListener() {
+            @Override
+            public void onSuccess(List<Ticket> tickets) {
+                if (tickets != null && !tickets.isEmpty()) {
+                    ArrayList<Event> liveResale = new ArrayList<>();
+                    for (Ticket t : tickets) {
+                        Event ev = new Event(t.getEventId(), t.getEventTitle(), null, t.getEventDate(), t.getEventLocation(), "resale", t.getResalePrice());
+                        ev.setSoldOut(true);
+                        
+                        int coverResId = R.drawable.event_live_non_song;
+                        if (!"b1".equals(t.getEventId()) && !"e1".equals(t.getEventId()) && !"rs1".equals(t.getEventId())) {
+                            coverResId = R.drawable.event_arts_private_fantasy;
+                        }
+                        ev.setLocalImageResId(coverResId);
+                        liveResale.add(ev);
+                    }
+                    danhSachResale.addAll(0, liveResale);
+                    if (resaleEventsAdapter != null) {
+                        resaleEventsAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Fail silently
+            }
+        });
     }
 
     @Override

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/clr_bg_light">
+
+    <!-- Top Toolbar Header -->
+    <RelativeLayout
+        android:id="@+id/layoutDetailHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_white"
+        android:elevation="2dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnDetailBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="sans-serif-medium"
+            android:text="Chi tiết sự kiện"
+            android:textColor="@color/clr_text_black"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/layoutDetailBottomBar"
+        app:layout_constraintTop_toBottomOf="@+id/layoutDetailHeader">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Cover Image -->
+            <ImageView
+                android:id="@+id/imvDetailEventCover"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/event_live_non_song" />
+
+            <!-- Event Details Body -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/txtDetailEventTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-light"
+                    android:text="LUNCH &amp; LEARN: Workshop về Phỏng vấn Ứng viên – Read Every Candidate Like A Pro"
+                    android:textColor="@color/clr_text_black"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- Date info -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_calendar_small"
+                        app:tint="@color/clr_primary_blue" />
+
+                    <TextView
+                        android:id="@+id/txtDetailEventDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:fontFamily="sans-serif"
+                        android:text="09:00 – 12:00, 23 May, 2026"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Location info -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_location_small"
+                        app:tint="@color/clr_primary_blue" />
+
+                    <TextView
+                        android:id="@+id/txtDetailEventLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:fontFamily="sans-serif"
+                        android:text="Tòa nhà WB Business Center, Tầng G, 200 Pasteur, P. Xuân Hòa, Quận 3, Hồ Chí Minh"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="20dp"
+                    android:background="@color/clr_divider" />
+
+                <!-- About section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Giới thiệu sự kiện"
+                    android:textColor="@color/clr_text_black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/txtDetailEventDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Read Every Candidate Like A Pro là buổi workshop chuyên sâu dành cho các nhà quản lý, tuyển dụng chuyên nghiệp nhằm tối ưu hóa quy trình đánh giá và phỏng vấn ứng viên. \n\nTại buổi chia sẻ này, các chuyên gia hàng đầu sẽ hướng dẫn các kỹ thuật đặt câu hỏi tình huống, quan sát ngôn ngữ cơ thể, nắm bắt tâm lý ứng viên và phân tích các kỹ năng chuyên môn cốt lõi một cách khoa học để tuyển chọn đúng nhân tài cho tổ chức của bạn."
+                    android:textColor="@color/clr_text_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Purchase Bar -->
+    <LinearLayout
+        android:id="@+id/layoutDetailBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_white"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giá vé từ"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtDetailMinPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="400.000 đ"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnBookTickets"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:backgroundTint="@color/clr_btn_blue"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="24dp"
+            android:text="Đặt vé ngay"
+            android:textColor="@color/clr_text_white"
+            android:textSize="16sp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

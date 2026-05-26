@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 
@@ -59,12 +60,14 @@ public class TrendingEventAdapter extends RecyclerView.Adapter<TrendingEventAdap
         Event event = danhSachTrending.get(position);
 
         // Landscape image
-        int resId = event.getLocalImageResId();
-        if (resId != 0) {
-            holder.imvTrendingImage.setImageResource(resId);
-        } else {
-            holder.imvTrendingImage.setImageResource(R.drawable.ic_launcher_background);
-        }
+        Object imageSource = event.getLocalImageResId() != 0
+                ? event.getLocalImageResId()
+                : R.drawable.ic_launcher_background;
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .into(holder.imvTrendingImage);
 
         // Rank number (1-based)
         holder.txtTrendingRank.setText(String.valueOf(position + 1));

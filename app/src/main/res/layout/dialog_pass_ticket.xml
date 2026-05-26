@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/clr_bg_white"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Bán lại vé (Pass vé)"
+        android:textColor="@color/clr_text_black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Explanatory note -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="2dp"
+        android:text="Vé của bạn sẽ được đăng lên danh sách 'Vé bán lại' trên Trang chủ. Những người dùng khác có thể tìm mua vé này của bạn trực tiếp ngay trong app VibeTix."
+        android:textColor="@color/clr_text_secondary"
+        android:textSize="12sp" />
+
+    <!-- Ticket Summary Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/clr_bg_light">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/txtPassDialogEventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="LUNCH &amp; LEARN: Workshop về Phỏng vấn Ứng viên"
+                android:textColor="@color/clr_text_black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtPassDialogOriginalPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Giá mua gốc: 400.000 đ"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Set Resale Price block -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Nhập giá bán lại (VND) *"
+        android:textColor="@color/clr_text_black"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etPassResalePrice"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_normal"
+        android:hint="Ví dụ: 350000"
+        android:inputType="number"
+        android:paddingHorizontal="12dp"
+        android:textColor="@color/clr_text_black"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Giá bán lại nên thấp hơn hoặc bằng giá gốc để dễ thanh lý"
+        android:textColor="@color/clr_grey_1"
+        android:textSize="11sp" />
+
+    <!-- Actions block -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnPassCancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="Hủy"
+            android:textColor="@color/clr_primary_blue" />
+
+        <Button
+            android:id="@+id/btnPassConfirm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1.5"
+            android:layout_marginStart="6dp"
+            android:backgroundTint="@color/clr_btn_blue"
+            android:text="Xác nhận bán"
+            android:textColor="@color/clr_text_white"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+</LinearLayout>

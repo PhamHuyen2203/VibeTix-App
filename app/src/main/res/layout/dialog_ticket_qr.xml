@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/clr_bg_white"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-medium"
+        android:text="Mã vé điện tử (E-Ticket)"
+        android:textColor="@color/clr_text_black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Event details inside QR dialog -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/clr_bg_light">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/txtQrDialogEventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="LUNCH &amp; LEARN: Workshop về Phỏng vấn Ứng viên"
+                android:textColor="@color/clr_text_black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtQrDialogAttendee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Người tham dự: Phạm Thu Huyền Kim"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtQrDialogTicketTypeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Hạng vé: Vé Tiêu chuẩn"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- QR Code Graphic container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imvQrCodeGraphic"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_menu_gallery" />
+    </FrameLayout>
+
+    <!-- Scanning note info -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="Đưa mã này cho nhân viên soát vé tại sự kiện"
+        android:textColor="@color/clr_text_secondary"
+        android:textSize="12sp"
+        android:textStyle="italic" />
+
+    <!-- ID receipt code -->
+    <TextView
+        android:id="@+id/txtQrDialogTicketId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="6dp"
+        android:fontFamily="monospace"
+        android:text="VTX-TICKET-ID-123456"
+        android:textColor="@color/clr_grey_1"
+        android:textSize="12sp" />
+
+    <!-- Dialog close action -->
+    <Button
+        android:id="@+id/btnQrDialogClose"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/clr_btn_blue"
+        android:fontFamily="sans-serif-medium"
+        android:text="Đóng"
+        android:textColor="@color/clr_text_white"
+        app:cornerRadius="8dp" />
+</LinearLayout>

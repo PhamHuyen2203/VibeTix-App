@@ -85,15 +85,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             holder.txtEventCity.setVisibility(View.GONE);
         }
 
-        if (event.getLocalImageResId() != 0) {
-            holder.imvEventImage.setImageResource(event.getLocalImageResId());
-        } else {
-            Glide.with(context)
-                    .load(event.getImageUrl())
-                    .centerCrop()
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .into(holder.imvEventImage);
-        }
+        Object imageSource = event.getLocalImageResId() != 0
+                ? event.getLocalImageResId()
+                : event.getImageUrl();
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.imvEventImage);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

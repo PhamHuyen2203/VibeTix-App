@@ -43,15 +43,15 @@ public class FeaturedStarAdapter extends RecyclerView.Adapter<FeaturedStarAdapte
     public void onBindViewHolder(@NonNull StarViewHolder holder, int position) {
         FeaturedStar star = danhSachStar.get(position);
         holder.txtStarName.setText(star.getName());
-        if (star.getLocalImageResId() != 0) {
-            holder.imvStarAvatar.setImageResource(star.getLocalImageResId());
-        } else {
-            Glide.with(context)
-                    .load(star.getAvatarUrl())
-                    .circleCrop()
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .into(holder.imvStarAvatar);
-        }
+        Object imageSource = star.getLocalImageResId() != 0
+                ? star.getLocalImageResId()
+                : star.getAvatarUrl();
+
+        Glide.with(context)
+                .load(imageSource)
+                .circleCrop()
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(holder.imvStarAvatar);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
