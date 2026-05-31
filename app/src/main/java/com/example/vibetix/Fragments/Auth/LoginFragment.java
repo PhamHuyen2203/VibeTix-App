@@ -214,9 +214,8 @@ public class LoginFragment extends Fragment {
 
         // If "Remember me" is NOT checked we still log in for this session,
         // but we clear the stored email so it won't be pre-filled next time.
-        if (!rememberMe) {
-            editor.remove(Constants.KEY_USER_EMAIL);
-        }
+        // If "Remember me" is NOT checked, we still keep the email for the active session.
+        // The session will be cleared on next app start in MainActivity if rememberMe is false.
         editor.apply();
 
         Intent intent = new Intent(requireContext(), UserMainActivity.class);

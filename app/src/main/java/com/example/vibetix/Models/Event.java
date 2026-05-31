@@ -17,6 +17,7 @@ public class Event {
     private String organizerName;
     private int interestCount;
     private boolean isFeatured;
+    private String description;
 
     public Event() {}
 
@@ -78,4 +79,7 @@ public class Event {
 
     public boolean isFeatured() { return isFeatured; }
     public void setFeatured(boolean featured) { isFeatured = featured; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

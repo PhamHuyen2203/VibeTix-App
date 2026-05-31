@@ -27,7 +27,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_AUTH, MODE_PRIVATE);
+        boolean rememberMe = prefs.getBoolean(Constants.KEY_REMEMBER_ME, false);
         boolean isLoggedIn = prefs.getBoolean(Constants.KEY_IS_LOGGED_IN, false);
+        
+        if (isLoggedIn && !rememberMe) {
+            prefs.edit().clear().apply();
+            isLoggedIn = false;
+        }
+        
         String role = prefs.getString(Constants.KEY_USER_ROLE, Constants.ROLE_CUSTOMER);
 
         Intent intent;

@@ -1,0 +1,76 @@
+package com.example.vibetix.Models;
+
+public class Ticket {
+    private String id;
+    private String orderId;
+    private String userEmail;
+    private String eventId;
+    private String eventTitle;
+    private String eventDate;
+    private String eventLocation;
+    private String eventImageUrl;
+    private String ticketTypeName;
+    private long purchasePrice;
+    private long resalePrice;
+    private String status; // ACTIVE, USED, EXPIRED, RESELLING, RESOLD
+    private String attendeeName;
+
+    public Ticket() {}
+
+    public Ticket(String id, String orderId, String userEmail, String eventId, String eventTitle,
+                  String eventDate, String eventLocation, String eventImageUrl, String ticketTypeName,
+                  long purchasePrice, long resalePrice, String status, String attendeeName) {
+        this.id = id;
+        this.orderId = orderId;
+        this.userEmail = userEmail;
+        this.eventId = eventId;
+        this.eventTitle = eventTitle;
+        this.eventDate = eventDate;
+        this.eventLocation = eventLocation;
+        this.eventImageUrl = eventImageUrl;
+        this.ticketTypeName = ticketTypeName;
+        this.purchasePrice = purchasePrice;
+        this.resalePrice = resalePrice;
+        this.status = status;
+        this.attendeeName = attendeeName;
+    }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getOrderId() { return orderId; }
+    public void setOrderId(String orderId) { this.orderId = orderId; }
+
+    public String getUserEmail() { return userEmail; }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+
+    public String getEventId() { return eventId; }
+    public void setEventId(String eventId) { this.eventId = eventId; }
+
+    public String getEventTitle() { return eventTitle; }
+    public void setEventTitle(String eventTitle) { this.eventTitle = eventTitle; }
+
+    public String getEventDate() { return eventDate; }
+    public void setEventDate(String eventDate) { this.eventDate = eventDate; }
+
+    public String getEventLocation() { return eventLocation; }
+    public void setEventLocation(String eventLocation) { this.eventLocation = eventLocation; }
+
+    public String getEventImageUrl() { return eventImageUrl; }
+    public void setEventImageUrl(String eventImageUrl) { this.eventImageUrl = eventImageUrl; }
+
+    public String getTicketTypeName() { return ticketTypeName; }
+    public void setTicketTypeName(String ticketTypeName) { this.ticketTypeName = ticketTypeName; }
+
+    public long getPurchasePrice() { return purchasePrice; }
+    public void setPurchasePrice(long purchasePrice) { this.purchasePrice = purchasePrice; }
+
+    public long getResalePrice() { return resalePrice; }
+    public void setResalePrice(long resalePrice) { this.resalePrice = resalePrice; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getAttendeeName() { return attendeeName; }
+    public void setAttendeeName(String attendeeName) { this.attendeeName = attendeeName; }
+}

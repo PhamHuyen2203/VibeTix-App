@@ -271,12 +271,12 @@
                     <EditText
                         android:id="@+id/etInfoName"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="6dp"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập họ và tên đầy đủ"
+                        android:hint="Nhập họ và tên đầy đủ (Ví dụ: Nguyễn Văn A)"
                         android:inputType="textPersonName"
-                        android:paddingHorizontal="12dp"
+                        android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
@@ -284,7 +284,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:text="Email *"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
@@ -292,12 +292,12 @@
                     <EditText
                         android:id="@+id/etInfoEmail"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="6dp"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập email"
+                        android:hint="Nhập email để nhận vé (Ví dụ: user@gmail.com)"
                         android:inputType="textEmailAddress"
-                        android:paddingHorizontal="12dp"
+                        android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
@@ -305,7 +305,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:text="Số điện thoại *"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
@@ -313,12 +313,12 @@
                     <EditText
                         android:id="@+id/etInfoPhone"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="6dp"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập số điện thoại"
+                        android:hint="Nhập số điện thoại (Ví dụ: 0912345678)"
                         android:inputType="phone"
-                        android:paddingHorizontal="12dp"
+                        android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 

@@ -367,7 +367,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Phương thức thanh toán"
+                android:text="Phương thức thanh toán bảo mật"
                 android:textColor="@color/clr_text_black"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -390,13 +390,13 @@
                     <RadioButton
                         android:id="@+id/rbVNPay"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
                         android:checked="true"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="VNPay / Mobile Banking"
+                        android:text="Cổng thanh toán VNPay (Thanh toán qua ứng dụng ngân hàng)"
                         android:textColor="@color/clr_text_black"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                     <View
                         android:layout_width="match_parent"
@@ -407,12 +407,12 @@
                     <RadioButton
                         android:id="@+id/rbVietQR"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="VietQR"
+                        android:text="Chuyển khoản VietQR (Quét mã QR để thanh toán)"
                         android:textColor="@color/clr_text_black"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                     <View
                         android:layout_width="match_parent"
@@ -423,12 +423,12 @@
                     <RadioButton
                         android:id="@+id/rbZaloPay"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="ZaloPay"
+                        android:text="Ví điện tử ZaloPay"
                         android:textColor="@color/clr_text_black"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                     <View
                         android:layout_width="match_parent"
@@ -439,12 +439,12 @@
                     <RadioButton
                         android:id="@+id/rbShopeePay"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="ShopeePay"
+                        android:text="Ví điện tử ShopeePay"
                         android:textColor="@color/clr_text_black"
-                        android:textSize="14sp" />
+                        android:textSize="13sp" />
 
                     <View
                         android:layout_width="match_parent"
@@ -455,12 +455,13 @@
                     <RadioButton
                         android:id="@+id/rbCreditCard"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Thẻ tín dụng / ghi nợ (Visa/Master)"
-                        android:textColor="@color/clr_text_black"
-                        android:textSize="14sp" />
+                        android:text="Thẻ quốc tế Visa, Mastercard, JCB (Sắp ra mắt)"
+                        android:textColor="@color/clr_grey_1"
+                        android:enabled="false"
+                        android:textSize="13sp" />
                 </RadioGroup>
             </androidx.cardview.widget.CardView>
 
