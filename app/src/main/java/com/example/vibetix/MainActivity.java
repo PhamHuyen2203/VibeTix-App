@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.vibetix.Activities.AuthActivity;
 import com.example.vibetix.Activities.UserMainActivity;
 import com.example.vibetix.Utils.Constants;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Splash / router activity.
@@ -26,19 +28,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_AUTH, MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean(Constants.KEY_IS_LOGGED_IN, false);
-        String role = prefs.getString(Constants.KEY_USER_ROLE, Constants.ROLE_CUSTOMER);
+        // Dùng Firebase Auth làm nguồn sự thật — nếu user đã đăng nhập trước đó
+        // Firebase tự phục hồi session mà không cần SharedPreferences
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         Intent intent;
-        if (isLoggedIn) {
-            // Route to appropriate main screen based on role
-            if (Constants.ROLE_ORGANIZER.equals(role)) {
-                // OrganizerMainActivity placeholder — redirect to user main for now
-                intent = new Intent(this, UserMainActivity.class);
-            } else {
-                intent = new Intent(this, UserMainActivity.class);
-            }
+        if (currentUser != null) {
+            intent = new Intent(this, UserMainActivity.class);
         } else {
             intent = new Intent(this, AuthActivity.class);
         }

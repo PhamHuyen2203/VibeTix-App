@@ -13,9 +13,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+
+import com.example.vibetix.Utils.NotificationPopupHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -28,14 +31,20 @@ import com.example.vibetix.Adapters.FeaturedEventAdapter;
 import com.example.vibetix.Adapters.FeaturedStarAdapter;
 import com.example.vibetix.Adapters.ResaleEventAdapter;
 import com.example.vibetix.Adapters.TrendingEventAdapter;
+import com.example.vibetix.Fragments.User.EventDetailFragment;
 import com.example.vibetix.Models.Category;
 import com.example.vibetix.Models.Destination;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.Models.FeaturedStar;
+import com.example.vibetix.Models.Ticket;
 import com.example.vibetix.R;
+import com.example.vibetix.Firebase.FirestoreHelper;
+import com.example.vibetix.Firebase.HomepageLoader;
+import com.example.vibetix.Repositories.TicketRepository;
 import com.example.vibetix.Utils.Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -98,6 +107,9 @@ public class HomeFragment extends Fragment {
     ArrayList<Event> danhSachSports = new ArrayList<>();
     ArrayList<Destination> danhSachDestination = new ArrayList<>();
 
+    // Repositories
+    private final TicketRepository ticketRepository = new TicketRepository();
+
     // Banner auto-scroll
     Handler bannerHandler = new Handler(Looper.getMainLooper());
     Runnable bannerRunnable;
@@ -111,7 +123,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_customer_home, container, false);
         addViews(view);
         addEvents(view);
-        loadMockData();
+        loadMockData();          // Mock hiển thị ngay
         return view;
     }
 
@@ -217,13 +229,15 @@ public class HomeFragment extends Fragment {
             });
         }
 
-        // Promo banner click
-        imvPromoBanner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(requireContext(), getString(R.string.str_promo_discount), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Bell (notification) click → show notification popup
+        View imgBell = view.findViewById(R.id.imgBtnNotification);
+        if (imgBell != null) {
+            imgBell.setOnClickListener(v ->
+                    NotificationPopupHelper.show(requireContext(), v));
+        }
+
+        // Promo banner click → show popup chi tiết
+        imvPromoBanner.setOnClickListener(v -> showPromoDialog());
 
         // See more clicks
         setSeeMoreClick(headerFeaturedEvents, Constants.EVENT_STATUS_PUBLISHED);
@@ -510,6 +524,70 @@ public class HomeFragment extends Fragment {
         setupAdapters();
         setupBannerDots();
         startBannerAutoScroll();
+        fetchLiveResaleTickets();
+        loadEventsFromFirestore(); // Fetch Firestore sau khi mock đã hiển thị
+    }
+
+    // ── Firestore: tải từng section theo cơ chế HomepageLoader ───────────────
+    private void loadEventsFromFirestore() {
+        // Đảm bảo venue cache sẵn sàng trước khi load
+        FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
+            @Override public void onSuccess(java.util.List<Event> ignored) {
+                // Venue cache đã sẵn sàng → load từng section song song
+                loadBannerSection();
+                loadFeaturedSection();
+                loadTrendingSection();
+                loadCategorySection(HomepageLoader.CAT_MUSIC,    danhSachLiveMusic,   liveMusicAdapter);
+                loadCategorySection(HomepageLoader.CAT_ARTS,     danhSachStageArts,   stageArtsAdapter);
+                loadCategorySection(HomepageLoader.CAT_WORKSHOP, danhSachWorkshop,    workshopAdapter);
+                loadCategorySection(HomepageLoader.CAT_TOUR,     danhSachTour,        tourExperienceAdapter);
+                loadCategorySection(HomepageLoader.CAT_SPORTS,   danhSachSports,      sportsAdapter);
+            }
+            @Override public void onFailure(Exception e) { /* mock vẫn hiển thị */ }
+        });
+    }
+
+    /** Banner: admin-controlled qua app_config/homepage, fallback is_featured */
+    private void loadBannerSection() {
+        HomepageLoader.loadBanners(events -> {
+            if (!isAdded() || events.isEmpty()) return;
+            danhSachBanner.clear();
+            danhSachBanner.addAll(events);
+            if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
+            setupBannerDots();
+        });
+    }
+
+    /** Featured: is_featured=true, sắp diễn ra */
+    private void loadFeaturedSection() {
+        HomepageLoader.loadFeatured(events -> {
+            if (!isAdded() || events.isEmpty()) return;
+            danhSachFeatured.clear();
+            danhSachFeatured.addAll(events);
+            if (featuredEventsAdapter != null) featuredEventsAdapter.notifyDataSetChanged();
+        });
+    }
+
+    /** Trending: xếp hạng theo vé bán (order_items), fallback interest_count */
+    private void loadTrendingSection() {
+        HomepageLoader.loadTrending(events -> {
+            if (!isAdded() || events.isEmpty()) return;
+            danhSachTrending.clear();
+            danhSachTrending.addAll(events);
+            if (trendingEventsAdapter != null) trendingEventsAdapter.notifyDataSetChanged();
+        });
+    }
+
+    /** Category: nếu Firestore có data → replace mock; nếu trống → giữ mock */
+    private void loadCategorySection(String categoryId,
+                                     java.util.ArrayList<Event> list,
+                                     com.example.vibetix.Adapters.EventAdapter adapter) {
+        HomepageLoader.loadByCategory(categoryId, events -> {
+            if (!isAdded() || events.isEmpty()) return; // giữ mock
+            list.clear();
+            list.addAll(events);
+            if (adapter != null) adapter.notifyDataSetChanged();
+        });
     }
 
     private void setupAdapters() {
@@ -621,8 +699,43 @@ public class HomeFragment extends Fragment {
     }
 
     private void onEventClick(Event event) {
-        // TODO: navigate to EventDetailFragment and pass event.getId()
-        Toast.makeText(requireContext(), event.getTitle(), Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(event.getId()))
+                    .addToBackStack("home")
+                    .commit();
+        }
+    }
+
+    private void fetchLiveResaleTickets() {
+        ticketRepository.getAllResellingTickets(new TicketRepository.OnTicketsLoadedListener() {
+            @Override
+            public void onSuccess(List<Ticket> tickets) {
+                if (tickets != null && !tickets.isEmpty()) {
+                    ArrayList<Event> liveResale = new ArrayList<>();
+                    for (Ticket t : tickets) {
+                        Event ev = new Event(t.getEventId(), t.getEventTitle(), null, t.getEventDate(), t.getEventLocation(), "resale", t.getResalePrice());
+                        ev.setSoldOut(true);
+                        
+                        int coverResId = R.drawable.event_live_non_song;
+                        if (!"b1".equals(t.getEventId()) && !"e1".equals(t.getEventId()) && !"rs1".equals(t.getEventId())) {
+                            coverResId = R.drawable.event_arts_private_fantasy;
+                        }
+                        ev.setLocalImageResId(coverResId);
+                        liveResale.add(ev);
+                    }
+                    danhSachResale.addAll(0, liveResale);
+                    if (resaleEventsAdapter != null) {
+                        resaleEventsAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Fail silently
+            }
+        });
     }
 
     @Override
@@ -641,5 +754,34 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         stopBannerAutoScroll();
+    }
+
+    // ── Promo dialog ───────────────────────────────────────────────────────────
+    private void showPromoDialog() {
+        if (!isAdded()) return;
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.layout_banner_promo_dialog, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        // Đóng
+        View btnClose = dialogView.findViewById(R.id.btnPromoDialogClose);
+        if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Nhận ngay → mở trang Sự kiện
+        View btnGo = dialogView.findViewById(R.id.btnPromoDialogGo);
+        if (btnGo != null) {
+            btnGo.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (getActivity() instanceof com.example.vibetix.Activities.UserMainActivity) {
+                    ((com.example.vibetix.Activities.UserMainActivity) getActivity()).openEventsFragment();
+                }
+            });
+        }
+
+        dialog.show();
     }
 }

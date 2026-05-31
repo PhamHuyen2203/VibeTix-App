@@ -4,6 +4,8 @@
 
     <!-- Bottom Navigation -->
     <string name="str_nav_home">Trang chủ</string>
+    <string name="str_nav_events">Sự kiện</string>
+    <string name="str_nav_create">Tạo mới</string>
     <string name="str_nav_my_tickets">Vé của tôi</string>
     <string name="str_nav_profile">Cá nhân</string>
 

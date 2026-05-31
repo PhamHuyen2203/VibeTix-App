@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FCF9F8">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- HEADER — paddingTop set via insets -->
+        <LinearLayout
+            android:id="@+id/layoutSecurityHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_auth_header"
+            android:orientation="vertical"
+            android:paddingTop="32dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingEnd="16dp">
+
+                <ImageView
+                    android:id="@+id/btnSecurityBack"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:padding="10dp"
+                    android:background="@drawable/bg_back_btn"
+                    android:src="@drawable/ic_back"
+                    android:contentDescription="Quay lại" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Bảo mật &amp; Mật khẩu"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <View android:layout_width="44dp" android:layout_height="44dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- CONTENT -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- MÃ PIN -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_section_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="MÃ PIN"
+                        android:textColor="#808E92"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <!-- Setup PIN -->
+                    <LinearLayout
+                        android:id="@+id/rowSetupPin"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_pin"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Thiết lập mã PIN"
+                            android:textColor="#1C1B1B"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/txtPinStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="Chưa thiết lập"
+                            android:textColor="#808E92"
+                            android:textSize="12sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="#808E92"
+                            android:contentDescription="@null" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginStart="44dp" android:background="#F0F0F0" />
+
+                    <!-- PIN cho Vé của tôi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_nav_ticket"
+                            android:tint="#808E92"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Bảo vệ trang Chi tiết vé bằng PIN"
+                            android:textColor="#1C1B1B"
+                            android:textSize="14sp" />
+
+                        <Switch
+                            android:id="@+id/switchPinForTickets"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:thumbTint="@color/clr_primary_blue"
+                            android:trackTint="#BBD4F8" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- MẬT KHẨU -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_section_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="MẬT KHẨU"
+                        android:textColor="#808E92"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <!-- Đổi mật khẩu -->
+                    <LinearLayout
+                        android:id="@+id/rowChangePassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_key"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Đổi mật khẩu"
+                            android:textColor="#1C1B1B"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="#808E92"
+                            android:contentDescription="@null" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <!-- ĐỔI MẬT KHẨU FORM (hiển thị khi click) -->
+                <LinearLayout
+                    android:id="@+id/sectionChangePassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_section_card"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="Đổi mật khẩu"
+                        android:textColor="#1C1B1B"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp" android:text="Mật khẩu hiện tại"
+                        android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_normal" android:gravity="center_vertical"
+                        android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="10dp">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:src="@drawable/ic_auth_lock" android:tint="#808E92" android:contentDescription="@null"/>
+                        <EditText android:id="@+id/edtCurrentPassword" android:layout_width="0dp"
+                            android:layout_height="match_parent" android:layout_weight="1"
+                            android:layout_marginStart="10dp" android:background="@null"
+                            android:hint="Nhập mật khẩu hiện tại" android:inputType="textPassword"
+                            android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
+                        <ImageView android:id="@+id/btnToggleCurrent" android:layout_width="36dp"
+                            android:layout_height="36dp" android:padding="8dp"
+                            android:src="@drawable/ic_auth_eye_off" android:contentDescription="@null"/>
+                    </LinearLayout>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:layout_marginBottom="6dp"
+                        android:text="Mật khẩu mới" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_normal" android:gravity="center_vertical"
+                        android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="10dp">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:src="@drawable/ic_auth_lock" android:tint="#808E92" android:contentDescription="@null"/>
+                        <EditText android:id="@+id/edtNewPassword" android:layout_width="0dp"
+                            android:layout_height="match_parent" android:layout_weight="1"
+                            android:layout_marginStart="10dp" android:background="@null"
+                            android:hint="Tối thiểu 6 ký tự" android:inputType="textPassword"
+                            android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
+                        <ImageView android:id="@+id/btnToggleNew" android:layout_width="36dp"
+                            android:layout_height="36dp" android:padding="8dp"
+                            android:src="@drawable/ic_auth_eye_off" android:contentDescription="@null"/>
+                    </LinearLayout>
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:layout_marginBottom="6dp"
+                        android:text="Xác nhận mật khẩu mới" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
+                        android:background="@drawable/bg_input_normal" android:gravity="center_vertical"
+                        android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="10dp">
+                        <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                            android:src="@drawable/ic_auth_lock" android:tint="#808E92" android:contentDescription="@null"/>
+                        <EditText android:id="@+id/edtConfirmNewPassword" android:layout_width="0dp"
+                            android:layout_height="match_parent" android:layout_weight="1"
+                            android:layout_marginStart="10dp" android:background="@null"
+                            android:hint="Nhập lại mật khẩu mới" android:inputType="textPassword"
+                            android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
+                    </LinearLayout>
+
+                    <Button android:id="@+id/btnSaveNewPassword"
+                        android:layout_width="match_parent" android:layout_height="48dp"
+                        android:layout_marginTop="16dp" android:background="@drawable/bg_btn_primary"
+                        android:text="Lưu mật khẩu mới" android:textColor="#FFFFFF"
+                        android:textSize="14sp" android:textStyle="bold" android:stateListAnimator="@null"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+</FrameLayout>
