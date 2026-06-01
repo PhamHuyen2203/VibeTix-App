@@ -18,6 +18,31 @@ public class Constants {
     public static final String KEY_REMEMBER_ME    = "remember_me";
     public static final String KEY_USER_ORG_NAME  = "user_org_name";
 
+    // Extended profile info
+    public static final String KEY_USER_DOB          = "user_dob";
+    public static final String KEY_USER_GENDER       = "user_gender";      // "male"/"female"/"other"
+    public static final String KEY_TICKETS_BOUGHT    = "tickets_bought";
+    public static final String KEY_EVENTS_INTERESTED = "events_interested";
+
+    // Organizer profile (mock - replace with Firebase when ready)
+    public static final String PREFS_PROFILE        = "vibetix_profile";
+    public static final String KEY_ORG_BRAND_NAME   = "org_brand_name";
+    public static final String KEY_ORG_DESCRIPTION  = "org_description";
+    public static final String KEY_ORG_WEBSITE      = "org_website";
+    public static final String KEY_ORG_STATUS       = "org_status";
+    public static final String ORG_STATUS_NONE      = "none";
+    public static final String ORG_STATUS_PENDING   = "pending";
+    public static final String ORG_STATUS_APPROVED  = "approved";
+
+    // Payment methods (JSON array in SharedPreferences)
+    public static final String KEY_PAYMENT_METHODS  = "payment_methods";
+    public static final String KEY_DEFAULT_PAYMENT  = "default_payment_id";
+    public static final String PAYMENT_MOMO         = "momo";
+    public static final String PAYMENT_ZALOPAY      = "zalopay";
+    public static final String PAYMENT_VNPAY        = "vnpay";
+    public static final String PAYMENT_VISA         = "visa";
+    public static final String PAYMENT_ATM          = "atm";
+
     public static final String EVENT_STATUS_DRAFT = "DRAFT";
     public static final String EVENT_STATUS_PENDING = "PENDING";
     public static final String EVENT_STATUS_APPROVED = "APPROVED";

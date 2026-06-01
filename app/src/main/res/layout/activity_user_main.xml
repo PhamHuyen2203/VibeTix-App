@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <!-- Fragment container -->
     <FrameLayout
@@ -19,22 +20,188 @@
         android:background="@color/clr_divider" />
 
     <!--
-      Bottom Navigation — EdgeToEdge notes:
-        • layout_height="wrap_content"  → Material3 auto-sizes for labeled mode (~80dp)
-        • fitsSystemWindows="true"      → Material3 BottomNavigationView automatically
-          applies paddingBottom = navigation-bar height, so icons/labels sit ABOVE the
-          gesture-bar area and the white background extends behind it (correct E2E look)
+        CUSTOM BOTTOM NAV — 5 items trong cùng 1 LinearLayout ngang.
+        fitsSystemWindows=true để tự padding navigation bar (gesture bar).
+        Tất cả 5 item có cùng structure: icon (24dp) + text (10sp).
+        Item giữa dùng nút tròn xanh nổi bật thay icon.
     -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavCustomer"
+    <LinearLayout
+        android:id="@+id/customBottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/clr_bg_white"
-        android:fitsSystemWindows="true"
-        app:itemIconSize="20dp"
-        app:itemIconTint="@drawable/selector_nav_icon"
-        app:itemTextColor="@drawable/selector_nav_icon"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/menu_customer_bottom_nav" />
+        android:orientation="horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!-- Tab 1: Trang chủ -->
+        <LinearLayout
+            android:id="@+id/tabHome"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="2dp"
+            android:paddingBottom="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/icHome"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_home"
+                android:tint="@color/clr_primary_blue"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Trang chủ"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Tab 2: Sự kiện -->
+        <LinearLayout
+            android:id="@+id/tabEvents"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="2dp"
+            android:paddingBottom="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/icEvents"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_events"
+                android:tint="#808E92"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtEvents"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Sự kiện"
+                android:textColor="#808E92"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Tab 3: Tạo sự kiện — nút tròn xanh nổi bật -->
+        <LinearLayout
+            android:id="@+id/tabCreate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="2dp"
+            android:paddingBottom="6dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:clickable="true"
+            android:focusable="true">
+
+            <!-- marginTop âm = -(circle_height - icon_height) = -(40-24) = -16dp
+                 Kéo nút tròn lên trên để text "Tạo sự kiện" thẳng hàng với 4 tab kia -->
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="-16dp"
+                android:background="@drawable/bg_create_btn"
+                android:elevation="4dp">
+
+                <ImageView
+                    android:id="@+id/fabCreateEvent"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_add_white"
+                    android:contentDescription="Tạo sự kiện" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/txtCreate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Tạo sự kiện"
+                android:textColor="#808E92"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Tab 4: Vé của tôi -->
+        <LinearLayout
+            android:id="@+id/tabTickets"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="2dp"
+            android:paddingBottom="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/icTickets"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_ticket"
+                android:tint="#808E92"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtTickets"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Vé của tôi"
+                android:textColor="#808E92"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Tab 5: Cá nhân -->
+        <LinearLayout
+            android:id="@+id/tabProfile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="2dp"
+            android:paddingBottom="6dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/icProfile"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_nav_profile"
+                android:tint="#808E92"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Cá nhân"
+                android:textColor="#808E92"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

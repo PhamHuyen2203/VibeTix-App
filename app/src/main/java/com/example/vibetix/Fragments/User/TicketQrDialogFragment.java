@@ -74,8 +74,8 @@ public class TicketQrDialogFragment extends DialogFragment {
     private void populateViews() {
         if (ticket == null) return;
         txtQrDialogEventTitle.setText(ticket.getEventTitle());
-        txtQrDialogAttendee.setText(getString(R.string.str_attendee_label, ticket.getAttendeeName()));
-        txtQrDialogTicketTypeName.setText(getString(R.string.str_ticket_type_label, ticket.getTicketTypeName()));
+        txtQrDialogAttendee.setText("Người tham dự: " + ticket.getAttendeeName());
+        txtQrDialogTicketTypeName.setText("Hạng vé: " + ticket.getTicketTypeName());
         txtQrDialogTicketId.setText(ticket.getId());
 
         btnQrDialogClose.setOnClickListener(v -> dismiss());
@@ -89,7 +89,7 @@ public class TicketQrDialogFragment extends DialogFragment {
             Bitmap bitmap = barcodeEncoder.encodeBitmap(ticket.getId(), BarcodeFormat.QR_CODE, 400, 400);
             imvQrCodeGraphic.setImageBitmap(bitmap);
         } catch (Exception e) {
-            Toast.makeText(requireContext(), getString(R.string.str_save_ticket_error) + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Lỗi tạo mã QR: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

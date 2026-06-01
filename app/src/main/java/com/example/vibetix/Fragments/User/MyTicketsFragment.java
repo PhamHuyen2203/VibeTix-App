@@ -28,7 +28,6 @@ import com.example.vibetix.Models.Ticket;
 import com.example.vibetix.R;
 import com.example.vibetix.Repositories.TicketRepository;
 import com.example.vibetix.Utils.Constants;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -213,17 +212,13 @@ public class MyTicketsFragment extends Fragment {
             if (currentMainTab == MainTab.BOUGHT) {
                 // Navigate to home tab
                 if (getActivity() instanceof UserMainActivity) {
-                    BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNavCustomer);
-                    if (bottomNav != null) {
-                        bottomNav.setSelectedItemId(R.id.nav_home);
-                    }
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.frameContainerMain, new HomeFragment())
                             .commit();
                 }
             } else if (currentMainTab == MainTab.RESELLING && currentSubTabResale == SubTabResale.ACTIVE) {
                 // Guide the user to go to bought tickets and pass them
-                Toast.makeText(requireContext(), getString(R.string.str_ticket_resell_instruction), Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Chọn vé bạn đã mua ở tab 'Vé đã mua' rồi bấm 'Bán lại vé' để đăng bán!", Toast.LENGTH_LONG).show();
                 selectMainTab(MainTab.BOUGHT);
                 selectSubTabBought(SubTabBought.UPCOMING);
                 loadTickets();
@@ -339,21 +334,17 @@ public class MyTicketsFragment extends Fragment {
                     PassTicketDialogFragment passDialog = PassTicketDialogFragment.newInstance(ticket, () -> loadTickets());
                     passDialog.show(getChildFragmentManager(), "pass_dialog");
                 } else if ("RESELLING".equalsIgnoreCase(ticket.getStatus())) {
-                    // Update: Better UI for canceling resale
+                    Toast.makeText(requireContext(), "Đang hủy đăng bán...", Toast.LENGTH_SHORT).show();
                     ticketRepository.cancelResale(ticket.getId(), new TicketRepository.OnTicketActionListener() {
                         @Override
                         public void onSuccess() {
-                            if (isAdded()) {
-                                Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_cancel_success), Toast.LENGTH_SHORT).show();
-                                loadTickets();
-                            }
+                            Toast.makeText(requireContext(), "Đã hủy đăng bán vé!", Toast.LENGTH_SHORT).show();
+                            loadTickets();
                         }
 
                         @Override
                         public void onFailure(Exception e) {
-                            if (isAdded()) {
-                                Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_cancel_fail) + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(requireContext(), "Hủy đăng bán thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -365,8 +356,6 @@ public class MyTicketsFragment extends Fragment {
     }
 
     private void loadTickets() {
-        if (!isAdded()) return;
-        
         displayTickets.clear();
         ticketAdapter.notifyDataSetChanged();
 
@@ -378,7 +367,6 @@ public class MyTicketsFragment extends Fragment {
         TicketRepository.OnTicketsLoadedListener callback = new TicketRepository.OnTicketsLoadedListener() {
             @Override
             public void onSuccess(List<Ticket> tickets) {
-                if (!isAdded()) return;
                 displayTickets.clear();
                 displayTickets.addAll(tickets);
                 ticketAdapter.notifyDataSetChanged();
@@ -387,7 +375,6 @@ public class MyTicketsFragment extends Fragment {
 
             @Override
             public void onFailure(Exception e) {
-                if (!isAdded()) return;
                 Toast.makeText(requireContext(), "Lỗi tải vé: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 updateEmptyStateUI();
             }
@@ -400,9 +387,11 @@ public class MyTicketsFragment extends Fragment {
                 ticketRepository.getEndedTickets(userEmail, callback);
             }
         } else if (currentMainTab == MainTab.RESELLING) {
+            // Load reselling list based on resale sub tab status
             if (currentSubTabResale == SubTabResale.ACTIVE) {
                 ticketRepository.getResellingTicketsByUser(userEmail, callback);
             } else {
+                // Empty states for PENDING, PAID, and CANCELLED mock listings (as modeled in user feedback)
                 updateEmptyStateUI();
             }
         }
@@ -420,37 +409,37 @@ public class MyTicketsFragment extends Fragment {
 
             if (currentMainTab == MainTab.BOUGHT) {
                 if (currentSubTabBought == SubTabBought.UPCOMING) {
-                    txtEmptyStateTitle.setText(getString(R.string.my_tickets_empty_message));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_upcoming_subtitle));
-                    btnEmptyStateAction.setText(getString(R.string.str_buy_ticket_action));
+                    txtEmptyStateTitle.setText("Bạn chưa có vé nào cả!");
+                    txtEmptyStateSubtitle.setText("Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn.");
+                    btnEmptyStateAction.setText("🎟  Mua vé ngay");
                     btnEmptyStateAction.setVisibility(View.VISIBLE);
                     
                     // Show suggestions on main empty screen
                     layoutEmptyRecommendationsHeader.setVisibility(View.VISIBLE);
                     rvEmptyRecommendationsList.setVisibility(View.VISIBLE);
                 } else {
-                    txtEmptyStateTitle.setText(getString(R.string.str_empty_ended_title));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_ended_subtitle));
+                    txtEmptyStateTitle.setText("Bạn chưa có vé nào đã kết thúc!");
+                    txtEmptyStateSubtitle.setText("Lịch sử mua vé của bạn sẽ xuất hiện tại đây.");
                 }
             } else if (currentMainTab == MainTab.RESELLING) {
                 if (currentSubTabResale == SubTabResale.ACTIVE) {
-                    txtEmptyStateTitle.setText(getString(R.string.str_empty_resell_title));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_resell_subtitle));
-                    btnEmptyStateAction.setText(getString(R.string.str_resell_ticket_action));
+                    txtEmptyStateTitle.setText("Bạn chưa có vé nào được đăng bán!");
+                    txtEmptyStateSubtitle.setText("Hãy bán lại vé để người khác có cơ hội tham gia sự kiện và bạn cũng thu về dễ dàng.");
+                    btnEmptyStateAction.setText("🎟  Bán lại vé");
                     btnEmptyStateAction.setVisibility(View.VISIBLE);
                 } else if (currentSubTabResale == SubTabResale.PENDING) {
-                    txtEmptyStateTitle.setText(getString(R.string.str_empty_pending_title));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_pending_subtitle));
+                    txtEmptyStateTitle.setText("Không có tin nào chờ thanh toán");
+                    txtEmptyStateSubtitle.setText("Bạn chưa có vé nào đang chờ thanh toán.");
                 } else if (currentSubTabResale == SubTabResale.PAID) {
-                    txtEmptyStateTitle.setText(getString(R.string.str_empty_paid_title));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_paid_subtitle));
+                    txtEmptyStateTitle.setText("Không có tin nào đã thanh toán");
+                    txtEmptyStateSubtitle.setText("Bạn chưa có vé nào đã được thanh toán thành công.");
                 } else if (currentSubTabResale == SubTabResale.CANCELLED) {
-                    txtEmptyStateTitle.setText(getString(R.string.str_empty_cancelled_title));
-                    txtEmptyStateSubtitle.setText(getString(R.string.str_empty_cancelled_subtitle));
+                    txtEmptyStateTitle.setText("Không có tin nào đã hủy");
+                    txtEmptyStateSubtitle.setText("Bạn chưa có vé nào đã hủy đăng bán.");
                 }
             } else if (currentMainTab == MainTab.MEMBERSHIP) {
-                txtEmptyStateTitle.setText(getString(R.string.str_empty_membership_title));
-                txtEmptyStateSubtitle.setText(getString(R.string.str_empty_membership_subtitle));
+                txtEmptyStateTitle.setText("Không có thẻ thành viên");
+                txtEmptyStateSubtitle.setText("Các chương trình thành viên VIP đang được chuẩn bị ra mắt!");
             }
         } else {
             rvMyTicketsList.setVisibility(View.VISIBLE);

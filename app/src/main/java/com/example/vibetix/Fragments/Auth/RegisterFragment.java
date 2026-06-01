@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,41 +26,33 @@ import com.example.vibetix.Activities.AuthActivity;
 import com.example.vibetix.Activities.UserMainActivity;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.Constants;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * RegisterFragment — collects user information and creates a new account.
+ * RegisterFragment — đăng ký tài khoản cá nhân mới.
  *
- * Role selector at top:
- *  • "Người mua vé" (customer) → shows Họ và tên field (sectionUserName)
- *  • "Ban tổ chức" (organizer)  → shows Tên tổ chức field (sectionOrgName)
+ * Mọi tài khoản đều bắt đầu với role CUSTOMER.
+ * Sau này người dùng có thể cập nhật thông tin ban tổ chức
+ * trong trang quản lý hồ sơ để nâng cấp lên Organizer.
  *
- * Both roles share: Email, Phone, Password, Confirm Password, Terms checkbox.
+ * Fields: Họ và tên, Email, Số điện thoại, Mật khẩu, Xác nhận mật khẩu, Terms.
  *
- * On success: saves to SharedPreferences and navigates to UserMainActivity.
- * (Replace with Firebase Auth / Firestore write when backend is ready.)
+ * (Thay bằng Firebase Auth + Firestore write khi backend sẵn sàng.)
  */
 public class RegisterFragment extends Fragment {
 
     // ── Views ──────────────────────────────────────────────────────────────────
-    // layoutRegisterHeader is a FrameLayout in XML — held as View to avoid ClassCastException
     View      layoutRegisterHeader;
     ImageView btnRegisterBack;
 
-    // Role toggle
-    LinearLayout btnRoleCustomer;
-    LinearLayout btnRoleOrganizer;
-    ImageView    icRoleCustomer;
-    ImageView    icRoleOrganizer;
-    TextView     txtRoleCustomer;
-    TextView     txtRoleOrganizer;
-
-    // Dynamic name sections
-    LinearLayout sectionUserName;          // visible when Customer selected
-    LinearLayout sectionOrgName;           // visible when Organizer selected
+    // Name field
     LinearLayout containerFullName;
-    LinearLayout containerOrgName;
     EditText     etFullName;
-    EditText     etOrgName;
 
     // Common fields
     LinearLayout containerRegEmail;
@@ -85,7 +76,6 @@ public class RegisterFragment extends Fragment {
     TextView txtGoToLogin;
 
     // ── State ──────────────────────────────────────────────────────────────────
-    private String  selectedRole             = Constants.ROLE_CUSTOMER;
     private boolean isPasswordVisible        = false;
     private boolean isConfirmPasswordVisible = false;
 
@@ -99,7 +89,6 @@ public class RegisterFragment extends Fragment {
         bindViews(view);
         applyInsets();
         setupFocusEffects();
-        setupRoleSelector();
         setupClickListeners();
         return view;
     }
@@ -109,19 +98,8 @@ public class RegisterFragment extends Fragment {
         layoutRegisterHeader     = view.findViewById(R.id.layoutRegisterHeader);
         btnRegisterBack          = view.findViewById(R.id.btnRegisterBack);
 
-        btnRoleCustomer          = view.findViewById(R.id.btnRoleCustomer);
-        btnRoleOrganizer         = view.findViewById(R.id.btnRoleOrganizer);
-        icRoleCustomer           = view.findViewById(R.id.icRoleCustomer);
-        icRoleOrganizer          = view.findViewById(R.id.icRoleOrganizer);
-        txtRoleCustomer          = view.findViewById(R.id.txtRoleCustomer);
-        txtRoleOrganizer         = view.findViewById(R.id.txtRoleOrganizer);
-
-        sectionUserName          = view.findViewById(R.id.sectionUserName);
-        sectionOrgName           = view.findViewById(R.id.sectionOrgName);
         containerFullName        = view.findViewById(R.id.containerFullName);
-        containerOrgName         = view.findViewById(R.id.containerOrgName);
         etFullName               = view.findViewById(R.id.etFullName);
-        etOrgName                = view.findViewById(R.id.etOrgName);
 
         containerRegEmail        = view.findViewById(R.id.containerRegEmail);
         containerPhone           = view.findViewById(R.id.containerPhone);
@@ -143,15 +121,13 @@ public class RegisterFragment extends Fragment {
     }
 
     // ── Status-bar inset ───────────────────────────────────────────────────────
-    // Back button lives in a FrameLayout overlay, so we push it down with marginTop
-    // instead of adding paddingTop to a parent row (which used to squish the button).
     private void applyInsets() {
         if (btnRegisterBack == null) return;
         ViewCompat.setOnApplyWindowInsetsListener(btnRegisterBack, (v, insets) -> {
             int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
             ViewGroup.MarginLayoutParams lp =
                     (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            lp.topMargin = topInset + 8;   // 8dp breathing room below status bar
+            lp.topMargin = topInset + 8;
             v.setLayoutParams(lp);
             return insets;
         });
@@ -159,10 +135,9 @@ public class RegisterFragment extends Fragment {
 
     // ── Input focus effects ────────────────────────────────────────────────────
     private void setupFocusEffects() {
-        applyFocusEffect(containerFullName, etFullName);
-        applyFocusEffect(containerOrgName,  etOrgName);
-        applyFocusEffect(containerRegEmail, etRegEmail);
-        applyFocusEffect(containerPhone,    etPhone);
+        applyFocusEffect(containerFullName,        etFullName);
+        applyFocusEffect(containerRegEmail,        etRegEmail);
+        applyFocusEffect(containerPhone,           etPhone);
         applyFocusEffect(containerRegPassword,     etRegPassword);
         applyFocusEffect(containerConfirmPassword, etConfirmPassword);
     }
@@ -173,61 +148,6 @@ public class RegisterFragment extends Fragment {
                 container.setBackgroundResource(hasFocus
                         ? R.drawable.bg_input_focused
                         : R.drawable.bg_input_normal));
-    }
-
-    // ── Role selector ──────────────────────────────────────────────────────────
-    private void setupRoleSelector() {
-        // Default: Customer selected (mirrors XML default visibility)
-        setRoleSelected(Constants.ROLE_CUSTOMER);
-
-        btnRoleCustomer.setOnClickListener(v  -> setRoleSelected(Constants.ROLE_CUSTOMER));
-        btnRoleOrganizer.setOnClickListener(v -> setRoleSelected(Constants.ROLE_ORGANIZER));
-    }
-
-    /**
-     * Updates toggle button appearances AND shows / hides the appropriate
-     * name-input section for the given role.
-     */
-    private void setRoleSelected(String role) {
-        selectedRole = role;
-        boolean isCustomer = Constants.ROLE_CUSTOMER.equals(role);
-
-        // ── Toggle button backgrounds, text colours & icon tints ──
-        int activeColor   = requireContext().getColor(R.color.clr_text_white);
-        int inactiveColor = requireContext().getColor(R.color.clr_primary_blue);
-
-        btnRoleCustomer.setBackgroundResource(isCustomer
-                ? R.drawable.bg_role_active
-                : R.drawable.bg_role_inactive);
-        txtRoleCustomer.setTextColor(isCustomer ? activeColor : inactiveColor);
-        if (icRoleCustomer != null) {
-            icRoleCustomer.setImageTintList(
-                    ColorStateList.valueOf(isCustomer ? activeColor : inactiveColor));
-        }
-
-        btnRoleOrganizer.setBackgroundResource(isCustomer
-                ? R.drawable.bg_role_inactive
-                : R.drawable.bg_role_active);
-        txtRoleOrganizer.setTextColor(isCustomer ? inactiveColor : activeColor);
-        if (icRoleOrganizer != null) {
-            icRoleOrganizer.setImageTintList(
-                    ColorStateList.valueOf(isCustomer ? inactiveColor : activeColor));
-        }
-
-        // ── Show / hide name sections ──
-        if (sectionUserName != null) {
-            sectionUserName.setVisibility(isCustomer ? View.VISIBLE : View.GONE);
-        }
-        if (sectionOrgName != null) {
-            sectionOrgName.setVisibility(isCustomer ? View.GONE : View.VISIBLE);
-        }
-
-        // Clear the hidden section's field so stale text doesn't sneak into validation
-        if (isCustomer && etOrgName  != null) etOrgName.setText("");
-        if (!isCustomer && etFullName != null) etFullName.setText("");
-
-        // Reset error message when role changes
-        hideError();
     }
 
     // ── Click listeners ────────────────────────────────────────────────────────
@@ -264,7 +184,7 @@ public class RegisterFragment extends Fragment {
             etConfirmPassword.setSelection(etConfirmPassword.getText().length());
         });
 
-        // Terms & Conditions link — show placeholder dialog / Toast
+        // Terms & Conditions link
         if (txtTermsLink != null) {
             txtTermsLink.setOnClickListener(v ->
                     Toast.makeText(requireContext(),
@@ -284,73 +204,99 @@ public class RegisterFragment extends Fragment {
 
     // ── Validation + register logic ────────────────────────────────────────────
     private void attemptRegister() {
-        boolean isCustomer = Constants.ROLE_CUSTOMER.equals(selectedRole);
-
-        // Grab the relevant name field
-        String name  = isCustomer
-                ? etFullName.getText().toString().trim()
-                : etOrgName.getText().toString().trim();
-        String email          = etRegEmail.getText().toString().trim();
-        String phone          = etPhone.getText().toString().trim();
-        String password       = etRegPassword.getText().toString().trim();
+        String name            = etFullName.getText().toString().trim();
+        String email           = etRegEmail.getText().toString().trim();
+        String phone           = etPhone.getText().toString().trim();
+        String password        = etRegPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // ── Non-empty check ──
+        // Non-empty check
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty()
                 || password.isEmpty() || confirmPassword.isEmpty()) {
             showError(getString(R.string.str_error_empty_field));
             return;
         }
 
-        // ── Email format ──
+        // Email format
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             showError(getString(R.string.str_error_invalid_email));
             return;
         }
 
-        // ── Password length ──
+        // Password length
         if (password.length() < 6) {
             showError(getString(R.string.str_error_password_too_short));
             return;
         }
 
-        // ── Password match ──
+        // Password match
         if (!password.equals(confirmPassword)) {
             showError(getString(R.string.str_error_password_mismatch));
             return;
         }
 
-        // ── Terms must be accepted ──
+        // Terms must be accepted
         if (cbTerms != null && !cbTerms.isChecked()) {
             showError(getString(R.string.str_error_terms_required));
             return;
         }
 
         hideError();
+        btnRegister.setEnabled(false);
+        btnRegister.setText("Đang đăng ký...");
 
-        // TODO: write to Firebase Auth + Firestore when backend is ready.
-        onRegisterSuccess(name, email, phone, selectedRole, isCustomer);
+        final String finalName  = name;
+        final String finalPhone = phone;
+
+        FirebaseAuth.getInstance()
+            .createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener(authResult -> {
+                String uid = authResult.getUser().getUid();
+
+                // Tạo document trong Firestore collection "users"
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("user_id",    uid);
+                userData.put("full_name",  finalName);
+                userData.put("email",      email);
+                userData.put("phone",      finalPhone);
+                userData.put("role",       "customer");
+                userData.put("created_at", FieldValue.serverTimestamp());
+
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+                    .set(userData)
+                    .addOnSuccessListener(v -> onRegisterSuccess(finalName, email, finalPhone))
+                    .addOnFailureListener(e -> {
+                        // Firestore write thất bại nhưng Auth đã tạo → vẫn cho vào
+                        onRegisterSuccess(finalName, email, finalPhone);
+                    });
+            })
+            .addOnFailureListener(e -> {
+                btnRegister.setEnabled(true);
+                btnRegister.setText("Đăng ký");
+                String msg = "Đăng ký thất bại";
+                if (e.getMessage() != null) {
+                    if (e.getMessage().contains("email address is already in use"))
+                        msg = "Email này đã được đăng ký. Vui lòng dùng email khác.";
+                    else if (e.getMessage().contains("badly formatted"))
+                        msg = "Email không hợp lệ.";
+                }
+                showError(msg);
+            });
     }
 
-    private void onRegisterSuccess(String name, String email, String phone,
-                                   String role, boolean isCustomer) {
+    private void onRegisterSuccess(String name, String email, String phone) {
         SharedPreferences prefs = requireContext()
                 .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE);
 
-        SharedPreferences.Editor editor = prefs.edit()
+        prefs.edit()
                 .putBoolean(Constants.KEY_IS_LOGGED_IN, true)
-                .putString(Constants.KEY_USER_EMAIL,    email)
-                .putString(Constants.KEY_USER_PHONE,    phone)
-                .putString(Constants.KEY_USER_ROLE,     role);
-
-        if (isCustomer) {
-            editor.putString(Constants.KEY_USER_NAME,     name);
-            editor.remove(Constants.KEY_USER_ORG_NAME);
-        } else {
-            editor.putString(Constants.KEY_USER_ORG_NAME, name);
-            editor.remove(Constants.KEY_USER_NAME);
-        }
-        editor.apply();
+                .putString(Constants.KEY_USER_NAME,  name)
+                .putString(Constants.KEY_USER_EMAIL, email)
+                .putString(Constants.KEY_USER_PHONE, phone)
+                .putString(Constants.KEY_USER_ROLE,  Constants.ROLE_CUSTOMER)
+                .apply();
 
         Intent intent = new Intent(requireContext(), UserMainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

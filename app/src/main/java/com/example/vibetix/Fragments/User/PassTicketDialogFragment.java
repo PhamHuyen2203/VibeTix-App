@@ -82,7 +82,7 @@ public class PassTicketDialogFragment extends DialogFragment {
     private void populateViews() {
         if (ticket == null) return;
         txtPassDialogEventTitle.setText(ticket.getEventTitle());
-        txtPassDialogOriginalPrice.setText(getString(R.string.str_original_price_label, formatter.format(ticket.getPurchasePrice())));
+        txtPassDialogOriginalPrice.setText("Giá mua gốc: " + formatter.format(ticket.getPurchasePrice()) + " đ");
     }
 
     private void setupClickListeners() {
@@ -91,7 +91,7 @@ public class PassTicketDialogFragment extends DialogFragment {
         btnPassConfirm.setOnClickListener(v -> {
             String priceStr = etPassResalePrice.getText().toString().trim();
             if (priceStr.isEmpty()) {
-                Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_input_empty), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Vui lòng nhập giá muốn bán", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -99,32 +99,36 @@ public class PassTicketDialogFragment extends DialogFragment {
             try {
                 resalePrice = Long.parseLong(priceStr);
             } catch (NumberFormatException e) {
-                Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_invalid_price), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Giá bán không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (resalePrice <= 0) {
-                Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_price_min), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Giá bán phải lớn hơn 0", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             btnPassConfirm.setEnabled(false);
-            Toast.makeText(requireContext(), getString(R.string.str_processing_payment), Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Đang xử lý...", Toast.LENGTH_SHORT).show();
 
             ticketRepository.resellTicket(ticket.getId(), resalePrice, new TicketRepository.OnTicketActionListener() {
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(requireContext(), getString(R.string.str_ticket_resale_success), Toast.LENGTH_SHORT).show();
-                    if (listener != null) {
-                        listener.onTicketPassed();
+                    if (isAdded()) {
+                        Toast.makeText(requireContext(), "Đã đăng bán lại vé thành công!", Toast.LENGTH_SHORT).show();
+                        if (listener != null) {
+                            listener.onTicketPassed();
+                        }
+                        dismiss();
                     }
-                    dismiss();
                 }
 
                 @Override
                 public void onFailure(Exception e) {
-                    btnPassConfirm.setEnabled(true);
-                    Toast.makeText(requireContext(), getString(R.string.str_payment_error) + e.getMessage(), Toast.LENGTH_LONG).show();
+                    if (isAdded()) {
+                        btnPassConfirm.setEnabled(true);
+                        Toast.makeText(requireContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         });

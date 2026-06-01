@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vibetix.Adapters.DestinationAdapter;
 import com.example.vibetix.Adapters.EventAdapter;
 import com.example.vibetix.Adapters.SearchCategoryAdapter;
+import com.example.vibetix.Firebase.FirestoreHelper;
 import com.example.vibetix.Models.Destination;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
@@ -85,8 +86,9 @@ public class SearchFragment extends Fragment {
         loadRecentSearches();
         setupCategoryRecycler();
         setupCityRecycler();
-        loadMockSuggestions();
+        loadMockSuggestions();      // Mock hiển thị ngay
         setupSuggestedRecycler();
+        loadSuggestionsFromFirestore(); // Sau đó replace bằng data thật
         return view;
     }
 
@@ -189,11 +191,27 @@ public class SearchFragment extends Fragment {
 
     // ── City horizontal scroll ────────────────────────────────────────────────────
     private void setupCityRecycler() {
-        cityItems.add(new Destination("d1", "TP. Hồ Chí Minh", null, R.drawable.destination_hcmc));
-        cityItems.add(new Destination("d2", "Hà Nội",          null, R.drawable.destination_hanoi));
-        cityItems.add(new Destination("d3", "Đà Lạt",          null, R.drawable.destination_da_lat));
-        cityItems.add(new Destination("d4", "Đà Nẵng",         null, R.drawable.destination_da_nang));
-        cityItems.add(new Destination("d5", "Hội An",          null, R.drawable.destination_hoi_an));
+        // Tham số thứ 4 là eventCount (int) — ảnh phải set riêng qua setLocalImageResId()
+        // Thứ tự đồng bộ với HomeFragment "Điểm đến nổi bật"
+        Destination c1 = new Destination("d1", "TP. Hồ Chí Minh", null, 120);
+        c1.setLocalImageResId(R.drawable.destination_hcmc);
+        cityItems.add(c1);
+
+        Destination c2 = new Destination("d2", "Hà Nội", null, 89);
+        c2.setLocalImageResId(R.drawable.destination_hanoi);
+        cityItems.add(c2);
+
+        Destination c3 = new Destination("d3", "Đà Nẵng", null, 45);
+        c3.setLocalImageResId(R.drawable.destination_da_nang);
+        cityItems.add(c3);
+
+        Destination c4 = new Destination("d4", "Hội An", null, 32);
+        c4.setLocalImageResId(R.drawable.destination_hoi_an);
+        cityItems.add(c4);
+
+        Destination c5 = new Destination("d5", "Đà Lạt", null, 28);
+        c5.setLocalImageResId(R.drawable.destination_da_lat);
+        cityItems.add(c5);
 
         destinationAdapter = new DestinationAdapter(requireContext(), cityItems,
                 dest -> Toast.makeText(requireContext(), dest.getName(), Toast.LENGTH_SHORT).show());
@@ -254,6 +272,18 @@ public class SearchFragment extends Fragment {
             e.setVenueCity(cities[i]);
             danhSachSuggested.add(e);
         }
+    }
+
+    private void loadSuggestionsFromFirestore() {
+        FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
+            @Override public void onSuccess(java.util.List<Event> events) {
+                if (!isAdded() || events.isEmpty()) return;
+                danhSachSuggested.clear();
+                danhSachSuggested.addAll(events);
+                if (suggestedAdapter != null) suggestedAdapter.notifyDataSetChanged();
+            }
+            @Override public void onFailure(Exception e) { /* mock vẫn hiển thị */ }
+        });
     }
 
     private void setupSuggestedRecycler() {

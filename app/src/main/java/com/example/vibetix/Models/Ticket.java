@@ -1,5 +1,9 @@
 package com.example.vibetix.Models;
 
+/**
+ * Ticket — vé của người dùng (USER_TICKET trong ERD).
+ * Đại diện cho một vé cụ thể thuộc sở hữu của một user.
+ */
 public class Ticket {
     private String id;
     private String orderId;
@@ -12,14 +16,15 @@ public class Ticket {
     private String ticketTypeName;
     private long purchasePrice;
     private long resalePrice;
-    private String status; // ACTIVE, USED, EXPIRED, RESELLING, RESOLD
+    private String status; // "ACTIVE", "RESELLING", "USED", "EXPIRED"
     private String attendeeName;
 
     public Ticket() {}
 
-    public Ticket(String id, String orderId, String userEmail, String eventId, String eventTitle,
-                  String eventDate, String eventLocation, String eventImageUrl, String ticketTypeName,
-                  long purchasePrice, long resalePrice, String status, String attendeeName) {
+    public Ticket(String id, String orderId, String userEmail, String eventId,
+                  String eventTitle, String eventDate, String eventLocation,
+                  String eventImageUrl, String ticketTypeName, long purchasePrice,
+                  long resalePrice, String status, String attendeeName) {
         this.id = id;
         this.orderId = orderId;
         this.userEmail = userEmail;
@@ -35,6 +40,7 @@ public class Ticket {
         this.attendeeName = attendeeName;
     }
 
+    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

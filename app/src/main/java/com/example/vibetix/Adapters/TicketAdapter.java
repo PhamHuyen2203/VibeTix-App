@@ -48,21 +48,26 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
     @Override
     public void onBindViewHolder(@NonNull TicketViewHolder holder, int position) {
         Ticket ticket = ticketsList.get(position);
+        if (ticket == null) return;
 
         holder.txtTicketEventTitle.setText(ticket.getEventTitle());
         holder.txtTicketEventDate.setText(ticket.getEventDate());
         holder.txtTicketEventLocation.setText(ticket.getEventLocation());
         holder.txtTicketTypeName.setText(ticket.getTicketTypeName());
 
-        // Display correct image based on event ID
-        int coverResId = R.drawable.event_live_non_song;
-        if (!"b1".equals(ticket.getEventId()) && !"e1".equals(ticket.getEventId()) && !"rs1".equals(ticket.getEventId())) {
-            coverResId = R.drawable.event_arts_private_fantasy;
+        // Display correct image based on event ID or imageUrl
+        if (ticket.getEventImageUrl() != null && !ticket.getEventImageUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(ticket.getEventImageUrl())
+                    .placeholder(R.drawable.event_live_non_song)
+                    .into(holder.imvTicketThumb);
+        } else {
+            int coverResId = R.drawable.event_live_non_song;
+            if (!"b1".equals(ticket.getEventId()) && !"e1".equals(ticket.getEventId()) && !"rs1".equals(ticket.getEventId())) {
+                coverResId = R.drawable.event_arts_private_fantasy;
+            }
+            holder.imvTicketThumb.setImageResource(coverResId);
         }
-
-        Glide.with(context)
-                .load(coverResId)
-                .into(holder.imvTicketThumb);
 
         // Bind status and pricing details
         String status = ticket.getStatus();
@@ -104,13 +109,17 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
         }
 
         // Set action triggers
-        holder.btnTicketQrAction.setOnClickListener(v -> listener.onQrClick(ticket));
-        holder.btnTicketResellAction.setOnClickListener(v -> listener.onResellClick(ticket));
+        holder.btnTicketQrAction.setOnClickListener(v -> {
+            if (listener != null) listener.onQrClick(ticket);
+        });
+        holder.btnTicketResellAction.setOnClickListener(v -> {
+            if (listener != null) listener.onResellClick(ticket);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return ticketsList.size();
+        return ticketsList == null ? 0 : ticketsList.size();
     }
 
     public static class TicketViewHolder extends RecyclerView.ViewHolder {

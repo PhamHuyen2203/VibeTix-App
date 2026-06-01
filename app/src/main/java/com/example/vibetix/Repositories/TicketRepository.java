@@ -4,7 +4,6 @@ import com.example.vibetix.Firebase.FirebaseCollections;
 import com.example.vibetix.Models.Ticket;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ public class TicketRepository {
                     List<Ticket> list = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Ticket t = doc.toObject(Ticket.class);
+                        if (t.getId() == null) t.setId(doc.getId());
                         list.add(t);
                     }
                     listener.onSuccess(list);
@@ -55,6 +55,7 @@ public class TicketRepository {
                     List<Ticket> list = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Ticket t = doc.toObject(Ticket.class);
+                        if (t.getId() == null) t.setId(doc.getId());
                         list.add(t);
                     }
                     listener.onSuccess(list);
@@ -71,6 +72,7 @@ public class TicketRepository {
                     List<Ticket> list = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Ticket t = doc.toObject(Ticket.class);
+                        if (t.getId() == null) t.setId(doc.getId());
                         list.add(t);
                     }
                     listener.onSuccess(list);
@@ -86,6 +88,7 @@ public class TicketRepository {
                     List<Ticket> list = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Ticket t = doc.toObject(Ticket.class);
+                        if (t.getId() == null) t.setId(doc.getId());
                         list.add(t);
                     }
                     listener.onSuccess(list);
@@ -101,7 +104,7 @@ public class TicketRepository {
                 .addOnFailureListener(listener::onFailure);
     }
 
-    // List a ticket for resale (Pass Ticket)
+    /** Đăng bán lại vé. */
     public void resellTicket(String ticketId, long resalePrice, OnTicketActionListener listener) {
         ticketsRef.document(ticketId)
                 .update("status", "RESELLING", "resalePrice", resalePrice)

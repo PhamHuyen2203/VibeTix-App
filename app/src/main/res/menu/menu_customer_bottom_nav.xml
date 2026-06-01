@@ -7,6 +7,18 @@
         android:title="@string/str_nav_home" />
 
     <item
+        android:id="@+id/nav_events"
+        android:icon="@drawable/ic_nav_events"
+        android:title="@string/str_nav_events" />
+
+    <!-- Placeholder rỗng cho khoảng trống FAB ở giữa — icon trong suốt -->
+    <item
+        android:id="@+id/nav_create_placeholder"
+        android:icon="@drawable/ic_transparent"
+        android:title=""
+        android:enabled="false" />
+
+    <item
         android:id="@+id/nav_my_tickets"
         android:icon="@drawable/ic_nav_ticket"
         android:title="@string/str_nav_my_tickets" />

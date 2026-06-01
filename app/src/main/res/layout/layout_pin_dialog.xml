@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dialog nhập mã PIN 6 chữ số -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Thiết lập mã PIN"
+        android:textColor="#1C1B1B"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:text="Nhập mã PIN 6 số để bảo vệ trang Chi tiết vé"
+        android:textColor="#808E92"
+        android:textSize="13sp" />
+
+    <!-- 6 input boxes -->
+    <LinearLayout
+        android:id="@+id/layoutPinBoxes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <EditText android:id="@+id/pinBox1"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+
+        <EditText android:id="@+id/pinBox2"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+
+        <EditText android:id="@+id/pinBox3"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+
+        <EditText android:id="@+id/pinBox4"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+
+        <EditText android:id="@+id/pinBox5"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+
+        <EditText android:id="@+id/pinBox6"
+            android:layout_width="44dp" android:layout_height="52dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="center" android:inputType="numberPassword"
+            android:maxLength="1" android:textSize="20sp" android:textStyle="bold"
+            android:textColor="#1C1B1B" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtPinError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="#EB5757"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+</LinearLayout>
