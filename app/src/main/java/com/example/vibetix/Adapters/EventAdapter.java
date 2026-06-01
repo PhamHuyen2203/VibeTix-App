@@ -1,113 +1,137 @@
 package com.example.vibetix.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
-import java.util.List;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
-    private List<Event> eventList;
-    private OnEventActionListener listener;
+    Context context;
+    ArrayList<Event> danhSachEvent;
+    OnEventClickListener listener;
+    private int layoutResId;
 
-    private int itemLayoutId = R.layout.item_event_admin;
-
-    public interface OnEventActionListener {
-        default void onFeaturedChanged(String eventId, boolean isFeatured) {}
+    public interface OnEventClickListener {
         void onEventClick(Event event);
     }
 
-    public EventAdapter(android.content.Context context, List<Event> eventList, OnEventActionListener listener) {
-        this.eventList = eventList;
-        this.listener = listener;
+    public EventAdapter(Context context, ArrayList<Event> danhSachEvent, OnEventClickListener listener) {
+        this(context, danhSachEvent, listener, R.layout.item_event_card);
     }
 
-    public EventAdapter(android.content.Context context, List<Event> eventList, OnEventActionListener listener, int itemLayoutId) {
-        this.eventList = eventList;
-        this.listener = listener;
-        this.itemLayoutId = itemLayoutId;
+    public EventAdapter(Context context, ArrayList<Event> danhSachEvent,
+                        OnEventClickListener listener, int layoutResId) {
+        this.context       = context;
+        this.danhSachEvent = danhSachEvent;
+        this.listener      = listener;
+        this.layoutResId   = layoutResId;
     }
 
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(itemLayoutId, parent, false);
+        View view = LayoutInflater.from(context).inflate(layoutResId, parent, false);
         return new EventViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
-        Event event = eventList.get(position);
-        holder.bind(event, listener);
+        Event event = danhSachEvent.get(position);
+
+        holder.txtEventTitle.setText(event.getTitle());
+        holder.txtEventDate.setText(event.getDate());
+
+        if (event.isFree()) {
+            holder.txtEventPrice.setText(context.getString(R.string.str_free));
+        } else {
+            NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+            String priceFormatted = fmt.format(event.getMinPrice()) + "đ";
+            holder.txtEventPrice.setText(
+                    context.getString(R.string.str_from_price, priceFormatted));
+        }
+
+        if (event.isSoldOut()) {
+            holder.txtSoldOutBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtSoldOutBadge.setVisibility(View.GONE);
+        }
+
+        // Ongoing badge (ERD: EVENT.status = 'ongoing')
+        if ("ongoing".equals(event.getStatus())) {
+            holder.txtOngoingBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtOngoingBadge.setVisibility(View.GONE);
+        }
+
+        // Venue city (ERD: VENUE.city)
+        if (event.getVenueCity() != null && !event.getVenueCity().isEmpty()) {
+            holder.txtEventCity.setText(event.getVenueCity());
+            holder.txtEventCity.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtEventCity.setVisibility(View.GONE);
+        }
+
+        Object imageSource = event.getLocalImageResId() != 0
+                ? event.getLocalImageResId()
+                : event.getImageUrl();
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(holder.imvEventImage);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listener != null) listener.onEventClick(event);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return eventList != null ? eventList.size() : 0;
+        return danhSachEvent.size();
     }
 
-    public void updateList(List<Event> newList) {
-        this.eventList = newList;
+    public void updateData(ArrayList<Event> data) {
+        danhSachEvent.clear();
+        danhSachEvent.addAll(data);
         notifyDataSetChanged();
     }
 
-    public static class EventViewHolder extends RecyclerView.ViewHolder {
-        private ImageView ivPoster;
-        private TextView tvTitle, tvTime, tvStatus;
-        private SwitchCompat switchFeatured;
+    static class EventViewHolder extends RecyclerView.ViewHolder {
+        ImageView imvEventImage;
+        TextView txtEventTitle;
+        TextView txtEventDate;
+        TextView txtEventCity;
+        TextView txtEventPrice;
+        TextView txtSoldOutBadge;
+        TextView txtOngoingBadge;
 
-        public EventViewHolder(@NonNull View itemView) {
+        EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivPoster = itemView.findViewById(R.id.iv_event_poster);
-            tvTitle = itemView.findViewById(R.id.tv_event_title);
-            tvTime = itemView.findViewById(R.id.tv_event_time);
-            tvStatus = itemView.findViewById(R.id.tv_event_status);
-            switchFeatured = itemView.findViewById(R.id.switch_featured);
-        }
-
-        public void bind(final Event event, final OnEventActionListener listener) {
-            if (tvTitle != null) tvTitle.setText(event.getTitle());
-            if (tvTime != null) tvTime.setText(event.getStartTime());
-            if (tvStatus != null) {
-                if (event.getStatus() != null) {
-                    tvStatus.setText(event.getStatus().name());
-                } else {
-                    tvStatus.setText(event.getStatusStr());
-                }
-            }
-
-            // Load image with Glide
-            if (ivPoster != null) {
-                Glide.with(itemView.getContext())
-                        .load(event.getPosterUrl())
-                        .placeholder(android.R.drawable.ic_menu_gallery)
-                        .into(ivPoster);
-            }
-
-            // Set switch state without triggering listener
-            if (switchFeatured != null) {
-                switchFeatured.setOnCheckedChangeListener(null);
-                switchFeatured.setChecked(event.isFeatured());
-
-                // Handle switch toggle
-                switchFeatured.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    if (listener != null) {
-                        listener.onFeaturedChanged(event.getId(), isChecked);
-                    }
-                });
-            }
-
-            itemView.setOnClickListener(v -> {
-                if (listener != null) listener.onEventClick(event);
-            });
+            imvEventImage = itemView.findViewById(R.id.imvEventImage);
+            txtEventTitle = itemView.findViewById(R.id.txtEventTitle);
+            txtEventDate = itemView.findViewById(R.id.txtEventDate);
+            txtEventCity = itemView.findViewById(R.id.txtEventCity);
+            txtEventPrice = itemView.findViewById(R.id.txtEventPrice);
+            txtSoldOutBadge = itemView.findViewById(R.id.txtSoldOutBadge);
+            txtOngoingBadge = itemView.findViewById(R.id.txtOngoingBadge);
         }
     }
 }

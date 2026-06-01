@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 
@@ -50,15 +51,14 @@ public class FeaturedEventAdapter extends RecyclerView.Adapter<FeaturedEventAdap
         Event event = danhSachFeatured.get(position);
 
         // Prefer portrait poster; fall back to landscape banner image
-        int resId = event.getLocalPortraitImageResId() != 0
+        Object imageSource = event.getLocalPortraitImageResId() != 0
                 ? event.getLocalPortraitImageResId()
-                : event.getLocalImageResId();
+                : (event.getLocalImageResId() != 0 ? event.getLocalImageResId() : R.drawable.ic_launcher_background);
 
-        if (resId != 0) {
-            holder.imvFeaturedPoster.setImageResource(resId);
-        } else {
-            holder.imvFeaturedPoster.setImageResource(R.drawable.ic_launcher_background);
-        }
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .into(holder.imvFeaturedPoster);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onFeaturedClick(event);

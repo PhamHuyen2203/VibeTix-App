@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 
@@ -57,11 +58,14 @@ public class ResaleEventAdapter extends RecyclerView.Adapter<ResaleEventAdapter.
         holder.txtResaleDate.setText(event.getDate());
 
         // Event image (local drawable preferred over URL)
-        if (event.getLocalImageResId() != 0) {
-            holder.imvResaleImage.setImageResource(event.getLocalImageResId());
-        } else {
-            holder.imvResaleImage.setImageResource(R.drawable.ic_launcher_background);
-        }
+        Object imageSource = event.getLocalImageResId() != 0
+                ? event.getLocalImageResId()
+                : R.drawable.ic_launcher_background;
+
+        Glide.with(context)
+                .load(imageSource)
+                .centerCrop()
+                .into(holder.imvResaleImage);
 
         // Click
         holder.itemView.setOnClickListener(v -> {

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_white"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Ticket Header with Logo -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_vibetix_logo_full"
+                app:tint="@color/clr_primary_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/bg_status_badge_ongoing"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:text="E-TICKET"
+                android:textColor="@color/clr_success"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/clr_divider" />
+
+        <!-- Event details -->
+        <TextView
+            android:id="@+id/txtQrDialogEventTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="LUNCH &amp; LEARN: Workshop về Phỏng vấn Ứng viên"
+            android:textColor="@color/clr_text_black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- QR Code Display Area -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+            <ImageView
+                android:id="@+id/imvQrCodeGraphic"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_menu_gallery" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/txtQrDialogTicketId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:fontFamily="monospace"
+            android:text="VTX-TICKET-ID-123456"
+            android:textColor="@color/clr_text_black"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <!-- Info row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/clr_bg_light"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/txtQrDialogAttendee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Người tham dự: Phạm Thu Huyền Kim"
+                android:textColor="@color/clr_text_black"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtQrDialogTicketTypeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Hạng vé: Vé Tiêu chuẩn"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Vui lòng đưa mã QR này cho nhân viên soát vé tại cửa để vào cổng sự kiện."
+            android:textColor="@color/clr_grey_1"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnQrDialogClose"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/clr_btn_blue"
+            android:fontFamily="sans-serif-medium"
+            android:text="Xong"
+            android:textColor="@color/clr_text_white"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
