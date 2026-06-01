@@ -51,4 +51,90 @@
         <item name="cardElevation">@dimen/card_elevation</item>
         <item name="cardBackgroundColor">@color/clr_bg_white</item>
     </style>
+
+    <!-- Style cho Nút bấm chính - Dùng chung cho cả 2 vai trò -->
+    <style name="Style.VibeTix.Button" parent="Widget.Material3.Button">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:backgroundTint">@color/clr_primary_blue</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <!-- Style cho Ô nhập liệu Outlined -->
+    <style name="Style.VibeTix.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxStrokeColor">@color/clr_primary_blue</item>
+        <item name="hintTextColor">@color/clr_primary_blue</item>
+    </style>
+
+    <style name="OrganizerTextBase" parent="TextAppearance.VibeTix">
+        <item name="android:textColor">@color/clr_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="OrganizerText.Heading05" parent="OrganizerTextBase">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+
+    <style name="OrganizerText.Body02" parent="OrganizerTextBase">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/clr_text_secondary</item>
+    </style>
+
+    <style name="OrganizerText.Heading01" parent="OrganizerTextBase">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="OrganizerText.Heading03" parent="OrganizerTextBase">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="OrganizerText.Heading04" parent="OrganizerTextBase">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="OrganizerText.Heading06" parent="OrganizerTextBase">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+    <style name="OrganizerText.Body03" parent="OrganizerTextBase">
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="OrganizerText.Body04" parent="OrganizerTextBase">
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="OrganizerText.Body05" parent="OrganizerTextBase">
+        <item name="android:textSize">11sp</item>
+    </style>
+    <style name="OrganizerText.Button01" parent="OrganizerTextBase">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="OrganizerText.Body06" parent="OrganizerTextBase">
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="RoundedImageView8dp">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+    <style name="RoundedImage12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+    <style name="ShapeAppearance.VibeTix.RoundedCorner8" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 </resources>

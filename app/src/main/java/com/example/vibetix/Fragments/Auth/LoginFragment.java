@@ -3,234 +3,259 @@ package com.example.vibetix.Fragments.Auth;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.vibetix.Activities.AuthActivity;
-import com.example.vibetix.Activities.UserMainActivity;
+import com.example.vibetix.Activities.Auth.AuthActivity;
+import com.example.vibetix.Activities.User.UserMainActivity;
+import com.example.vibetix.Activities.Admin.AdminMainActivity;
+import com.example.vibetix.Firebase.FirebaseCollections;
+import com.example.vibetix.Models.Organizer;
+import com.example.vibetix.Models.User;
 import com.example.vibetix.R;
+import com.example.vibetix.Repositories.UserRepository;
 import com.example.vibetix.Utils.Constants;
+import com.example.vibetix.Utils.SessionManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * LoginFragment — email + password login with optional "Remember me",
- * Google / Apple social stubs, and forgot-password link.
+ * LoginFragment — Đăng nhập bằng Firebase Auth.
  *
- * UI behaviour:
- *  • Status-bar top inset applied only to the blue header.
- *  • Input containers change border colour on focus / blur.
- *  • Eye icon toggles password visibility.
- *  • Remember me: if checked the login state is persisted in SharedPreferences;
- *    if unchecked the KEY_REMEMBER_ME flag is stored as false (used later when
- *    Firebase Auth is wired up to decide whether to persist the token).
- *  • Validation: non-empty, valid email format, password ≥ 6 chars.
- *  • On success: saves credentials + remember preference, navigates to UserMainActivity.
+ * Sau khi xác thực:
+ *  1. Fetch User document từ Firestore
+ *  2. Fetch danh sách Organizer profiles của user (1:N)
+ *  3. Lưu vào SessionManager
+ *  4. Điều hướng → UserMainActivity (luôn bắt đầu từ User mode)
+ *     (User tự chuyển sang Organizer mode từ Profile)
+ *
+ * Exception: Admin user → AdminMainActivity
  */
 public class LoginFragment extends Fragment {
 
-    // ── Views ─────────────────────────────────────────────────────────────────
-    LinearLayout layoutLoginHeader;
-    LinearLayout containerEmail;
-    LinearLayout containerPassword;
-    EditText     etEmail;
-    EditText     etPassword;
-    ImageView    btnTogglePassword;
-    TextView     txtForgotPassword;
-    CheckBox     cbRememberMe;
-    TextView     txtLoginError;
-    Button       btnLogin;
-    LinearLayout btnLoginGoogle;
-    LinearLayout btnLoginApple;
-    TextView     txtGoToRegister;
+    private EditText etEmail, etPassword;
+    private Button btnLogin;
+    private CheckBox cbRememberMe;
+    private TextView txtLoginError;
+    private ProgressBar pbLogin;
 
-    // ── State ──────────────────────────────────────────────────────────────────
-    private boolean isPasswordVisible = false;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private UserRepository userRepository;
+    private SessionManager sessionManager;
 
-    // ── Lifecycle ──────────────────────────────────────────────────────────────
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        userRepository = new UserRepository();
+        sessionManager = new SessionManager(requireContext());
+
         bindViews(view);
         restoreRememberMe();
-        applyInsets();
-        setupFocusEffects();
-        setupClickListeners();
+        setupClickListeners(view);
         return view;
     }
 
-    // ── View binding ───────────────────────────────────────────────────────────
     private void bindViews(View view) {
-        layoutLoginHeader  = view.findViewById(R.id.layoutLoginHeader);
-        containerEmail     = view.findViewById(R.id.containerEmail);
-        containerPassword  = view.findViewById(R.id.containerPassword);
-        etEmail            = view.findViewById(R.id.etEmail);
-        etPassword         = view.findViewById(R.id.etPassword);
-        btnTogglePassword  = view.findViewById(R.id.btnTogglePassword);
-        txtForgotPassword  = view.findViewById(R.id.txtForgotPassword);
-        cbRememberMe       = view.findViewById(R.id.cbRememberMe);
-        txtLoginError      = view.findViewById(R.id.txtLoginError);
-        btnLogin           = view.findViewById(R.id.btnLogin);
-        btnLoginGoogle     = view.findViewById(R.id.btnLoginGoogle);
-        btnLoginApple      = view.findViewById(R.id.btnLoginApple);
-        txtGoToRegister    = view.findViewById(R.id.txtGoToRegister);
+        etEmail       = view.findViewById(R.id.etEmail);
+        etPassword    = view.findViewById(R.id.etPassword);
+        btnLogin      = view.findViewById(R.id.btnLogin);
+        cbRememberMe  = view.findViewById(R.id.cbRememberMe);
+        txtLoginError = view.findViewById(R.id.txtLoginError);
+        pbLogin       = view.findViewById(R.id.pbLogin);
     }
 
-    // ── Restore "Remember me" state from previous session ─────────────────────
     private void restoreRememberMe() {
         SharedPreferences prefs = requireContext()
                 .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE);
-        boolean remembered = prefs.getBoolean(Constants.KEY_REMEMBER_ME, false);
-        if (cbRememberMe != null) {
-            cbRememberMe.setChecked(remembered);
+        boolean rememberMe = prefs.getBoolean(Constants.KEY_REMEMBER_ME, false);
+        if (cbRememberMe != null) cbRememberMe.setChecked(rememberMe);
+    }
+
+    private void setupClickListeners(View view) {
+        if (btnLogin != null) btnLogin.setOnClickListener(v -> attemptLogin());
+
+        // Nút Register
+        TextView txtGoRegister = view.findViewById(R.id.txtGoToRegister);
+        if (txtGoRegister != null) {
+            txtGoRegister.setOnClickListener(v -> {
+                if (getActivity() instanceof AuthActivity) {
+                    ((AuthActivity) getActivity()).showRegisterFragment();
+                }
+            });
         }
-        // If user was remembered, pre-fill email
-        if (remembered) {
-            String savedEmail = prefs.getString(Constants.KEY_USER_EMAIL, "");
-            if (etEmail != null && !savedEmail.isEmpty()) {
-                etEmail.setText(savedEmail);
-            }
+
+        // Nút Quên mật khẩu
+        TextView txtForgot = view.findViewById(R.id.txtForgotPassword);
+        if (txtForgot != null) {
+            txtForgot.setOnClickListener(v -> {
+                // TODO: Điều hướng sang ForgotPasswordFragment nếu có
+            });
         }
     }
 
-    // ── Status-bar inset (top only — same pattern as HomeFragment) ─────────────
-    private void applyInsets() {
-        if (layoutLoginHeader == null) return;
-        ViewCompat.setOnApplyWindowInsetsListener(layoutLoginHeader, (v, insets) -> {
-            int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            v.setPadding(v.getPaddingLeft(), topInset, v.getPaddingRight(), v.getPaddingBottom());
-            return insets;
-        });
-    }
-
-    // ── Input focus border effects ─────────────────────────────────────────────
-    private void setupFocusEffects() {
-        applyFocusEffect(containerEmail, etEmail);
-        applyFocusEffect(containerPassword, etPassword);
-    }
-
-    private void applyFocusEffect(LinearLayout container, EditText editText) {
-        editText.setOnFocusChangeListener((v, hasFocus) ->
-                container.setBackgroundResource(hasFocus
-                        ? R.drawable.bg_input_focused
-                        : R.drawable.bg_input_normal));
-    }
-
-    // ── Click listeners ────────────────────────────────────────────────────────
-    private void setupClickListeners() {
-
-        // Eye icon — toggle password visibility
-        btnTogglePassword.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
-            etPassword.setTransformationMethod(isPasswordVisible
-                    ? HideReturnsTransformationMethod.getInstance()
-                    : PasswordTransformationMethod.getInstance());
-            btnTogglePassword.setImageResource(isPasswordVisible
-                    ? R.drawable.ic_auth_eye
-                    : R.drawable.ic_auth_eye_off);
-            // Keep cursor at end after toggling
-            etPassword.setSelection(etPassword.getText().length());
-        });
-
-        // Quên mật khẩu — placeholder (Firebase reset password will go here)
-        txtForgotPassword.setOnClickListener(v ->
-                Toast.makeText(requireContext(),
-                        "Tính năng sắp ra mắt", Toast.LENGTH_SHORT).show());
-
-        // Google social login — placeholder
-        btnLoginGoogle.setOnClickListener(v ->
-                Toast.makeText(requireContext(),
-                        "Đăng nhập Google — sắp ra mắt", Toast.LENGTH_SHORT).show());
-
-        // Apple social login — placeholder
-        btnLoginApple.setOnClickListener(v ->
-                Toast.makeText(requireContext(),
-                        "Đăng nhập Apple — sắp ra mắt", Toast.LENGTH_SHORT).show());
-
-        // Đăng nhập
-        btnLogin.setOnClickListener(v -> attemptLogin());
-
-        // Chưa có tài khoản? → Register
-        txtGoToRegister.setOnClickListener(v -> {
-            if (getActivity() instanceof AuthActivity) {
-                ((AuthActivity) getActivity()).showRegisterFragment();
-            }
-        });
-    }
-
-    // ── Validation + login logic ───────────────────────────────────────────────
     private void attemptLogin() {
+        if (etEmail == null || etPassword == null) return;
+
         String email    = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showError(getString(R.string.str_error_empty_field));
-            return;
-        }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showError(getString(R.string.str_error_invalid_email));
-            return;
-        }
-        if (password.length() < 6) {
-            showError(getString(R.string.str_error_password_too_short));
+            showError("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
 
         hideError();
+        setLoading(true);
 
-        // TODO: replace with Firebase Auth call when backend is ready.
-        // Mock: any valid-format credentials → login as customer.
-        onLoginSuccess(email, Constants.ROLE_CUSTOMER);
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && mAuth.getCurrentUser() != null) {
+                        fetchUserData(mAuth.getCurrentUser().getUid());
+                    } else {
+                        setLoading(false);
+                        String error = task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Sai email hoặc mật khẩu.";
+                        showError("Đăng nhập thất bại: " + error);
+                    }
+                });
     }
 
-    private void onLoginSuccess(String email, String role) {
-        boolean rememberMe = cbRememberMe != null && cbRememberMe.isChecked();
+    /**
+     * Bước 1: Lấy thông tin User từ Firestore.
+     */
+    private void fetchUserData(String uid) {
+        userRepository.getUserById(uid)
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        User user = doc.toObject(User.class);
+                        if (user != null) {
+                            // Set userId nếu Firestore không trả về trong object
+                            if (user.getUserId() == null) user.setUserId(uid);
+                            sessionManager.createLoginSession(user);
+                            fetchOrganizerProfiles(user);
+                        } else {
+                            setLoading(false);
+                            showError("Dữ liệu người dùng không hợp lệ.");
+                        }
+                    } else {
+                        // User đã auth nhưng chưa có document Firestore → tạo mới
+                        setLoading(false);
+                        showError("Tài khoản chưa có dữ liệu. Vui lòng liên hệ hỗ trợ.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    showError("Lỗi kết nối: " + e.getMessage());
+                });
+    }
 
-        SharedPreferences prefs = requireContext()
-                .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE);
+    /**
+     * Bước 2: Lấy danh sách Organizer profiles.
+     * Lưu active organizer = default hoặc profile đầu tiên.
+     */
+    private void fetchOrganizerProfiles(User user) {
+        db.collection(FirebaseCollections.ORGANIZERS)
+                .whereEqualTo("user_id", user.getUserId())
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<Organizer> organizers = new ArrayList<>();
+                    if (snapshot != null) {
+                        for (QueryDocumentSnapshot doc : snapshot) {
+                            Organizer org = doc.toObject(Organizer.class);
+                            if (org != null) {
+                                if (org.getOrganizerId() == null) org.setOrganizerId(doc.getId());
+                                organizers.add(org);
+                            }
+                        }
+                    }
 
-        SharedPreferences.Editor editor = prefs.edit()
-                .putBoolean(Constants.KEY_IS_LOGGED_IN, true)
-                .putString(Constants.KEY_USER_EMAIL, email)
-                .putString(Constants.KEY_USER_ROLE, role)
-                .putBoolean(Constants.KEY_REMEMBER_ME, rememberMe);
+                    // Xác định active organizer
+                    if (!organizers.isEmpty()) {
+                        Organizer activeOrg = findDefaultOrganizer(organizers, user.getDefaultOrganizerId());
+                        sessionManager.setActiveOrganizer(
+                                activeOrg.getOrganizerId(),
+                                activeOrg.getBrandName(),
+                                activeOrg.getLogoUrl()
+                        );
+                        // Mặc định là owner (user sở hữu organizer này)
+                        sessionManager.setStaffRole("owner", null);
+                    }
 
-        // If "Remember me" is NOT checked we still log in for this session,
-        // but we clear the stored email so it won't be pre-filled next time.
-        if (!rememberMe) {
-            editor.remove(Constants.KEY_USER_EMAIL);
+                    // Lưu remember me
+                    boolean rememberMe = cbRememberMe != null && cbRememberMe.isChecked();
+                    SharedPreferences prefs = requireContext()
+                            .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE);
+                    prefs.edit().putBoolean(Constants.KEY_REMEMBER_ME, rememberMe).apply();
+
+                    setLoading(false);
+                    navigateToMain(user);
+                })
+                .addOnFailureListener(e -> {
+                    // Vẫn cho vào app dù không load được organizer profiles
+                    setLoading(false);
+                    navigateToMain(user);
+                });
+    }
+
+    private Organizer findDefaultOrganizer(List<Organizer> organizers, String defaultId) {
+        if (defaultId != null) {
+            for (Organizer org : organizers) {
+                if (defaultId.equals(org.getOrganizerId())) return org;
+            }
         }
-        editor.apply();
+        return organizers.get(0); // Fallback: profile đầu tiên
+    }
 
-        Intent intent = new Intent(requireContext(), UserMainActivity.class);
+    /**
+     * Bước 3: Điều hướng.
+     * Admin → AdminMainActivity
+     * Tất cả còn lại → UserMainActivity (User tự chuyển sang Organizer mode)
+     */
+    private void navigateToMain(User user) {
+        Intent intent;
+        if (Constants.ROLE_ADMIN.equals(user.getRole())) {
+            intent = new Intent(requireContext(), AdminMainActivity.class);
+        } else {
+            intent = new Intent(requireContext(), UserMainActivity.class);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
-    // ── Error helpers ──────────────────────────────────────────────────────────
+    private void setLoading(boolean loading) {
+        if (btnLogin != null) btnLogin.setEnabled(!loading);
+        if (pbLogin != null) pbLogin.setVisibility(loading ? View.VISIBLE : View.GONE);
+    }
+
     private void showError(String message) {
-        txtLoginError.setText(message);
-        txtLoginError.setVisibility(View.VISIBLE);
+        if (txtLoginError != null) {
+            txtLoginError.setText(message);
+            txtLoginError.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideError() {
-        txtLoginError.setVisibility(View.GONE);
+        if (txtLoginError != null) txtLoginError.setVisibility(View.GONE);
     }
 }

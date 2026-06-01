@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_quick_action.xml — Quick action button in OrganizerHub grid -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="12dp"
+        android:background="@color/clr_bg_white">
+
+        <TextView
+            android:id="@+id/tvActionIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📅"
+            android:textSize="26sp"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:id="@+id/tvActionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sự kiện"
+            android:textColor="@color/clr_text_black"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:maxLines="2" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

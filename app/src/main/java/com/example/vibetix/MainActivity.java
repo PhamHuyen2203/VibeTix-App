@@ -6,36 +6,28 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.vibetix.Activities.AuthActivity;
-import com.example.vibetix.Activities.UserMainActivity;
+import com.example.vibetix.Activities.Auth.AuthActivity;
+import com.example.vibetix.Activities.Admin.AdminMainActivity;
+import com.example.vibetix.Activities.Organizer.OrganizerMainActivity;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import com.example.vibetix.Utils.Constants;
+import com.example.vibetix.Utils.SessionManager;
 
-/**
- * Splash / router activity.
- *
- * Checks SharedPreferences for an existing login session:
- *   • Logged in  → UserMainActivity (or OrganizerMainActivity when built)
- *   • Not logged in → AuthActivity (Login screen)
- *
- * TODO: when Firebase Auth is integrated, replace the SharedPreferences check
- *       with FirebaseAuth.getInstance().getCurrentUser() != null.
- */
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_AUTH, MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean(Constants.KEY_IS_LOGGED_IN, false);
-        String role = prefs.getString(Constants.KEY_USER_ROLE, Constants.ROLE_CUSTOMER);
-
+        SessionManager sessionManager = new SessionManager(this);
+        
         Intent intent;
-        if (isLoggedIn) {
-            // Route to appropriate main screen based on role
-            if (Constants.ROLE_ORGANIZER.equals(role)) {
-                // OrganizerMainActivity placeholder — redirect to user main for now
-                intent = new Intent(this, UserMainActivity.class);
+        if (sessionManager.isLoggedIn()) {
+            String role = sessionManager.getUserRole();
+            if (Constants.ROLE_ORGANIZER.equalsIgnoreCase(role)) {
+                intent = new Intent(this, OrganizerMainActivity.class);
+            } else if (Constants.ROLE_ADMIN.equalsIgnoreCase(role)) {
+                intent = new Intent(this, AdminMainActivity.class);
             } else {
                 intent = new Intent(this, UserMainActivity.class);
             }
@@ -44,6 +36,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         startActivity(intent);
-        finish(); // remove MainActivity from back stack
+        finish();
     }
 }

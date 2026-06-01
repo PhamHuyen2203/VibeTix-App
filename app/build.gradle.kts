@@ -5,15 +5,22 @@ plugins {
 
 android {
     namespace = "com.example.vibetix"
+    // Compile với 36 để thỏa mãn các thư viện AndroidX mới nhất
     compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.vibetix"
         minSdk = 26
-        targetSdk = 36
+        // Target 34 hoặc 35 để máy ảo chạy ổn định hơn bản 36 preview
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        }
     }
 
     buildTypes {
@@ -29,29 +36,26 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.constraintlayout)
     implementation(libs.activity.ktx)
-    implementation(libs.recyclerview)
-    implementation(libs.viewpager2)
-    implementation(libs.glide)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-
-    // Firebase
+    implementation(libs.appcompat)
+    implementation(libs.constraintlayout)
+    implementation(libs.material)
+    implementation(libs.gson)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-
-    // QR Scanner
-    implementation(libs.zxing)
-
+    implementation(libs.glide)
+    implementation(libs.swiperefreshlayout)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.ext.junit)
+    implementation(libs.mpandroidchart)
+    implementation(libs.mlkit.barcode)
 }

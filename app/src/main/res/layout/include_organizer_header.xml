@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Organizer Header Component (include layout)
+  Đồng nhất với include_home_header.xml của User:
+    - Nền xanh clr_primary_blue
+    - Logo VibeTix full bên trái
+    - Tiêu đề trang ở giữa/phải
+    - Notification icon bên phải
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/clr_primary_blue"
+    android:elevation="4dp"
+    android:orientation="vertical">
+
+    <!-- Header Row: Logo + Title + Notification -->
+    <LinearLayout
+        android:id="@+id/rowOrganizerHeader"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingEnd="12dp"
+        android:paddingStart="20dp">
+
+        <!-- Logo VibeTix (full) -->
+        <ImageView
+            android:id="@+id/imgOrgLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/str_cd_app_logo"
+            android:scaleType="fitStart"
+            android:src="@drawable/ic_vibetix_logo_full" />
+
+        <!-- Flexible spacer -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Notification icon -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/imgOrgNotification"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/str_notification"
+                android:src="@drawable/ic_notification"
+                android:tint="@color/clr_text_white" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

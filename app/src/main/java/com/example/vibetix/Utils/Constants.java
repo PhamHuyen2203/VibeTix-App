@@ -1,12 +1,10 @@
 package com.example.vibetix.Utils;
 
 public class Constants {
-    // User roles (match ERD: USER.role)
+    // User roles (Match Firestore values)
     public static final String ROLE_CUSTOMER  = "customer";
     public static final String ROLE_ORGANIZER = "organizer";
     public static final String ROLE_ADMIN     = "admin";
-    /** @deprecated Use ROLE_CUSTOMER instead */
-    public static final String ROLE_USER = "USER";
 
     // SharedPreferences — auth state (temporary until Firebase Auth is integrated)
     public static final String PREFS_AUTH         = "vibetix_auth";

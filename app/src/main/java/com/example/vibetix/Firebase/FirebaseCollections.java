@@ -1,24 +1,31 @@
 package com.example.vibetix.Firebase;
 
+/**
+ * Hằng số tên collection Firestore — lowercase snake_case, đồng bộ với Firebase Console.
+ */
 public class FirebaseCollections {
-    public static final String USERS = "users";
-    public static final String ORGANIZERS = "organizers";
-    public static final String EVENTS = "events";
-    public static final String EVENT_DOCUMENTS = "event_documents";
-    public static final String EVENT_SUBMISSIONS = "event_submissions";
-    public static final String CATEGORIES = "categories";
-    public static final String TICKET_TYPES = "ticket_types";
-    public static final String ORDERS = "orders";
-    public static final String TICKETS = "tickets";
-    public static final String PAYMENTS = "payments";
-    public static final String WISHLISTS = "wishlists";
-    public static final String NOTIFICATIONS = "notifications";
-    public static final String PAYMENT_GATEWAYS = "payment_gateways";
-    public static final String FINANCIAL_SETTLEMENTS = "financial_settlements";
-    public static final String PROMOTIONS = "promotions";
-    public static final String SYSTEM_REPORTS = "system_reports";
+    // Core entities
+    public static final String USERS         = "users";
+    public static final String ORGANIZERS    = "organizers";
+    public static final String EVENTS        = "events";
 
-    private FirebaseCollections() {
-        // Prevent initialization
-    }
+    // Ticket & Order
+    public static final String TICKET_TYPES  = "ticket_types";
+    public static final String ORDERS        = "orders";
+    public static final String ORDER_ITEMS   = "order_items";
+    public static final String USER_TICKETS  = "user_tickets";
+
+    // Promotion & Access
+    public static final String DISCOUNTS     = "discounts";
+    public static final String EVENT_STAFF   = "event_staff";
+
+    // Communication
+    public static final String NOTIFICATIONS = "notifications";
+
+    // Legacy (kept for Admin screens — to be migrated later)
+    public static final String CATEGORIES    = "categories";
+    public static final String VENUES        = "venues";
+    public static final String DESTINATIONS  = "destinations"; // legacy
+
+    private FirebaseCollections() {}
 }

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Organizer Top Header Bar -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/clr_primary"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="12dp"
+            android:gravity="center_vertical">
+
+            <!-- Back to User Mode Button -->
+            <ImageView
+                android:id="@+id/btnBackToUser"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_back"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="@color/clr_text_white"
+                android:contentDescription="Quay về User mode" />
+
+            <!-- Organizer Logo -->
+            <ImageView
+                android:id="@+id/ivOrganizerLogo"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_organizer_placeholder"
+                android:background="@drawable/bg_circle_white_alpha"
+                android:scaleType="centerCrop" />
+
+            <!-- Organizer Name + Switch -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ban tổ chức"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="11sp" />
+
+                <LinearLayout
+                    android:id="@+id/btnSwitchOrganizer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="?attr/selectableItemBackgroundBorderless">
+
+                    <TextView
+                        android:id="@+id/tvOrganizerName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tên ban tổ chức"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_chevron_down"
+                        android:tint="@color/clr_text_white" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Notification Bell -->
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_bell"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="@color/clr_text_white"
+                android:contentDescription="Thông báo" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Fragment Container -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/clr_divider" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavOrganizer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_white"
+        android:fitsSystemWindows="true"
+        app:itemIconSize="20dp"
+        app:itemIconTint="@color/selector_organizer_nav_icon"
+        app:itemTextColor="@color/selector_organizer_nav_icon"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/organizer_bottom_nav_menu" />
+
+</LinearLayout>

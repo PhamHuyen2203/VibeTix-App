@@ -4,6 +4,9 @@ public class Destination {
     private String id;
     private String name;
     private String imageUrl;
+    private String address;
+    private String city;
+    private int capacity;
     private int eventCount;
     private int localImageResId;
 
@@ -24,6 +27,15 @@ public class Destination {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 
     public int getEventCount() { return eventCount; }
     public void setEventCount(int eventCount) { this.eventCount = eventCount; }

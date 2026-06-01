@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="OrganizerText.Heading02" parent="OrganizerTextBase">
+        <item name="android:textSize">22sp</item>
+        <item name="android:lineHeight">36sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

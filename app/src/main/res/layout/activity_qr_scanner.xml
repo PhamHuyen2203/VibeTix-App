@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <!-- Camera preview — full screen -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/cameraPreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:implementationMode="compatible"
+        app:scaleType="fillCenter" />
+
+    <!-- Dark overlay above/below scanner frame using a semi-transparent view -->
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:importantForAccessibility="no" />
+
+    <!-- Scanner frame (white-border square) centered -->
+    <View
+        android:id="@+id/scannerFrame"
+        android:layout_width="264dp"
+        android:layout_height="264dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/bg_scanner_frame" />
+
+    <!-- Instruction text below the scanner frame -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="0dp"
+        android:gravity="center"
+        android:paddingHorizontal="32dp"
+        android:text="Đặt mã QR vào khung để quét"
+        android:textColor="@color/clr_text_white"
+        android:textSize="14sp"
+        android:layout_marginBottom="0dp"
+        android:id="@+id/tvInstruction"
+        android:visibility="visible"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        android:translationY="240dp" />
+
+    <!-- Back button top-left -->
+    <FrameLayout
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
+        android:background="#40000000"
+        android:padding="4dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_back"
+            android:tint="@color/clr_text_white"
+            android:contentDescription="Quay lại"
+            android:padding="10dp" />
+
+    </FrameLayout>
+
+    <!-- Title label at top center -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="24dp"
+        android:text="Quét vé"
+        android:textColor="@color/clr_text_white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Result panel — slides up from bottom -->
+    <LinearLayout
+        android:id="@+id/panelResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="40dp"
+        android:paddingHorizontal="24dp"
+        android:gravity="center"
+        android:background="@color/clr_bg_white"
+        android:translationY="400dp"
+        android:visibility="gone"
+        android:elevation="8dp">
+
+        <!-- Result icon emoji -->
+        <TextView
+            android:id="@+id/tvResultIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="✅"
+            android:textSize="52sp" />
+
+        <!-- Attendee name / display code -->
+        <TextView
+            android:id="@+id/tvResultName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="VTX-XXXX-XXXX"
+            android:textColor="@color/clr_text_black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Ticket type name -->
+        <TextView
+            android:id="@+id/tvResultTicketType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="Vé VIP"
+            android:textColor="@color/clr_text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Result message -->
+        <TextView
+            android:id="@+id/tvResultMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="Check-in thành công!"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/clr_success" />
+
+        <!-- Scan next button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnScanNext"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Quét vé tiếp theo"
+            android:textSize="15sp"
+            android:textColor="@color/clr_text_white"
+            app:backgroundTint="@color/clr_primary"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</FrameLayout>
