@@ -1,6 +1,7 @@
 package com.example.vibetix.Repositories;
 
 import com.example.vibetix.Firebase.FirebaseCollections;
+import com.example.vibetix.Firebase.FirestoreHelper;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.Models.TicketType;
 import com.example.vibetix.R;
@@ -203,11 +204,12 @@ public class EventRepository {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Event event = documentSnapshot.toObject(Event.class);
-                        if (event != null && event.getId() == null) {
-                            event.setId(documentSnapshot.getId());
+                        Event event = FirestoreHelper.docToEvent(documentSnapshot);
+                        if (event != null) {
+                            listener.onSuccess(event);
+                        } else {
+                            listener.onFailure(new Exception("Fail to map event"));
                         }
-                        listener.onSuccess(event);
                     } else {
                         // Document does not exist in Firestore, fallback to local mock database
                         Event mockEvent = MOCK_EVENTS.get(eventId);

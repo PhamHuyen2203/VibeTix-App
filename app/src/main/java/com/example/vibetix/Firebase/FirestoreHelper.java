@@ -83,7 +83,7 @@ public class FirestoreHelper {
     }
 
     /** Map Firestore document → Event model với đúng field names */
-    public static Event docToEvent(QueryDocumentSnapshot doc) {
+    public static Event docToEvent(com.google.firebase.firestore.DocumentSnapshot doc) {
         try {
             String title = doc.getString("title");
             if (title == null || title.isEmpty()) return null;
@@ -117,6 +117,9 @@ public class FirestoreHelper {
             Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
             e.setVenueCity(city);
             e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
+            
+            // Description
+            e.setDescription(doc.getString("description"));
 
             Boolean featured = doc.getBoolean("is_featured");
             if (Boolean.TRUE.equals(featured)) e.setFeatured(true);

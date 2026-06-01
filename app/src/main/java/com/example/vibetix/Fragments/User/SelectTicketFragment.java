@@ -102,17 +102,28 @@ public class SelectTicketFragment extends Fragment {
     }
 
     private void loadEventDetails() {
-        // Fetch event from Firestore
+        // Fetch event from Firestore using team's style
         eventRepository.getEventById(eventId, new EventRepository.OnEventLoadedListener() {
             @Override
             public void onSuccess(Event event) {
-                if (event != null) {
-                    eventTitle = event.getTitle();
-                    txtSelectEventTitle.setText(eventTitle);
-                    txtSelectBottomEventTitle.setText(eventTitle);
-                    txtSelectEventDate.setText(event.getDate());
-                    txtSelectEventLocation.setText(event.getLocation());
-                    
+                if (!isAdded() || event == null) return;
+                
+                eventTitle = event.getTitle();
+                txtSelectEventTitle.setText(eventTitle);
+                txtSelectBottomEventTitle.setText(eventTitle);
+                txtSelectEventDate.setText(event.getDate());
+                txtSelectEventLocation.setText(event.getLocation());
+                
+                // Display correct image based on Firestore data or local fallback
+                if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+                    com.bumptech.glide.Glide.with(requireContext())
+                            .load(event.getImageUrl())
+                            .placeholder(R.drawable.event_live_non_song)
+                            .into(imvSelectEventThumb);
+                    com.bumptech.glide.Glide.with(requireContext())
+                            .load(event.getImageUrl())
+                            .into(imvSelectBottomThumb);
+                } else {
                     int imageRes = "b1".equals(eventId) || "e1".equals(eventId) || "rs1".equals(eventId)
                             ? R.drawable.event_live_non_song
                             : R.drawable.event_arts_private_fantasy;

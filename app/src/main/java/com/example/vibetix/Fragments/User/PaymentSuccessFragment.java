@@ -119,17 +119,33 @@ public class PaymentSuccessFragment extends Fragment {
         txtSuccessTime.setText(formattedDate);
         txtSuccessEmail.setText(email);
 
-        if ("b1".equals(eventId) || "e1".equals(eventId) || "rs1".equals(eventId)) {
-            txtSuccessEventTitle.setText("LUNCH & LEARN: Workshop về Phỏng vấn Ứng viên – Read Every Candidate Like A Pro");
-            txtSuccessEventDate.setText("09:00 – 12:00, 23 May, 2026");
-            txtSuccessEventLocation.setText("Tòa nhà WB Business Center, Tầng G, 200 Pasteur, P. Xuân Hòa, Gò Vấp, TP. HCM");
-            imvSuccessEventThumb.setImageResource(R.drawable.event_live_non_song);
-        } else {
-            txtSuccessEventTitle.setText("Private Show in Fantasy - Quốc Thiên");
-            txtSuccessEventDate.setText("16:00 - 19:00, 16 May, 2026");
-            txtSuccessEventLocation.setText("Tòa nhà WB Business Center, Tầng G, 200 Pasteur, P. Xuân Hòa, Gò Vấp, TP. HCM");
-            imvSuccessEventThumb.setImageResource(R.drawable.event_arts_private_fantasy);
-        }
+        // Fetch event data to show correct title and image
+        new com.example.vibetix.Repositories.EventRepository().getEventById(eventId, new com.example.vibetix.Repositories.EventRepository.OnEventLoadedListener() {
+            @Override
+            public void onSuccess(com.example.vibetix.Models.Event event) {
+                if (!isAdded() || event == null) return;
+                txtSuccessEventTitle.setText(event.getTitle());
+                txtSuccessEventDate.setText(event.getDate());
+                txtSuccessEventLocation.setText(event.getLocation());
+                
+                if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+                    com.bumptech.glide.Glide.with(requireContext())
+                            .load(event.getImageUrl())
+                            .placeholder(R.drawable.event_live_non_song)
+                            .into(imvSuccessEventThumb);
+                } else {
+                    int coverRes = "b1".equals(eventId) || "e1".equals(eventId) || "rs1".equals(eventId)
+                            ? R.drawable.event_live_non_song
+                            : R.drawable.event_arts_private_fantasy;
+                    imvSuccessEventThumb.setImageResource(coverRes);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Keep default layout or mock
+            }
+        });
     }
 
     private void setupClickListeners() {

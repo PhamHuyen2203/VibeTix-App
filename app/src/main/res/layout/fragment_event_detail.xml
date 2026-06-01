@@ -35,6 +35,17 @@
             android:text="Chi tiết sự kiện"
             android:textColor="@color/clr_text_black"
             android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/btnDetailFavorite"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_heart_small"
+            app:tint="@color/clr_grey_1" />
     </RelativeLayout>
 
     <!-- Scrollable content -->

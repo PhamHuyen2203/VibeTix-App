@@ -154,12 +154,19 @@ public class SimulatedPaymentFragment extends Fragment {
         eventRepository.getEventById(eventId, new EventRepository.OnEventLoadedListener() {
             @Override
             public void onSuccess(Event event) {
-                if (event != null) {
-                    txtPaymentEventTitle.setText(event.getTitle());
-                    txtPaymentEventDate.setText(event.getDate());
-                    txtPaymentEventLocation.setText(event.getLocation());
-                    
-                    int imageRes = "b1".equals(eventId) || "e1".equals(eventId) || "rs1".equals(eventId)
+                if (!isAdded() || event == null) return;
+                
+                txtPaymentEventTitle.setText(event.getTitle());
+                txtPaymentEventDate.setText(event.getDate());
+                txtPaymentEventLocation.setText(event.getLocation());
+                
+                if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+                    com.bumptech.glide.Glide.with(requireContext())
+                            .load(event.getImageUrl())
+                            .placeholder(R.drawable.event_live_non_song)
+                            .into(imvPaymentEventThumb);
+                } else {
+                    int imageRes = "b1".equals(eventId) || "e1".equals(eventId) || "rs1".equalsIgnoreCase(eventId)
                             ? R.drawable.event_live_non_song
                             : R.drawable.event_arts_private_fantasy;
                     imvPaymentEventThumb.setImageResource(imageRes);
