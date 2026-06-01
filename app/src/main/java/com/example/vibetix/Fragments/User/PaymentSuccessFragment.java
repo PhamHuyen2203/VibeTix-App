@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vibetix.Activities.UserMainActivity;
 import com.example.vibetix.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.DecimalFormat;
 
@@ -150,30 +149,15 @@ public class PaymentSuccessFragment extends Fragment {
 
     private void setupClickListeners() {
         btnSuccessViewTickets.setOnClickListener(v -> {
-            // Update bottom navigation active tab
-            updateBottomNavigationActiveItem(R.id.nav_my_tickets);
-
-            // Navigate to MyTicketsFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, new MyTicketsFragment())
-                    .commit();
+            if (getActivity() instanceof UserMainActivity) {
+                ((UserMainActivity) getActivity()).selectTab(R.id.tabTickets);
+            }
         });
 
         btnSuccessGoHome.setOnClickListener(v -> {
-            updateBottomNavigationActiveItem(R.id.nav_home);
-
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, new HomeFragment())
-                    .commit();
-        });
-    }
-
-    private void updateBottomNavigationActiveItem(int itemId) {
-        if (getActivity() instanceof UserMainActivity) {
-            BottomNavigationView bottomNav = getActivity().findViewById(R.id.bottomNavCustomer);
-            if (bottomNav != null) {
-                bottomNav.setSelectedItemId(itemId);
+            if (getActivity() instanceof UserMainActivity) {
+                ((UserMainActivity) getActivity()).selectTab(R.id.tabHome);
             }
-        }
+        });
     }
 }

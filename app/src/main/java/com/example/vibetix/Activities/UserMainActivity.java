@@ -81,7 +81,7 @@ public class UserMainActivity extends AppCompatActivity {
         tabProfile.setOnClickListener(v -> selectTab(R.id.tabProfile));
     }
 
-    private void selectTab(int tabId) {
+    public void selectTab(int tabId) {
         activeTabId = tabId;
         updateTabStyles();
 
