@@ -86,7 +86,7 @@
 
     <!-- Ticket Flow Strings -->
     <string name="ticket_select_title">Chọn vé</string>
-    <string name="payment_simulation_title">Thanh toán giả lập</string>
+    <string name="payment_simulation_title">Thanh toán</string>
     <string name="my_tickets_empty_message">Bạn chưa có vé nào cả!</string>
     <string name="ticket_qr_title">Vé điện tử QR</string>
     <string name="ticket_transfer_button">Bán lại vé</string>

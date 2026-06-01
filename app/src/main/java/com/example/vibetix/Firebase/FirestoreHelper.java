@@ -30,17 +30,31 @@ public class FirestoreHelper {
 
     // ── Category ID → App key (public để HomepageLoader dùng chung) ──────────
     public static final Map<String, String> CAT_MAP = new HashMap<>();
+    public static final Map<String, String> CAT_NAME_MAP = new HashMap<>();
     static {
-        CAT_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "music");     // Nhạc sống
-        CAT_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "arts");      // Sân khấu & Nghệ thuật
-        CAT_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "workshop");  // Hội thảo & Workshop
-        CAT_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "tour");      // Tham quan & Trải nghiệm
-        CAT_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "sports");    // Thể thao
-        CAT_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "festival");  // Khác/Lễ hội
+        CAT_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "music");
+        CAT_NAME_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "Nhạc sống");
+
+        CAT_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "arts");
+        CAT_NAME_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "Sân khấu & Nghệ thuật");
+
+        CAT_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "workshop");
+        CAT_NAME_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "Hội thảo & Workshop");
+
+        CAT_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "tour");
+        CAT_NAME_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "Tham quan & Trải nghiệm");
+
+        CAT_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "sports");
+        CAT_NAME_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "Thể thao");
+
+        CAT_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "festival");
+        CAT_NAME_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "Khác/Lễ hội");
     }
 
     // ── Venue cache (public để HomepageLoader dùng chung) ────────────────────
     public static final Map<String, String> VENUE_CACHE = new HashMap<>();
+    public static final Map<String, String> VENUE_NAME_CACHE = new HashMap<>();
+    public static final Map<String, String> VENUE_ADDRESS_CACHE = new HashMap<>();
 
     /**
      * Load toàn bộ published events (approved + ongoing).
@@ -56,7 +70,11 @@ public class FirestoreHelper {
                     for (QueryDocumentSnapshot vd : venueSnap) {
                         String vid  = vd.getString("venue_id");
                         String city = vd.getString("city");
+                        String name = vd.getString("name");
+                        String addr = vd.getString("address");
                         if (vid != null && city != null) VENUE_CACHE.put(vid, city);
+                        if (vid != null && name != null) VENUE_NAME_CACHE.put(vid, name);
+                        if (vid != null && addr != null) VENUE_ADDRESS_CACHE.put(vid, addr);
                     }
                     // Bước 2: Load events sau khi có venue cache
                     fetchEvents(db, callback);
@@ -93,11 +111,17 @@ public class FirestoreHelper {
             if (imageUrl == null) imageUrl = doc.getString("poster_url");
 
             // Ngày — start_time là Timestamp
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String date = "";
-            com.google.firebase.Timestamp ts = doc.getTimestamp("start_time");
-            if (ts != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                date = sdf.format(ts.toDate());
+            com.google.firebase.Timestamp tsStart = doc.getTimestamp("start_time");
+            if (tsStart != null) {
+                date = sdf.format(tsStart.toDate());
+            }
+
+            String endDate = "";
+            com.google.firebase.Timestamp tsEnd = doc.getTimestamp("end_time");
+            if (tsEnd != null) {
+                endDate = sdf.format(tsEnd.toDate());
             }
 
             // Thành phố — resolve từ venue_id
@@ -109,20 +133,48 @@ public class FirestoreHelper {
             String category = catId != null ? CAT_MAP.getOrDefault(catId, "music") : "music";
 
             // Giá
-            long price = 0;
-            Object p = doc.get("min_price");
-            if (p instanceof Long)   price = (Long) p;
-            else if (p instanceof Double) price = ((Double) p).longValue();
+            long minPrice = 0;
+            Object pMin = doc.get("min_price");
+            if (pMin instanceof Long)   minPrice = (Long) pMin;
+            else if (pMin instanceof Double) minPrice = ((Double) pMin).longValue();
 
-            Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
+            long maxPrice = 0;
+            Object pMax = doc.get("max_price");
+            if (pMax instanceof Long)   maxPrice = (Long) pMax;
+            else if (pMax instanceof Double) maxPrice = ((Double) pMax).longValue();
+
+            Event e = new Event(doc.getId(), title, imageUrl, date, city, category, minPrice);
+            e.setEndDate(endDate);
+            e.setMaxPrice(maxPrice);
             e.setVenueCity(city);
             e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
             
             // Description
             e.setDescription(doc.getString("description"));
 
-            Boolean featured = doc.getBoolean("is_featured");
-            if (Boolean.TRUE.equals(featured)) e.setFeatured(true);
+            // Organizer & Venue Detail
+            e.setOrganizerName(doc.getString("organizer_name"));
+
+            // Venue name & address
+            String vName = venueId != null ? VENUE_NAME_CACHE.get(venueId) : null;
+            String vAddr = venueId != null ? VENUE_ADDRESS_CACHE.get(venueId) : null;
+            e.setVenueName(vName);
+            e.setVenueAddress(vAddr);
+
+            // Build full location string for detail display
+            StringBuilder fullLocation = new StringBuilder();
+            if (vName != null && !vName.isEmpty()) fullLocation.append(vName);
+            if (vAddr != null && !vAddr.isEmpty()) {
+                if (fullLocation.length() > 0) fullLocation.append(", ");
+                fullLocation.append(vAddr);
+            }
+            if (city != null && !city.isEmpty()) {
+                if (fullLocation.length() > 0) fullLocation.append(", ");
+                fullLocation.append(city);
+            }
+            if (fullLocation.length() > 0) {
+                e.setLocation(fullLocation.toString());
+            }
 
             Long interest = doc.getLong("interest_count");
             if (interest != null) e.setInterestCount(interest.intValue());

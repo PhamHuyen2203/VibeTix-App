@@ -8,13 +8,17 @@ public class Event {
     private String location;
     private String category;
     private long minPrice;
+    private long maxPrice;
     private boolean isFree;
     private boolean isSoldOut;
     private String status;
     private int localImageResId;          // landscape / banner image
     private int localPortraitImageResId;  // portrait poster image (for Featured section)
     private String venueCity;
+    private String venueName;
+    private String venueAddress;
     private String organizerName;
+    private String endDate;
     private int interestCount;
     private boolean isFeatured;
     private String description;
@@ -53,6 +57,9 @@ public class Event {
     public long getMinPrice() { return minPrice; }
     public void setMinPrice(long minPrice) { this.minPrice = minPrice; }
 
+    public long getMaxPrice() { return maxPrice; }
+    public void setMaxPrice(long maxPrice) { this.maxPrice = maxPrice; }
+
     public boolean isFree() { return isFree; }
     public void setFree(boolean free) { isFree = free; }
 
@@ -71,8 +78,17 @@ public class Event {
     public String getVenueCity() { return venueCity; }
     public void setVenueCity(String venueCity) { this.venueCity = venueCity; }
 
+    public String getVenueName() { return venueName; }
+    public void setVenueName(String venueName) { this.venueName = venueName; }
+
+    public String getVenueAddress() { return venueAddress; }
+    public void setVenueAddress(String venueAddress) { this.venueAddress = venueAddress; }
+
     public String getOrganizerName() { return organizerName; }
     public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
+
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
 
     public int getInterestCount() { return interestCount; }
     public void setInterestCount(int interestCount) { this.interestCount = interestCount; }

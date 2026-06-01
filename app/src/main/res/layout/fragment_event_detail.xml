@@ -76,6 +76,38 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/txtDetailCategory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_category_chip_small"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:text="Category"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="11sp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/txtDetailInterest"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 lượt quan tâm"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/txtDetailEventTitle"
                     android:layout_width="match_parent"
@@ -85,6 +117,33 @@
                     android:textColor="@color/clr_text_black"
                     android:textSize="22sp"
                     android:textStyle="bold" />
+
+                <!-- Organizer info -->
+                <LinearLayout
+                    android:id="@+id/layoutOrganizer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="Tổ chức bởi "
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/txtDetailOrganizer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Organizer Name"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="13sp" />
+                </LinearLayout>
 
                 <!-- Date info -->
                 <LinearLayout
