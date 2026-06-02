@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 
@@ -50,14 +51,26 @@ public class FeaturedEventAdapter extends RecyclerView.Adapter<FeaturedEventAdap
     public void onBindViewHolder(@NonNull FeaturedViewHolder holder, int position) {
         Event event = danhSachFeatured.get(position);
 
-        // Prefer portrait poster; fall back to landscape banner image
-        Object imageSource = event.getLocalPortraitImageResId() != 0
-                ? event.getLocalPortraitImageResId()
-                : (event.getLocalImageResId() != 0 ? event.getLocalImageResId() : R.drawable.ic_launcher_background);
+        // Portrait section: ưu tiên poster_url, fallback banner_url, rồi local
+        Object imageSource;
+        if (event.getLocalPortraitImageResId() != 0) {
+            imageSource = event.getLocalPortraitImageResId();        // local portrait
+        } else if (event.getPortraitImageUrl() != null && !event.getPortraitImageUrl().isEmpty()) {
+            imageSource = event.getPortraitImageUrl();               // poster_url từ Firestore
+        } else if (event.getLocalImageResId() != 0) {
+            imageSource = event.getLocalImageResId();                // local landscape fallback
+        } else if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+            imageSource = event.getImageUrl();                       // banner_url fallback cuối
+        } else {
+            imageSource = R.drawable.ic_launcher_background;
+        }
 
         Glide.with(context)
                 .load(imageSource)
                 .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
                 .into(holder.imvFeaturedPoster);
 
         holder.itemView.setOnClickListener(v -> {

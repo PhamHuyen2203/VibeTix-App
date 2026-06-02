@@ -123,7 +123,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_customer_home, container, false);
         addViews(view);
         addEvents(view);
-        loadMockData();          // Mock hiển thị ngay
+        loadMockData();  // Setup adapters + stars/destinations + banner dots
         return view;
     }
 
@@ -291,28 +291,7 @@ public class HomeFragment extends Fragment {
         danhSachCategory.add(new Category("c5", getString(R.string.str_sports), "sports", R.drawable.ic_cat_sports, R.color.clr_cat_sports));
         danhSachCategory.add(new Category("c6", getString(R.string.str_cat_festival), "festival", R.drawable.ic_cat_festival, R.color.clr_cat_festival));
 
-        // Mock Banners (ERD: EVENT.banner_url for landscape, EVENT.status, VENUE.city)
-        Event b1 = new Event("b1", "VinhVerse - Đêm nhạc thế kỷ", null, "19/05/2025", "TP.HCM", "ongoing", 500000);
-        b1.setLocalImageResId(R.drawable.banner_vinh_verse);
-        b1.setVenueCity("TP.Hồ Chí Minh");
-        b1.setInterestCount(8200);
-        b1.setFeatured(true);
-        danhSachBanner.add(b1);
-
-        Event b2 = new Event("b2", "Private Show in Fantasy", null, "25/05/2025", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 800000);
-        b2.setLocalImageResId(R.drawable.banner_private_show_fantasy);
-        b2.setVenueCity("Hà Nội");
-        b2.setInterestCount(5400);
-        b2.setFeatured(true);
-        danhSachBanner.add(b2);
-
-        Event b3 = new Event("b3", "Hòa nhạc Non Sông 2025", null, "01/06/2025", "Đà Nẵng", Constants.EVENT_STATUS_PUBLISHED, 350000);
-        b3.setLocalImageResId(R.drawable.banner_non_song);
-        b3.setVenueCity("Đà Nẵng");
-        b3.setInterestCount(3100);
-        b3.setFeatured(true);
-        danhSachBanner.add(b3);
-
+        // Banner, Featured, Trending → load từ Firebase (không hardcode)
         // Mock Featured Stars
         FeaturedStar s1 = new FeaturedStar("s1", "Sơn Tùng M-TP", null);
         s1.setLocalImageResId(R.drawable.star_son_tung);
@@ -350,154 +329,26 @@ public class HomeFragment extends Fragment {
         s9.setLocalImageResId(R.drawable.star_noo_phuoc_thinh);
         danhSachStar.add(s9);
 
-        // Mock Featured Events (EVENT.is_featured = true)
-        // localPortraitImageResId = portrait poster for Featured section
-        // localImageResId         = landscape banner (used in other sections)
-        // localPortraitImageResId = ảnh poster dọc hiển thị trong mục "Sự kiện đặc biệt".
-        // e1 & e2 dùng ảnh poster thật (dọc). e3 & e4 tạm dùng ảnh ngang cho đến khi có poster riêng.
-        Event e1 = new Event("e1", "Mừng Ngày Hội Non Sông - Võ Hà Trâm", null, "01/05/2026", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 350000);
-        e1.setLocalImageResId(R.drawable.event_live_non_song);
-        e1.setLocalPortraitImageResId(R.drawable.event_live_non_song_2); // ảnh poster dọc 194×259
-        e1.setVenueCity("TP.Hồ Chí Minh"); e1.setInterestCount(4200); e1.setFeatured(true);
-        danhSachFeatured.add(e1);
+        // ── Events sections (Featured/Trending/Category) load từ Firebase ──────
+        // Không hardcode mock events → sections trống ban đầu, Firebase fill vào
+        // (xem loadEventsFromFirestore() bên dưới)
 
-        Event e2 = new Event("e2", "Private Show in Fantasy - Quốc Thiên", null, "16/05/2026", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 800000);
-        e2.setLocalImageResId(R.drawable.event_arts_private_fantasy);
-        e2.setLocalPortraitImageResId(R.drawable.banner_private_show_fantasy); // ảnh poster dọc
-        e2.setVenueCity("Hà Nội"); e2.setInterestCount(5400); e2.setFeatured(true);
-        danhSachFeatured.add(e2);
-
-        Event e3 = new Event("e3", "BẰNG KIỀU - CÒN MƯA NGANG QUA", null, "19/05/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 350000);
-        e3.setLocalImageResId(R.drawable.event_featured_bang_kieu);
-        e3.setLocalPortraitImageResId(R.drawable.event_featured_bang_kieu); // tạm dùng ảnh ngang
-        e3.setVenueCity("TP.Hồ Chí Minh"); e3.setInterestCount(3100); e3.setFeatured(true);
-        danhSachFeatured.add(e3);
-
-        Event e4 = new Event("e4", "Vì Lý Do Đời - Mr. Siro", null, "01/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 600000);
-        e4.setLocalImageResId(R.drawable.event_featured_vi_ly_doi);
-        e4.setLocalPortraitImageResId(R.drawable.event_featured_vi_ly_doi); // tạm dùng ảnh ngang
-        e4.setVenueCity("TP.Hồ Chí Minh"); e4.setInterestCount(3900); e4.setFeatured(true);
-        danhSachFeatured.add(e4);
-
-        // Mock Trending Events
-        Event t1 = new Event("t1", "FWS SEA 2025", null, "15/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 1200000);
-        t1.setLocalImageResId(R.drawable.event_trending_fws_sea);
-        t1.setVenueCity("TP.Hồ Chí Minh"); t1.setInterestCount(12500);
-        danhSachTrending.add(t1);
-
-        Event t2 = new Event("t2", "RISING FEST 2025", null, "22/06/2025", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 900000);
-        t2.setLocalImageResId(R.drawable.event_trending_rising_fest);
-        t2.setVenueCity("Hà Nội"); t2.setInterestCount(9800);
-        danhSachTrending.add(t2);
-
-        Event t3 = new Event("t3", "Ultra Vietnam 2025", null, "12/07/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 1500000);
-        t3.setLocalImageResId(R.drawable.event_trending_rising_2);
-        t3.setVenueCity("TP.Hồ Chí Minh"); t3.setInterestCount(15200);
-        danhSachTrending.add(t3);
-
-        // Mock Resale Tickets (vé bán lại — soldOut=true để hiện badge "Bán lại")
-        Event rs1 = new Event("rs1", "BẰNG KIỀU - CÒN MƯA NGANG QUA", null, "19/05/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 420000);
-        rs1.setLocalImageResId(R.drawable.event_featured_bang_kieu);
-        rs1.setVenueCity("TP.Hồ Chí Minh"); rs1.setInterestCount(4200); rs1.setSoldOut(true);
+        // ── VÉ BÁN LẠI (Mock) ─────────────────────────────────────────────────
+        // Firebase chưa có data: tickets collection trống, orders không có status "reselling"
+        // Giữ mock để UI hiển thị. Khi teammate bổ sung data thật → TicketRepository.getAllResellingTickets() sẽ tự load
+        Event rs1 = new Event("rs1", "NON SONG Live Show", null, "05/06/2026", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 420000);
+        rs1.setLocalImageResId(R.drawable.event_live_non_song); rs1.setVenueCity("TP.Hồ Chí Minh"); rs1.setSoldOut(true);
         danhSachResale.add(rs1);
 
-        Event rs2 = new Event("rs2", "The Story Concert", null, "27/05/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 580000);
-        rs2.setLocalImageResId(R.drawable.event_featured_the_story);
-        rs2.setVenueCity("TP.Hồ Chí Minh"); rs2.setInterestCount(6500); rs2.setSoldOut(true);
+        Event rs2 = new Event("rs2", "Private Show in Fantasy", null, "16/05/2026", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 650000);
+        rs2.setLocalImageResId(R.drawable.event_arts_private_fantasy); rs2.setVenueCity("Hà Nội"); rs2.setSoldOut(true);
         danhSachResale.add(rs2);
 
-        Event rs3 = new Event("rs3", "FWS SEA 2025", null, "15/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 1350000);
-        rs3.setLocalImageResId(R.drawable.event_trending_fws_sea);
-        rs3.setVenueCity("TP.Hồ Chí Minh"); rs3.setInterestCount(12500); rs3.setSoldOut(true);
+        Event rs3 = new Event("rs3", "FORESTIVAL CHIẾN BINH BÌNH MINH", null, "20/07/2026", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 900000);
+        rs3.setLocalImageResId(R.drawable.event_trending_rising_fest); rs3.setVenueCity("TP.Hồ Chí Minh"); rs3.setSoldOut(true);
         danhSachResale.add(rs3);
 
-        Event rs4 = new Event("rs4", "Ultra Vietnam 2025", null, "12/07/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 1650000);
-        rs4.setLocalImageResId(R.drawable.event_trending_rising_2);
-        rs4.setVenueCity("TP.Hồ Chí Minh"); rs4.setInterestCount(15200); rs4.setSoldOut(true);
-        danhSachResale.add(rs4);
-
-        // Mock Live Music
-        Event lm1 = new Event("lm1", "Đêm nhạc Trịnh Công Sơn", null, "28/05/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 150000);
-        lm1.setLocalImageResId(R.drawable.event_live_concert_1);
-        lm1.setVenueCity("TP.Hồ Chí Minh"); lm1.setInterestCount(2300);
-        danhSachLiveMusic.add(lm1);
-
-        Event lm2 = new Event("lm2", "NON SONG Live Show", null, "05/06/2025", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 250000);
-        lm2.setLocalImageResId(R.drawable.event_live_non_song);
-        lm2.setVenueCity("Hà Nội"); lm2.setInterestCount(4700);
-        danhSachLiveMusic.add(lm2);
-
-        Event lm3 = new Event("lm3", "Jazz Night HCM", null, "10/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 300000);
-        lm3.setLocalImageResId(R.drawable.event_live_non_song_2);
-        lm3.setVenueCity("TP.Hồ Chí Minh"); lm3.setInterestCount(1600);
-        danhSachLiveMusic.add(lm3);
-
-        Event lm4 = new Event("lm4", "Live Concert Vol.2", null, "18/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 400000);
-        lm4.setLocalImageResId(R.drawable.event_live_concert_2);
-        lm4.setVenueCity("TP.Hồ Chí Minh"); lm4.setInterestCount(2100);
-        danhSachLiveMusic.add(lm4);
-
-        // Mock Stage & Arts
-        Event sa1 = new Event("sa1", "Chèo Đất Việt", null, "30/05/2025", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 100000);
-        sa1.setLocalImageResId(R.drawable.event_arts_traditional);
-        sa1.setVenueCity("Hà Nội"); sa1.setInterestCount(890);
-        danhSachStageArts.add(sa1);
-
-        Event sa2 = new Event("sa2", "Opera Night 2025", null, "07/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 450000);
-        sa2.setLocalImageResId(R.drawable.event_arts_concert);
-        sa2.setVenueCity("TP.Hồ Chí Minh"); sa2.setInterestCount(3200);
-        danhSachStageArts.add(sa2);
-
-        Event sa3 = new Event("sa3", "Private Show in Fantasy", null, "14/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 700000);
-        sa3.setLocalImageResId(R.drawable.event_arts_private_fantasy);
-        sa3.setVenueCity("TP.Hồ Chí Minh"); sa3.setInterestCount(5100);
-        danhSachStageArts.add(sa3);
-
-        Event sa4 = new Event("sa4", "Quốc Thiên Live", null, "21/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 300000);
-        sa4.setLocalImageResId(R.drawable.event_arts_quoc_thien);
-        sa4.setVenueCity("TP.Hồ Chí Minh"); sa4.setInterestCount(1400);
-        danhSachStageArts.add(sa4);
-
-        // Mock Workshop
-        Event ws1 = new Event("ws1", "GSTAR SUMMIT 2025", null, "25/05/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 500000);
-        ws1.setLocalImageResId(R.drawable.event_ws_gstar_summit);
-        ws1.setVenueCity("TP.Hồ Chí Minh"); ws1.setInterestCount(2800);
-        danhSachWorkshop.add(ws1);
-
-        Event ws2 = new Event("ws2", "Workshop Âm nhạc & Nghệ thuật", null, "01/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 100000);
-        ws2.setLocalImageResId(R.drawable.event_ws_concert);
-        ws2.setVenueCity("TP.Hồ Chí Minh"); ws2.setInterestCount(750);
-        danhSachWorkshop.add(ws2);
-
-        // Mock Tour
-        Event tr1 = new Event("tr1", "Tour Di tích Văn Hóa - Vân Mộc", null, "29/05/2025", "Quảng Bình", Constants.EVENT_STATUS_PUBLISHED, 350000);
-        tr1.setLocalImageResId(R.drawable.event_tour_mountain);
-        tr1.setVenueCity("Quảng Bình"); tr1.setInterestCount(1200);
-        danhSachTour.add(tr1);
-
-        Event tr2 = new Event("tr2", "Trải nghiệm suối nước nóng Đà Lạt", null, "10/06/2025", "Đà Lạt", Constants.EVENT_STATUS_PUBLISHED, 200000);
-        tr2.setLocalImageResId(R.drawable.event_tour_outdoor);
-        tr2.setVenueCity("Đà Lạt"); tr2.setInterestCount(980);
-        danhSachTour.add(tr2);
-
-        // Mock Sports
-        Event sp1 = new Event("sp1", "FWS SEA 2025 - Finals", null, "20/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 150000);
-        sp1.setLocalImageResId(R.drawable.event_sports_esport);
-        sp1.setVenueCity("TP.Hồ Chí Minh"); sp1.setInterestCount(7600);
-        sp1.setSoldOut(true);
-        danhSachSports.add(sp1);
-
-        Event sp2 = new Event("sp2", "THE GLOBAL CHAMPIONSHIP 2025", null, "25/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 200000);
-        sp2.setLocalImageResId(R.drawable.event_sports_global_champ);
-        sp2.setVenueCity("TP.Hồ Chí Minh"); sp2.setInterestCount(11000);
-        danhSachSports.add(sp2);
-
-        Event sp3 = new Event("sp3", "Playoffs 2025", null, "15/06/2025", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 100000);
-        sp3.setLocalImageResId(R.drawable.event_sports_playoffs);
-        sp3.setVenueCity("TP.Hồ Chí Minh"); sp3.setInterestCount(4300);
-        danhSachSports.add(sp3);
-
-        // Mock Destinations
+        // Destinations
         Destination d1 = new Destination("d1", "TP.Hồ Chí Minh", null, 120);
         d1.setLocalImageResId(R.drawable.destination_hcmc);
         danhSachDestination.add(d1);
@@ -517,9 +368,7 @@ public class HomeFragment extends Fragment {
         Destination d5 = new Destination("d5", "Đà Lạt", null, 28);
         d5.setLocalImageResId(R.drawable.destination_da_lat);
         danhSachDestination.add(d5);
-
-        Destination d6 = new Destination("d6", "Huế", null, 20);
-        danhSachDestination.add(d6);
+        // Huế đã bị xóa — không có đủ data Firestore
 
         setupAdapters();
         setupBannerDots();
@@ -528,22 +377,26 @@ public class HomeFragment extends Fragment {
         loadEventsFromFirestore(); // Fetch Firestore sau khi mock đã hiển thị
     }
 
-    // ── Firestore: tải từng section theo cơ chế HomepageLoader ───────────────
+    // ── Firestore: load category cache trước, rồi load từng section ──────────
     private void loadEventsFromFirestore() {
-        // Đảm bảo venue cache sẵn sàng trước khi load
-        FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
-            @Override public void onSuccess(java.util.List<Event> ignored) {
-                // Venue cache đã sẵn sàng → load từng section song song
-                loadBannerSection();
-                loadFeaturedSection();
-                loadTrendingSection();
-                loadCategorySection(HomepageLoader.CAT_MUSIC,    danhSachLiveMusic,   liveMusicAdapter);
-                loadCategorySection(HomepageLoader.CAT_ARTS,     danhSachStageArts,   stageArtsAdapter);
-                loadCategorySection(HomepageLoader.CAT_WORKSHOP, danhSachWorkshop,    workshopAdapter);
-                loadCategorySection(HomepageLoader.CAT_TOUR,     danhSachTour,        tourExperienceAdapter);
-                loadCategorySection(HomepageLoader.CAT_SPORTS,   danhSachSports,      sportsAdapter);
-            }
-            @Override public void onFailure(Exception e) { /* mock vẫn hiển thị */ }
+        // Bước 1: Load categories + venues song song
+        FirestoreHelper.loadCategoryCache(() -> {
+            // Bước 2: Sau khi category cache sẵn, load venues + events
+            FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
+                @Override public void onSuccess(java.util.List<Event> ignored) {
+                    if (!isAdded()) return;
+                    loadBannerSection();
+                    loadFeaturedSection();
+                    loadTrendingSection();
+                    // Dùng getCatId() để lấy UUID thật từ cache
+                    loadCategorySection(HomepageLoader.getCatId("music"),    danhSachLiveMusic,   liveMusicAdapter);
+                    loadCategorySection(HomepageLoader.getCatId("arts"),     danhSachStageArts,   stageArtsAdapter);
+                    loadCategorySection(HomepageLoader.getCatId("workshop"), danhSachWorkshop,    workshopAdapter);
+                    loadCategorySection(HomepageLoader.getCatId("tour"),     danhSachTour,        tourExperienceAdapter);
+                    loadCategorySection(HomepageLoader.getCatId("sports"),   danhSachSports,      sportsAdapter);
+                }
+                @Override public void onFailure(Exception e) {}
+            });
         });
     }
 
@@ -658,9 +511,9 @@ public class HomeFragment extends Fragment {
         rvSports.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvSports.setAdapter(sportsAdapter);
 
-        // Destinations
+        // Destinations — click → mở Search với bộ lọc thành phố tương ứng
         destinationAdapter = new DestinationAdapter(requireContext(), danhSachDestination,
-                dest -> Toast.makeText(requireContext(), dest.getName(), Toast.LENGTH_SHORT).show());
+                dest -> openSearchWithCity(dest.getName()));
         rvDestinations.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvDestinations.setAdapter(destinationAdapter);
     }
@@ -754,6 +607,33 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         stopBannerAutoScroll();
+    }
+
+    // ── Mở Search Fragment với bộ lọc thành phố đã chọn sẵn ──────────────────
+    private void openSearchWithCity(String displayName) {
+        // Map tên hiển thị → keyword dùng để filter (khớp với venue_city trong Firestore)
+        String cityKeyword;
+        if (displayName.contains("Hồ Chí Minh"))   cityKeyword = "Hồ Chí Minh";
+        else if (displayName.contains("Hà Nội"))    cityKeyword = "Hà Nội";
+        else if (displayName.contains("Đà Nẵng"))   cityKeyword = "Đà Nẵng";
+        else if (displayName.contains("Hội An"))    cityKeyword = "Hội An";
+        else if (displayName.contains("Đà Lạt"))    cityKeyword = "Đà Lạt";
+        else                                         cityKeyword = displayName;
+
+        // Truyền keyword qua Bundle sang SearchFragment
+        android.os.Bundle args = new android.os.Bundle();
+        args.putString("preset_city", cityKeyword);
+
+        SearchFragment searchFragment = new SearchFragment();
+        searchFragment.setArguments(args);
+
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContainerMain, searchFragment)
+                .addToBackStack("search_city")
+                .commit();
+        }
     }
 
     // ── Promo dialog ───────────────────────────────────────────────────────────

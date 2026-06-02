@@ -11,8 +11,9 @@ public class Event {
     private boolean isFree;
     private boolean isSoldOut;
     private String status;
-    private int localImageResId;          // landscape / banner image
-    private int localPortraitImageResId;  // portrait poster image (for Featured section)
+    private int    localImageResId;          // landscape / banner image (local drawable)
+    private int    localPortraitImageResId;  // portrait poster (local drawable)
+    private String portraitImageUrl;         // poster_url từ Firestore (portrait sections)
     private String venueCity;
     private String organizerName;
     private int interestCount;
@@ -67,6 +68,9 @@ public class Event {
 
     public int getLocalPortraitImageResId() { return localPortraitImageResId; }
     public void setLocalPortraitImageResId(int localPortraitImageResId) { this.localPortraitImageResId = localPortraitImageResId; }
+
+    public String getPortraitImageUrl() { return portraitImageUrl; }
+    public void   setPortraitImageUrl(String v) { this.portraitImageUrl = v; }
 
     public String getVenueCity() { return venueCity; }
     public void setVenueCity(String venueCity) { this.venueCity = venueCity; }

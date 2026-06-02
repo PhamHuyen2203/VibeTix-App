@@ -18,10 +18,18 @@ public class SearchCategoryAdapter extends RecyclerView.Adapter<SearchCategoryAd
 
     public static class SearchCategoryItem {
         public String name;
-        public int imageResId;
+        public String categoryId; // Firestore category_id UUID, "all" = tất cả
+        public int    imageResId;
 
         public SearchCategoryItem(String name, int imageResId) {
-            this.name = name;
+            this.name       = name;
+            this.categoryId = "all";
+            this.imageResId = imageResId;
+        }
+
+        public SearchCategoryItem(String name, String categoryId, int imageResId) {
+            this.name       = name;
+            this.categoryId = categoryId;
             this.imageResId = imageResId;
         }
     }

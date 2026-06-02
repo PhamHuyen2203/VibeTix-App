@@ -26,6 +26,8 @@ import com.example.vibetix.Firebase.FirestoreHelper;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.Constants;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,25 +51,19 @@ public class EventsFragment extends Fragment {
     private final ArrayList<Event> displayList  = new ArrayList<>();
     private EventAdapter adapter;
 
-    private String activeCategory = "all";
-    private String activeSort     = "newest";
-    private String activeCity     = "";
+    private String activeCategory  = "all";
+    private String activeSort      = "newest";
+    private String activeCity      = "";      // keyword để filter (match với Firestore venue_city)
+    private String activeCityLabel = "";      // label hiển thị trên button
 
-    // Danh mục: {key, label, iconResId}
-    private static final Object[][] CATEGORIES = {
-        {"all",      "Tất cả",   R.drawable.ic_cat_all},
-        {"music",    "Âm nhạc",  R.drawable.ic_cat_music},
-        {"arts",     "Sân khấu", R.drawable.ic_cat_arts},
-        {"workshop", "Workshop", R.drawable.ic_cat_workshop},
-        {"tour",     "Tour",     R.drawable.ic_cat_tour},
-        {"sports",   "Thể thao", R.drawable.ic_cat_sports},
-        {"festival", "Lễ hội",   R.drawable.ic_cat_festival},
-    };
+    private final java.util.List<Object[]> categoryList = new java.util.ArrayList<>();
 
-    private static final String[] SORT_LABELS  = {"Mới nhất", "Cũ nhất", "Giá thấp → cao", "Giá cao → thấp"};
-    private static final String[] SORT_KEYS    = {"newest",   "oldest",  "price_asc",       "price_desc"};
+    private static final String[] SORT_LABELS   = {"Mới nhất", "Cũ nhất", "Giá thấp → cao", "Giá cao → thấp"};
+    private static final String[] SORT_KEYS     = {"newest",   "oldest",  "price_asc",       "price_desc"};
 
-    private static final String[] CITY_LABELS  = {"Tất cả tỉnh thành", "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Đà Lạt", "Hội An"};
+    // CITY_LABELS: tên hiển thị | CITY_KEYWORDS: keyword filter (khớp Firestore venue_city)
+    private static final String[] CITY_LABELS   = {"Tất cả tỉnh thành", "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Đà Lạt", "Hội An"};
+    private static final String[] CITY_KEYWORDS = {"",                  "Hồ Chí Minh",     "Hà Nội", "Đà Nẵng", "Đà Lạt", "Hội An"};
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
     @Nullable
@@ -83,12 +79,15 @@ public class EventsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         bindViews(view);
         applyInsets(view);
-        buildMockData();          // Hiển thị mock ngay (UI phản hồi nhanh)
-        buildCategoryChips();
         setupRecyclerView();
         setupListeners();
-        applyFilters();
-        loadEventsFromFirestore(); // Sau đó fetch Firestore replace mock
+        // Load category cache trước → rebuild chips → rồi load events
+        FirestoreHelper.loadCategoryCache(() -> {
+            if (!isAdded()) return;
+            buildCategoryChipsDefault(); // Build chips với UUIDs mới từ cache
+            loadCategoriesFromFirestore(); // Rebuild với tên thật
+            loadEventsFromFirestore();     // Load events
+        });
     }
 
     // ── View binding ───────────────────────────────────────────────────────────
@@ -179,15 +178,78 @@ public class EventsFragment extends Fragment {
         });
     }
 
+    /** Build chips dùng UUIDs từ FirestoreHelper.CAT_KEY_TO_ID (dynamic) */
+    private void buildCategoryChipsDefault() {
+        categoryList.clear();
+        categoryList.add(new Object[]{"all", "Tất cả", R.drawable.ic_cat_all});
+        // Dùng getCatId() để lấy UUID thật — không hardcode
+        addCatChip("music",    "Nhạc sống",          R.drawable.ic_cat_music);
+        addCatChip("arts",     "Sân khấu & NT",       R.drawable.ic_cat_arts);
+        addCatChip("workshop", "Hội thảo & Workshop", R.drawable.ic_cat_workshop);
+        addCatChip("tour",     "Tham quan & TN",      R.drawable.ic_cat_tour);
+        addCatChip("sports",   "Thể thao",            R.drawable.ic_cat_sports);
+        addCatChip("festival", "Khác",                R.drawable.ic_cat_festival);
+        buildCategoryChips();
+    }
+
+    private void addCatChip(String appKey, String defaultLabel, int icon) {
+        String uuid = FirestoreHelper.CAT_KEY_TO_ID.get(appKey);
+        if (uuid == null || uuid.isEmpty()) return; // skip nếu chưa load
+        // Lấy tên hiển thị từ cache, fallback về defaultLabel
+        String slugKey;
+        switch (appKey) {
+            case "music":    slugKey = "nhac-song"; break;
+            case "arts":     slugKey = "san-khau-nghe-thuat"; break;
+            case "workshop": slugKey = "hoi-thao-workshop"; break;
+            case "tour":     slugKey = "tham-quan-trai-nghiem"; break;
+            case "sports":   slugKey = "the-thao"; break;
+            default:         slugKey = "khac"; break;
+        }
+        String label = FirestoreHelper.CAT_SLUG_TO_NAME.containsKey(slugKey)
+            ? FirestoreHelper.CAT_SLUG_TO_NAME.get(slugKey) : defaultLabel;
+        categoryList.add(new Object[]{uuid, label, icon});
+    }
+
+    /** Load categories từ Firestore → rebuild chips với tên khớp Firebase */
+    private void loadCategoriesFromFirestore() {
+        FirebaseFirestore.getInstance().collection("categories").get()
+            .addOnSuccessListener(snap -> {
+                if (!isAdded() || snap.isEmpty()) return;
+                categoryList.clear();
+                categoryList.add(new Object[]{"all", "Tất cả", R.drawable.ic_cat_all});
+                for (QueryDocumentSnapshot doc : snap) {
+                    String catId = doc.getString("category_id");
+                    String name  = doc.getString("name");
+                    String slug  = doc.getString("slug");
+                    if (catId == null || name == null) continue;
+                    int icon = getIconForSlug(slug);
+                    categoryList.add(new Object[]{catId, name, icon});
+                }
+                buildCategoryChips(); // Rebuild với tên thật từ Firebase
+            });
+    }
+
+    private int getIconForSlug(String slug) {
+        if (slug == null) return R.drawable.ic_cat_all;
+        switch (slug) {
+            case "nhac-song":               return R.drawable.ic_cat_music;
+            case "san-khau-nghe-thuat":     return R.drawable.ic_cat_arts;
+            case "hoi-thao-workshop":       return R.drawable.ic_cat_workshop;
+            case "tham-quan-trai-nghiem":   return R.drawable.ic_cat_tour;
+            case "the-thao":                return R.drawable.ic_cat_sports;
+            default:                        return R.drawable.ic_cat_festival;
+        }
+    }
+
     // ── Category chips — icon đơn sắc + text ──────────────────────────────────
     private void buildCategoryChips() {
         containerCategoryChips.removeAllViews();
         float dp = getResources().getDisplayMetrics().density;
 
-        for (int i = 0; i < CATEGORIES.length; i++) {
-            final String key   = (String) CATEGORIES[i][0];
-            final String label = (String) CATEGORIES[i][1];
-            final int    icon  = (int)    CATEGORIES[i][2];
+        for (int i = 0; i < categoryList.size(); i++) {
+            final String key   = (String) categoryList.get(i)[0];
+            final String label = (String) categoryList.get(i)[1];
+            final int    icon  = (int)    categoryList.get(i)[2];
             final int    idx   = i;
 
             // Chip = horizontal LinearLayout (icon + text)
@@ -231,7 +293,8 @@ public class EventsFragment extends Fragment {
                         if (c.getChildCount() >= 2) {
                             android.widget.ImageView ic2 = (android.widget.ImageView) c.getChildAt(0);
                             TextView txt2 = (TextView) c.getChildAt(1);
-                            updateChipStyle(c, ic2, txt2, CATEGORIES[j][0].equals(activeCategory));
+                            String chipKey = j < categoryList.size() ? (String) categoryList.get(j)[0] : "";
+                            updateChipStyle(c, ic2, txt2, chipKey.equals(activeCategory));
                         }
                     }
                 }
@@ -301,26 +364,139 @@ public class EventsFragment extends Fragment {
         btnFilterCity.setOnClickListener(v -> showCityDialog());
     }
 
+    /** Bottom sheet chọn sắp xếp — có nút Xóa bộ lọc */
     private void showSortDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Sắp xếp theo")
-                .setItems(SORT_LABELS, (d, which) -> {
-                    activeSort = SORT_KEYS[which];
-                    txtFilterSort.setText(SORT_LABELS[which]);
-                    applyFilters();
-                })
-                .show();
+        android.app.Dialog sheet = new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        android.view.View v = buildOptionSheet("Sắp xếp theo", SORT_LABELS, activeSort.equals("newest") ? -1 : getActiveSortIndex(),
+            which -> {
+                activeSort = SORT_KEYS[which];
+                txtFilterSort.setText(SORT_LABELS[which]);
+                applyFilters();
+                sheet.dismiss();
+            },
+            () -> { // Xóa sắp xếp
+                activeSort = "newest";
+                txtFilterSort.setText("Mới nhất");
+                applyFilters();
+                sheet.dismiss();
+            });
+        sheet.setContentView(v);
+        sheet.show();
     }
 
+    /** Bottom sheet chọn tỉnh thành — có nút Xóa bộ lọc */
     private void showCityDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Chọn tỉnh thành")
-                .setItems(CITY_LABELS, (d, which) -> {
-                    activeCity = which == 0 ? "" : CITY_LABELS[which];
-                    txtFilterCity.setText(CITY_LABELS[which]);
-                    applyFilters();
-                })
-                .show();
+        android.app.Dialog sheet = new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        android.view.View v = buildOptionSheet("Chọn tỉnh thành", CITY_LABELS, getActiveCityIndex(),
+            which -> {
+                activeCity      = CITY_KEYWORDS[which];
+                activeCityLabel = which == 0 ? "Tất cả tỉnh thành" : CITY_LABELS[which];
+                txtFilterCity.setText(activeCityLabel);
+                applyFilters();
+                sheet.dismiss();
+            },
+            () -> { // Xóa bộ lọc thành phố
+                activeCity = ""; activeCityLabel = "Tất cả tỉnh thành";
+                txtFilterCity.setText("Tất cả tỉnh thành");
+                applyFilters();
+                sheet.dismiss();
+            });
+        sheet.setContentView(v);
+        sheet.show();
+    }
+
+    private int getActiveSortIndex() {
+        for (int i = 0; i < SORT_KEYS.length; i++) if (SORT_KEYS[i].equals(activeSort)) return i;
+        return 0;
+    }
+    private int getActiveCityIndex() {
+        for (int i = 0; i < CITY_KEYWORDS.length; i++) if (CITY_KEYWORDS[i].equals(activeCity)) return i;
+        return 0;
+    }
+
+    /** Tạo view cho bottom sheet option picker */
+    private android.view.View buildOptionSheet(String title, String[] options, int activeIdx,
+                                                java.util.function.IntConsumer onSelect, Runnable onClear) {
+        float dp = getResources().getDisplayMetrics().density;
+        android.widget.LinearLayout root = new android.widget.LinearLayout(requireContext());
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFFFFFFFF);
+        int ph = (int)(20*dp);
+
+        // Drag handle
+        android.view.View handle = new android.view.View(requireContext());
+        android.widget.LinearLayout.LayoutParams hLp = new android.widget.LinearLayout.LayoutParams((int)(40*dp), (int)(4*dp));
+        hLp.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+        hLp.topMargin = (int)(12*dp); hLp.bottomMargin = (int)(8*dp);
+        handle.setLayoutParams(hLp);
+        handle.setBackgroundColor(0xFFDDDDDD);
+        root.addView(handle);
+
+        // Title
+        android.widget.TextView txtTitle = new android.widget.TextView(requireContext());
+        txtTitle.setText(title);
+        txtTitle.setTextSize(16f);
+        txtTitle.setTypeface(null, android.graphics.Typeface.BOLD);
+        txtTitle.setTextColor(0xFF1C1B1B);
+        android.widget.LinearLayout.LayoutParams tLp = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        tLp.setMarginStart(ph); tLp.topMargin = (int)(8*dp); tLp.bottomMargin = (int)(12*dp);
+        txtTitle.setLayoutParams(tLp);
+        root.addView(txtTitle);
+
+        // Divider
+        android.view.View div = new android.view.View(requireContext());
+        div.setLayoutParams(new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        div.setBackgroundColor(0xFFF0F0F0);
+        root.addView(div);
+
+        // Options
+        for (int i = 0; i < options.length; i++) {
+            final int idx = i;
+            boolean isActive = (i == activeIdx);
+
+            android.widget.LinearLayout row = new android.widget.LinearLayout(requireContext());
+            row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+            row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+            row.setPadding(ph, (int)(14*dp), ph, (int)(14*dp));
+            row.setClickable(true); row.setFocusable(true);
+            row.setBackgroundColor(isActive ? 0xFFF0F4FF : 0xFFFFFFFF);
+
+            android.widget.TextView optTxt = new android.widget.TextView(requireContext());
+            android.widget.LinearLayout.LayoutParams oLp = new android.widget.LinearLayout.LayoutParams(0,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            optTxt.setLayoutParams(oLp);
+            optTxt.setText(options[i]);
+            optTxt.setTextSize(14f);
+            optTxt.setTextColor(isActive ? 0xFF226CEB : 0xFF1C1B1B);
+            if (isActive) optTxt.setTypeface(null, android.graphics.Typeface.BOLD);
+            row.addView(optTxt);
+
+            if (isActive) {
+                android.widget.TextView check = new android.widget.TextView(requireContext());
+                check.setText("✓");
+                check.setTextColor(0xFF226CEB);
+                check.setTextSize(16f);
+                row.addView(check);
+            }
+
+            row.setOnClickListener(v -> onSelect.accept(idx));
+            root.addView(row);
+
+            // Thin divider
+            android.view.View d2 = new android.view.View(requireContext());
+            d2.setLayoutParams(new android.widget.LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, 1));
+            d2.setBackgroundColor(0xFFF8F8F8);
+            root.addView(d2);
+        }
+
+        // Bottom padding
+        android.view.View bottomPad = new android.view.View(requireContext());
+        bottomPad.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, (int)(16*dp)));
+        root.addView(bottomPad);
+
+        return root;
     }
 
     // ── Filter + Sort ──────────────────────────────────────────────────────────
@@ -331,10 +507,18 @@ public class EventsFragment extends Fragment {
 
         displayList.clear();
         for (Event e : allEvents) {
-            // Category filter
-            if (!"all".equals(activeCategory) && !activeCategory.equals(e.getCategory())) continue;
-            // City filter
-            if (!activeCity.isEmpty() && !activeCity.equalsIgnoreCase(e.getVenueCity())) continue;
+            // Category filter — activeCategory là UUID hoặc "all"
+            // e.getCategory() là app key (music/arts/...) từ CAT_MAP
+            if (!"all".equals(activeCategory)) {
+                // Lấy app key tương ứng của activeCategory UUID
+                String catKey = FirestoreHelper.CAT_MAP.getOrDefault(activeCategory, activeCategory);
+                if (!catKey.equals(e.getCategory())) continue;
+            }
+            // City filter — dùng contains vì Firestore có thể lưu "Hồ Chí Minh" khác "TP. Hồ Chí Minh"
+            if (!activeCity.isEmpty()) {
+                String city = e.getVenueCity() != null ? e.getVenueCity() : "";
+                if (!city.toLowerCase(Locale.ROOT).contains(activeCity.toLowerCase(Locale.ROOT))) continue;
+            }
             // Search filter
             if (!query.isEmpty()) {
                 boolean match = e.getTitle().toLowerCase(Locale.ROOT).contains(query)

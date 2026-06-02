@@ -25,8 +25,18 @@ import java.util.Locale;
 
 public class EventFilterDialog extends BottomSheetDialogFragment {
 
+    /** Tất cả tiêu chí lọc được trả về khi Apply */
+    public static class FilterCriteria {
+        public int     count;        // số điều kiện active
+        public String  cityFilter;   // "" = toàn quốc | "Hồ Chí Minh" | "Hà Nội" | "Đà Lạt" | "Đà Nẵng"
+        public boolean freeOnly;     // chỉ sự kiện miễn phí
+        public long    minPrice;     // 0 nếu không set
+        public long    maxPrice;     // Long.MAX_VALUE nếu không set
+        public boolean[] categories; // [music, arts, workshop, tour, sports, festival]
+    }
+
     public interface OnFilterApplied {
-        void onApplied(int activeFilterCount);
+        void onApplied(FilterCriteria criteria);
     }
 
     private static final float PRICE_MIN = 0f;
@@ -162,17 +172,32 @@ public class EventFilterDialog extends BottomSheetDialogFragment {
             });
         }
 
-        // ── Apply ─────────────────────────────────────────────────────────
+        // ── Apply — build FilterCriteria và trả về ────────────────────────
         if (btnApply != null) {
             btnApply.setOnClickListener(v -> {
                 if (listener != null) {
-                    int count = 0;
-                    if (rgLocation != null
-                            && rgLocation.getCheckedRadioButtonId() != R.id.rbNational) count++;
-                    if (switchFreeOnly != null && switchFreeOnly.isChecked()) count++;
-                    if (currentMin > PRICE_MIN || currentMax < PRICE_MAX) count++;
-                    for (boolean b : catSelected) if (b) count++;
-                    listener.onApplied(count);
+                    FilterCriteria c = new FilterCriteria();
+                    // Địa điểm
+                    c.cityFilter = "";
+                    if (rgLocation != null) {
+                        int loc = rgLocation.getCheckedRadioButtonId();
+                        if (loc == R.id.rbHCMC)   c.cityFilter = "Hồ Chí Minh";
+                        else if (loc == R.id.rbHanoi)  c.cityFilter = "Hà Nội";
+                        else if (loc == R.id.rbDaLat)  c.cityFilter = "Đà Lạt";
+                        else if (loc == R.id.rbDaNang) c.cityFilter = "Đà Nẵng";
+                    }
+                    // Giá
+                    c.freeOnly = switchFreeOnly != null && switchFreeOnly.isChecked();
+                    c.minPrice = c.freeOnly ? 0 : (long) currentMin;
+                    c.maxPrice = c.freeOnly ? 0 : (currentMax >= PRICE_MAX ? Long.MAX_VALUE : (long) currentMax);
+                    // Thể loại trong dialog (index: 0=music,1=arts,2=workshop,3=tour,4=sports,5=festival)
+                    c.categories = catSelected.clone();
+                    // Đếm số filter active
+                    if (!c.cityFilter.isEmpty()) c.count++;
+                    if (c.freeOnly) c.count++;
+                    if (c.minPrice > 0 || c.maxPrice < Long.MAX_VALUE) c.count++;
+                    for (boolean b : c.categories) if (b) c.count++;
+                    listener.onApplied(c);
                 }
                 dismiss();
             });

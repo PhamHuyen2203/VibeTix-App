@@ -28,15 +28,43 @@ public class FirestoreHelper {
         void onFailure(Exception e);
     }
 
-    // ── Category ID → App key (public để HomepageLoader dùng chung) ──────────
-    public static final Map<String, String> CAT_MAP = new HashMap<>();
-    static {
-        CAT_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "music");     // Nhạc sống
-        CAT_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "arts");      // Sân khấu & Nghệ thuật
-        CAT_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "workshop");  // Hội thảo & Workshop
-        CAT_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "tour");      // Tham quan & Trải nghiệm
-        CAT_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "sports");    // Thể thao
-        CAT_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "festival");  // Khác/Lễ hội
+    // ── Category ID → App key — được load ĐỘNG từ Firestore ──────────────────
+    // Không hardcode UUID vì teammate thường xuyên tạo lại categories collection
+    public static final Map<String, String> CAT_MAP      = new HashMap<>();
+    public static final Map<String, String> CAT_KEY_TO_ID = new HashMap<>();
+    // Tên hiển thị: slug → Vietnamese name
+    public static final Map<String, String> CAT_SLUG_TO_NAME = new HashMap<>();
+
+    /** Gọi 1 lần khi app khởi động để load category IDs thật từ Firestore */
+    public static void loadCategoryCache(Runnable onDone) {
+        FirebaseFirestore.getInstance()
+            .collection("categories")
+            .get()
+            .addOnSuccessListener(snap -> {
+                CAT_MAP.clear(); CAT_KEY_TO_ID.clear(); CAT_SLUG_TO_NAME.clear();
+                for (QueryDocumentSnapshot doc : snap) {
+                    String catId = doc.getString("category_id");
+                    String slug  = doc.getString("slug");
+                    String name  = doc.getString("name");
+                    if (catId == null || slug == null) continue;
+                    String appKey = slugToKey(slug);
+                    CAT_MAP.put(catId, appKey);
+                    CAT_KEY_TO_ID.put(appKey, catId);
+                    if (name != null) CAT_SLUG_TO_NAME.put(slug, name);
+                }
+                if (onDone != null) onDone.run();
+            })
+            .addOnFailureListener(e -> { if (onDone != null) onDone.run(); });
+    }
+
+    private static String slugToKey(String slug) {
+        if (slug == null) return "festival";
+        if (slug.contains("nhac-song"))   return "music";
+        if (slug.contains("san-khau"))    return "arts";
+        if (slug.contains("hoi-thao") || slug.contains("workshop")) return "workshop";
+        if (slug.contains("tham-quan") || slug.contains("trai-nghiem")) return "tour";
+        if (slug.contains("the-thao"))    return "sports";
+        return "festival"; // default cho Khác
     }
 
     // ── Venue cache (public để HomepageLoader dùng chung) ────────────────────
@@ -69,7 +97,7 @@ public class FirestoreHelper {
 
     private static void fetchEvents(FirebaseFirestore db, OnEventsLoaded callback) {
         db.collection("events")
-            .whereIn("status", Arrays.asList("approved", "ongoing"))
+            .whereIn("status", Arrays.asList("approved", "ongoing", "completed"))
             .get()
             .addOnSuccessListener(snap -> {
                 List<Event> events = new ArrayList<>();
@@ -88,9 +116,11 @@ public class FirestoreHelper {
             String title = doc.getString("title");
             if (title == null || title.isEmpty()) return null;
 
-            // Ảnh — banner_url là field chính
-            String imageUrl = doc.getString("banner_url");
-            if (imageUrl == null) imageUrl = doc.getString("poster_url");
+            // Ảnh ngang — banner_url cho horizontal sections (trending, category)
+            String imageUrl   = doc.getString("banner_url");
+            // Ảnh dọc — poster_url cho portrait sections (featured)
+            String posterUrl  = doc.getString("poster_url");
+            if (imageUrl == null) imageUrl = posterUrl; // fallback
 
             // Ngày — start_time là Timestamp
             String date = "";
@@ -117,6 +147,8 @@ public class FirestoreHelper {
             Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
             e.setVenueCity(city);
             e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
+            // Lưu poster_url riêng cho portrait sections (Featured)
+            if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
             
             // Description
             e.setDescription(doc.getString("description"));
