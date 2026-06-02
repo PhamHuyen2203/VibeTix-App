@@ -3,7 +3,7 @@
     "allow": [
       "mcp__figma__get_design_context",
       "mcp__figma__get_screenshot",
-      "Bash(find \"D:\\\\HỌC TẬP UEL\\\\NĂM 3\\\\HỌC KÌ 9\\\\MOBILE\\\\FinalProject\\\\VibeTix-App/app/src/main/res/mipmap-\"* -type f)",
+      "Bash(find \"E:/AndroidStudioProjects/VibeTix-App/app/src/main/res/mipmap-\"* -type f)",
       "Bash(powershell -Command ' *)"
     ]
   }

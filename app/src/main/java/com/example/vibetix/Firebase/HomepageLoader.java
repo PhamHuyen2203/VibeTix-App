@@ -1,233 +1,229 @@
 package com.example.vibetix.Firebase;
 
+import android.util.Log;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.Utils.Constants;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * HomepageLoader — tải dữ liệu thật cho từng section của trang chủ.
+ * HomepageLoader — tải dữ liệu thật cho từng section trang chủ.
  *
- * ════════════════════════════════════════════════════════════
- *  CƠ CHẾ PHÂN LOẠI SỰ KIỆN
- * ════════════════════════════════════════════════════════════
+ * NGUYÊN TẮC QUERY: KHÔNG dùng orderBy kết hợp whereIn/whereEqualTo
+ * vì Firestore yêu cầu composite index chưa được tạo.
+ * → Lấy data thô từ Firestore → sort trong memory.
  *
- *  1. BANNER SLIDES
- *     - Đọc Firestore: app_config/homepage → trường banner_event_ids (mảng ID)
- *     - Admin thiết lập danh sách này qua Firebase Console (hoặc web admin sau)
- *     - Fallback: lấy events is_featured=true, sort theo start_time tăng dần
+ * ════════════════════════ CƠ CHẾ TỪNG SECTION ════════════════════════
  *
- *  2. SỰ KIỆN ĐẶC BIỆT (Featured)
- *     - events where is_featured=true AND status IN [approved, ongoing]
- *     - Sort: start_time ascending (sự kiện sắp diễn ra trước)
+ * 1. BANNER: app_config/homepage.banner_event_ids (admin chọn)
+ *    Fallback: events có is_featured=true, sort start_time ASC (in memory)
  *
- *  3. XU HƯỚNG / XẾPHẠNG (Trending)
- *     - Đọc order_items collection → đếm số vé bán theo event_id → top 8
- *     - Fallback nếu order_items trống: dùng interest_count desc
+ * 2. SỰ KIỆN ĐẶC BIỆT: is_featured=true + approved/ongoing
+ *    Sort start_time ASC in memory → sự kiện sắp diễn ra trước
  *
- *  4. THEO DANH MỤC (Live Music, Sân khấu, Workshop...)
- *     - events where category_id = <UUID tương ứng>
- *     - Category UUIDs lấy từ Firestore categories collection
- *     - Nếu teammate chưa gán đúng category → section trống → HomeFragment ẩn section đó
+ * 3. XU HƯỚNG: Đếm SUM(quantity) từ order_items theo event_id
+ *    → Top 8 event bán nhiều vé nhất (tính từ tất cả đơn hàng)
+ *    Fallback: approved/ongoing events sort start_time ASC
  *
- *  5. KHI TEAMMATE FIX CATEGORY:
- *     - Chỉ cần cập nhật đúng category_id trong Firestore events documents
- *     - Code không cần thay đổi gì — tự động hiển thị đúng section
- *
- * ════════════════════════════════════════════════════════════
+ * 4. THEO DANH MỤC: events.category_id = UUID, approved/ongoing
+ *    Sort start_time ASC in memory
+ * ══════════════════════════════════════════════════════════════════════
  */
 public class HomepageLoader {
 
-    // ── Category UUIDs từ Firestore categories collection ─────────────────────
-    public static final String CAT_MUSIC    = "7e3014ad-e70f-4349-a8c3-cc3e9a9329b1"; // Nhạc sống
-    public static final String CAT_ARTS     = "c9800d36-ecaa-4bb9-a0dd-ed24665b4f46"; // Sân khấu & NT
-    public static final String CAT_WORKSHOP = "6bdda95a-2232-4cd6-b3e0-33e223e22bfa"; // Hội thảo
-    public static final String CAT_TOUR     = "e810fbc7-79c9-4764-aa81-88ad49e4a069"; // Tham quan
-    public static final String CAT_SPORTS   = "afc9ed2a-c01c-4b78-b869-e23efd70a56e"; // Thể thao
-    public static final String CAT_OTHER    = "c77c10df-b480-4b41-8fc7-440e9f1e391c"; // Khác
+    private static final String TAG = "HomepageLoader";
 
-    private static final List<String> ACTIVE_STATUS = Arrays.asList("approved", "ongoing");
+    // ── Category IDs — load ĐỘNG từ Firestore, không hardcode ────────────────
+    // Dùng FirestoreHelper.CAT_KEY_TO_ID để lấy UUID hiện tại theo app key
+    public static String getCatId(String appKey) {
+        String id = FirestoreHelper.CAT_KEY_TO_ID.get(appKey);
+        return id != null ? id : "";
+    }
+    // Backward-compat wrappers (dùng trong HomeFragment)
+    public static final String CAT_MUSIC    = ""; // sẽ được resolve động
+    public static final String CAT_ARTS     = "";
+    public static final String CAT_WORKSHOP = "";
+    public static final String CAT_TOUR     = "";
+    public static final String CAT_SPORTS   = "";
+    public static final String CAT_OTHER    = "";
+
+    // approved(20) + ongoing(25) + completed(12) = 57 events có thể hiển thị
+    private static final List<String> ACTIVE = Arrays.asList("approved", "ongoing", "completed");
 
     public interface OnLoaded { void onSuccess(List<Event> events); }
 
-    // ── 1. BANNER: Admin-controlled via app_config/homepage ───────────────────
-    /**
-     * Tải banner events.
-     * Ưu tiên: app_config/homepage.banner_event_ids
-     * Fallback: is_featured=true events
-     */
+    // ── 1. BANNER ─────────────────────────────────────────────────────────────
     public static void loadBanners(OnLoaded callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("app_config").document("homepage").get()
+        FirebaseFirestore.getInstance()
+            .collection("app_config").document("homepage").get()
             .addOnSuccessListener(doc -> {
                 if (doc.exists()) {
                     List<String> ids = (List<String>) doc.get("banner_event_ids");
                     if (ids != null && !ids.isEmpty()) {
-                        fetchEventsByIds(ids, 5, callback);
+                        fetchByIds(ids, 5, callback);
                         return;
                     }
                 }
-                // Fallback: is_featured events
-                loadFeatured(callback);
+                loadFeatured(callback); // Fallback
             })
             .addOnFailureListener(e -> loadFeatured(callback));
     }
 
-    // ── 2. FEATURED: is_featured=true, sắp diễn ra sớm nhất ──────────────────
+    // ── 2. FEATURED ───────────────────────────────────────────────────────────
     public static void loadFeatured(OnLoaded callback) {
+        // Query đơn giản: chỉ filter is_featured — KHÔNG orderBy để tránh index
         FirebaseFirestore.getInstance()
             .collection("events")
-            .whereIn("status", ACTIVE_STATUS)
             .whereEqualTo("is_featured", true)
-            .orderBy("start_time", Query.Direction.ASCENDING)
-            .limit(8)
+            .limit(100)
             .get()
             .addOnSuccessListener(snap -> {
                 List<Event> list = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
+                    // Lọc status trong memory
+                    String status = doc.getString("status");
+                    if (status == null || !ACTIVE.contains(status)) continue;
                     Event e = FirestoreHelper.docToEvent(doc);
                     if (e != null) list.add(e);
                 }
-                callback.onSuccess(list);
+                // Sort: start_time ASC (sắp diễn ra sớm nhất trước)
+                sortByStartTime(list, true);
+                // Nếu không có featured events → lấy events bất kỳ
+                if (list.isEmpty()) loadAnyActiveEvents(8, callback);
+                else callback.onSuccess(list.subList(0, Math.min(8, list.size())));
             })
-            .addOnFailureListener(e -> callback.onSuccess(new ArrayList<>()));
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "loadFeatured failed: " + e.getMessage());
+                loadAnyActiveEvents(8, callback);
+            });
     }
 
-    // ── 3. TRENDING: Xếp hạng theo vé bán (order_items) ──────────────────────
-    /**
-     * Đếm số vé bán ra theo event_id từ order_items.
-     * Fallback: sort theo interest_count nếu order_items trống.
-     */
+    // ── 3. TRENDING: Đếm vé bán từ order_items ────────────────────────────────
     public static void loadTrending(OnLoaded callback) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("order_items").limit(200).get()
+        FirebaseFirestore.getInstance()
+            .collection("order_items")
+            .limit(500)
+            .get()
             .addOnSuccessListener(snap -> {
-                // Đếm số order_items theo event_id
-                Map<String, Integer> salesCount = new HashMap<>();
-                for (QueryDocumentSnapshot doc : snap) {
-                    String eventId = doc.getString("event_id");
-                    if (eventId != null) {
-                        salesCount.put(eventId, salesCount.containsKey(eventId)
-                                ? salesCount.get(eventId) + 1 : 1);
-                    }
-                }
-
-                if (salesCount.isEmpty()) {
-                    // Fallback: interest_count
-                    loadTrendingByInterest(callback);
+                if (snap.isEmpty()) {
+                    Log.d(TAG, "order_items empty, fallback to active events");
+                    loadAnyActiveEvents(8, callback);
                     return;
                 }
+                // Đếm SUM(quantity) theo event_id
+                Map<String, Integer> sales = new HashMap<>();
+                for (QueryDocumentSnapshot doc : snap) {
+                    String eid = doc.getString("event_id");
+                    int qty = 1;
+                    Object q = doc.get("quantity");
+                    if (q instanceof Long) qty = ((Long)q).intValue();
+                    if (eid != null && !eid.isEmpty())
+                        sales.put(eid, sales.containsKey(eid) ? sales.get(eid)+qty : qty);
+                }
+                Log.d(TAG, "Trending: " + sales.size() + " unique events from order_items");
 
-                // Top 8 event IDs theo vé bán
-                List<Map.Entry<String, Integer>> sorted = new ArrayList<>(salesCount.entrySet());
+                // Top 8 IDs theo vé bán
+                List<Map.Entry<String,Integer>> sorted = new ArrayList<>(sales.entrySet());
                 Collections.sort(sorted, (a, b) -> b.getValue() - a.getValue());
                 List<String> topIds = new ArrayList<>();
-                for (int i = 0; i < Math.min(8, sorted.size()); i++) {
+                for (int i = 0; i < Math.min(8, sorted.size()); i++)
                     topIds.add(sorted.get(i).getKey());
-                }
-                fetchEventsByIds(topIds, 8, callback);
-            })
-            .addOnFailureListener(e -> loadTrendingByInterest(callback));
-    }
 
-    private static void loadTrendingByInterest(OnLoaded callback) {
-        FirebaseFirestore.getInstance()
-            .collection("events")
-            .whereIn("status", ACTIVE_STATUS)
-            .orderBy("interest_count", Query.Direction.DESCENDING)
-            .limit(8)
-            .get()
-            .addOnSuccessListener(snap -> {
-                List<Event> list = new ArrayList<>();
-                for (QueryDocumentSnapshot doc : snap) {
-                    Event e = FirestoreHelper.docToEvent(doc);
-                    if (e != null) list.add(e);
-                }
-                // Nếu vẫn trống, lấy random events mới nhất
-                if (list.isEmpty()) loadLatestEvents(callback);
-                else callback.onSuccess(list);
+                fetchByIds(topIds, 8, callback);
             })
-            .addOnFailureListener(e -> loadLatestEvents(callback));
-    }
-
-    private static void loadLatestEvents(OnLoaded callback) {
-        FirebaseFirestore.getInstance()
-            .collection("events")
-            .whereIn("status", ACTIVE_STATUS)
-            .orderBy("start_time", Query.Direction.ASCENDING)
-            .limit(8)
-            .get()
-            .addOnSuccessListener(snap -> {
-                List<Event> list = new ArrayList<>();
-                for (QueryDocumentSnapshot doc : snap) {
-                    Event e = FirestoreHelper.docToEvent(doc);
-                    if (e != null) list.add(e);
-                }
-                callback.onSuccess(list);
-            })
-            .addOnFailureListener(e -> callback.onSuccess(new ArrayList<>()));
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "order_items query failed: " + e.getMessage());
+                loadAnyActiveEvents(8, callback);
+            });
     }
 
     // ── 4. THEO DANH MỤC ──────────────────────────────────────────────────────
     public static void loadByCategory(String categoryId, OnLoaded callback) {
+        // limit(100) đủ để lọc status trong memory mà không bỏ sót
         FirebaseFirestore.getInstance()
             .collection("events")
-            .whereIn("status", ACTIVE_STATUS)
             .whereEqualTo("category_id", categoryId)
-            .orderBy("start_time", Query.Direction.ASCENDING)
-            .limit(10)
+            .limit(100)
             .get()
             .addOnSuccessListener(snap -> {
                 List<Event> list = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
+                    String status = doc.getString("status");
+                    if (status == null || !ACTIVE.contains(status)) continue;
                     Event e = FirestoreHelper.docToEvent(doc);
                     if (e != null) list.add(e);
                 }
-                callback.onSuccess(list);
+                sortByStartTime(list, true);
+                callback.onSuccess(list.subList(0, Math.min(10, list.size())));
             })
-            .addOnFailureListener(e -> callback.onSuccess(new ArrayList<>()));
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "loadByCategory(" + categoryId + ") failed: " + e.getMessage());
+                callback.onSuccess(new ArrayList<>());
+            });
     }
 
-    // ── Helper: lấy events theo danh sách IDs ─────────────────────────────────
-    private static void fetchEventsByIds(List<String> ids, int limit, OnLoaded callback) {
+    // ── Helper: lấy events bất kỳ (approved/ongoing) ─────────────────────────
+    private static void loadAnyActiveEvents(int limit, OnLoaded callback) {
+        // Query đơn giản nhất — KHÔNG orderBy, KHÔNG whereIn
+        FirebaseFirestore.getInstance()
+            .collection("events")
+            .limit(200)
+            .get()
+            .addOnSuccessListener(snap -> {
+                List<Event> list = new ArrayList<>();
+                for (QueryDocumentSnapshot doc : snap) {
+                    String status = doc.getString("status");
+                    if (!"approved".equals(status) && !"ongoing".equals(status)) continue;
+                    Event e = FirestoreHelper.docToEvent(doc);
+                    if (e != null) list.add(e);
+                }
+                sortByStartTime(list, true);
+                Log.d(TAG, "loadAnyActiveEvents: " + list.size() + " events");
+                callback.onSuccess(list.subList(0, Math.min(limit, list.size())));
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "loadAnyActiveEvents failed: " + e.getMessage());
+                callback.onSuccess(new ArrayList<>());
+            });
+    }
+
+    // ── Helper: fetch events theo list ID ─────────────────────────────────────
+    private static void fetchByIds(List<String> ids, int limit, OnLoaded callback) {
         if (ids.isEmpty()) { callback.onSuccess(new ArrayList<>()); return; }
         int count = Math.min(ids.size(), limit);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         List<Event> results = new ArrayList<>();
         AtomicInteger remaining = new AtomicInteger(count);
 
         for (int i = 0; i < count; i++) {
-            db.collection("events").document(ids.get(i)).get()
+            FirebaseFirestore.getInstance()
+                .collection("events").document(ids.get(i)).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         try {
                             String title = doc.getString("title");
-                            if (title != null) {
-                                String imgUrl = doc.getString("banner_url");
-                                if (imgUrl == null) imgUrl = doc.getString("poster_url");
+                            if (title != null && !title.isEmpty()) {
+                                String imgUrl    = doc.getString("banner_url");
+                                String posterUrl = doc.getString("poster_url");
+                                if (imgUrl == null) imgUrl = posterUrl;
                                 String date = "";
                                 Timestamp ts = doc.getTimestamp("start_time");
-                                if (ts != null) {
-                                    date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                            .format(ts.toDate());
-                                }
-                                String city = FirestoreHelper.VENUE_CACHE.containsKey(doc.getString("venue_id"))
-                                        ? FirestoreHelper.VENUE_CACHE.get(doc.getString("venue_id")) : "Việt Nam";
+                                if (ts != null)
+                                    date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(ts.toDate());
+                                String venueId = doc.getString("venue_id");
+                                String city = venueId != null ? FirestoreHelper.VENUE_CACHE.getOrDefault(venueId, "Việt Nam") : "Việt Nam";
                                 String catId = doc.getString("category_id");
-                                String cat   = catId != null ? FirestoreHelper.CAT_MAP.getOrDefault(catId, "music") : "music";
+                                String cat = catId != null ? FirestoreHelper.CAT_MAP.getOrDefault(catId, "music") : "music";
                                 long price = 0;
                                 Object p = doc.get("min_price");
                                 if (p instanceof Long) price = (Long) p;
@@ -237,6 +233,7 @@ public class HomepageLoader {
                                 e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
                                 Boolean feat = doc.getBoolean("is_featured");
                                 if (Boolean.TRUE.equals(feat)) e.setFeatured(true);
+                                if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
                                 synchronized (results) { results.add(e); }
                             }
                         } catch (Exception ignored) {}
@@ -249,13 +246,22 @@ public class HomepageLoader {
         }
     }
 
-    // ── Admin helper: Thiết lập banner events ─────────────────────────────────
-    /**
-     * Ghi danh sách event IDs cho banner vào app_config/homepage.
-     * Admin gọi method này (hoặc cập nhật trực tiếp Firebase Console).
-     *
-     * Cách dùng: HomepageLoader.setAdminBanners(Arrays.asList("id1","id2","id3"))
-     */
+    // ── Sort helper ───────────────────────────────────────────────────────────
+    private static void sortByStartTime(List<Event> list, boolean ascending) {
+        Collections.sort(list, (a, b) -> {
+            String da = parseDate(a.getDate()), db2 = parseDate(b.getDate());
+            return ascending ? da.compareTo(db2) : db2.compareTo(da);
+        });
+    }
+
+    private static String parseDate(String date) {
+        if (date == null || date.isEmpty()) return "0000/00/00";
+        String[] p = date.split("/");
+        if (p.length != 3) return date;
+        return p[2] + "/" + p[1] + "/" + p[0]; // yyyy/MM/dd
+    }
+
+    // ── Admin: thiết lập banner ───────────────────────────────────────────────
     public static void setAdminBanners(List<String> eventIds) {
         Map<String, Object> config = new HashMap<>();
         config.put("banner_event_ids", eventIds);

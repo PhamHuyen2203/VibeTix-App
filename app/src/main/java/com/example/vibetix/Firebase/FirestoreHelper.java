@@ -28,33 +28,47 @@ public class FirestoreHelper {
         void onFailure(Exception e);
     }
 
-    // ── Category ID → App key (public để HomepageLoader dùng chung) ──────────
-    public static final Map<String, String> CAT_MAP = new HashMap<>();
-    public static final Map<String, String> CAT_NAME_MAP = new HashMap<>();
-    static {
-        CAT_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "music");
-        CAT_NAME_MAP.put("7e3014ad-e70f-4349-a8c3-cc3e9a9329b1", "Nhạc sống");
+    // ── Category ID → App key — được load ĐỘNG từ Firestore ──────────────────
+    // Không hardcode UUID vì teammate thường xuyên tạo lại categories collection
+    public static final Map<String, String> CAT_MAP      = new HashMap<>();
+    public static final Map<String, String> CAT_KEY_TO_ID = new HashMap<>();
+    // Tên hiển thị: slug → Vietnamese name
+    public static final Map<String, String> CAT_SLUG_TO_NAME = new HashMap<>();
 
-        CAT_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "arts");
-        CAT_NAME_MAP.put("c9800d36-ecaa-4bb9-a0dd-ed24665b4f46", "Sân khấu & Nghệ thuật");
+    /** Gọi 1 lần khi app khởi động để load category IDs thật từ Firestore */
+    public static void loadCategoryCache(Runnable onDone) {
+        FirebaseFirestore.getInstance()
+            .collection("categories")
+            .get()
+            .addOnSuccessListener(snap -> {
+                CAT_MAP.clear(); CAT_KEY_TO_ID.clear(); CAT_SLUG_TO_NAME.clear();
+                for (QueryDocumentSnapshot doc : snap) {
+                    String catId = doc.getString("category_id");
+                    String slug  = doc.getString("slug");
+                    String name  = doc.getString("name");
+                    if (catId == null || slug == null) continue;
+                    String appKey = slugToKey(slug);
+                    CAT_MAP.put(catId, appKey);
+                    CAT_KEY_TO_ID.put(appKey, catId);
+                    if (name != null) CAT_SLUG_TO_NAME.put(slug, name);
+                }
+                if (onDone != null) onDone.run();
+            })
+            .addOnFailureListener(e -> { if (onDone != null) onDone.run(); });
+    }
 
-        CAT_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "workshop");
-        CAT_NAME_MAP.put("6bdda95a-2232-4cd6-b3e0-33e223e22bfa", "Hội thảo & Workshop");
-
-        CAT_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "tour");
-        CAT_NAME_MAP.put("e810fbc7-79c9-4764-aa81-88ad49e4a069", "Tham quan & Trải nghiệm");
-
-        CAT_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "sports");
-        CAT_NAME_MAP.put("afc9ed2a-c01c-4b78-b869-e23efd70a56e", "Thể thao");
-
-        CAT_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "festival");
-        CAT_NAME_MAP.put("c77c10df-b480-4b41-8fc7-440e9f1e391c", "Khác/Lễ hội");
+    private static String slugToKey(String slug) {
+        if (slug == null) return "festival";
+        if (slug.contains("nhac-song"))   return "music";
+        if (slug.contains("san-khau"))    return "arts";
+        if (slug.contains("hoi-thao") || slug.contains("workshop")) return "workshop";
+        if (slug.contains("tham-quan") || slug.contains("trai-nghiem")) return "tour";
+        if (slug.contains("the-thao"))    return "sports";
+        return "festival"; // default cho Khác
     }
 
     // ── Venue cache (public để HomepageLoader dùng chung) ────────────────────
     public static final Map<String, String> VENUE_CACHE = new HashMap<>();
-    public static final Map<String, String> VENUE_NAME_CACHE = new HashMap<>();
-    public static final Map<String, String> VENUE_ADDRESS_CACHE = new HashMap<>();
 
     /**
      * Load toàn bộ published events (approved + ongoing).
@@ -70,11 +84,7 @@ public class FirestoreHelper {
                     for (QueryDocumentSnapshot vd : venueSnap) {
                         String vid  = vd.getString("venue_id");
                         String city = vd.getString("city");
-                        String name = vd.getString("name");
-                        String addr = vd.getString("address");
                         if (vid != null && city != null) VENUE_CACHE.put(vid, city);
-                        if (vid != null && name != null) VENUE_NAME_CACHE.put(vid, name);
-                        if (vid != null && addr != null) VENUE_ADDRESS_CACHE.put(vid, addr);
                     }
                     // Bước 2: Load events sau khi có venue cache
                     fetchEvents(db, callback);
@@ -87,7 +97,7 @@ public class FirestoreHelper {
 
     private static void fetchEvents(FirebaseFirestore db, OnEventsLoaded callback) {
         db.collection("events")
-            .whereIn("status", Arrays.asList("approved", "ongoing"))
+            .whereIn("status", Arrays.asList("approved", "ongoing", "completed"))
             .get()
             .addOnSuccessListener(snap -> {
                 List<Event> events = new ArrayList<>();
@@ -106,22 +116,18 @@ public class FirestoreHelper {
             String title = doc.getString("title");
             if (title == null || title.isEmpty()) return null;
 
-            // Ảnh — banner_url là field chính
-            String imageUrl = doc.getString("banner_url");
-            if (imageUrl == null) imageUrl = doc.getString("poster_url");
+            // Ảnh ngang — banner_url cho horizontal sections (trending, category)
+            String imageUrl   = doc.getString("banner_url");
+            // Ảnh dọc — poster_url cho portrait sections (featured)
+            String posterUrl  = doc.getString("poster_url");
+            if (imageUrl == null) imageUrl = posterUrl; // fallback
 
             // Ngày — start_time là Timestamp
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String date = "";
-            com.google.firebase.Timestamp tsStart = doc.getTimestamp("start_time");
-            if (tsStart != null) {
-                date = sdf.format(tsStart.toDate());
-            }
-
-            String endDate = "";
-            com.google.firebase.Timestamp tsEnd = doc.getTimestamp("end_time");
-            if (tsEnd != null) {
-                endDate = sdf.format(tsEnd.toDate());
+            com.google.firebase.Timestamp ts = doc.getTimestamp("start_time");
+            if (ts != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                date = sdf.format(ts.toDate());
             }
 
             // Thành phố — resolve từ venue_id
@@ -133,48 +139,22 @@ public class FirestoreHelper {
             String category = catId != null ? CAT_MAP.getOrDefault(catId, "music") : "music";
 
             // Giá
-            long minPrice = 0;
-            Object pMin = doc.get("min_price");
-            if (pMin instanceof Long)   minPrice = (Long) pMin;
-            else if (pMin instanceof Double) minPrice = ((Double) pMin).longValue();
+            long price = 0;
+            Object p = doc.get("min_price");
+            if (p instanceof Long)   price = (Long) p;
+            else if (p instanceof Double) price = ((Double) p).longValue();
 
-            long maxPrice = 0;
-            Object pMax = doc.get("max_price");
-            if (pMax instanceof Long)   maxPrice = (Long) pMax;
-            else if (pMax instanceof Double) maxPrice = ((Double) pMax).longValue();
-
-            Event e = new Event(doc.getId(), title, imageUrl, date, city, category, minPrice);
-            e.setEndDate(endDate);
-            e.setMaxPrice(maxPrice);
+            Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
             e.setVenueCity(city);
             e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
+            // Lưu poster_url riêng cho portrait sections (Featured)
+            if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
             
             // Description
             e.setDescription(doc.getString("description"));
 
-            // Organizer & Venue Detail
-            e.setOrganizerName(doc.getString("organizer_name"));
-
-            // Venue name & address
-            String vName = venueId != null ? VENUE_NAME_CACHE.get(venueId) : null;
-            String vAddr = venueId != null ? VENUE_ADDRESS_CACHE.get(venueId) : null;
-            e.setVenueName(vName);
-            e.setVenueAddress(vAddr);
-
-            // Build full location string for detail display
-            StringBuilder fullLocation = new StringBuilder();
-            if (vName != null && !vName.isEmpty()) fullLocation.append(vName);
-            if (vAddr != null && !vAddr.isEmpty()) {
-                if (fullLocation.length() > 0) fullLocation.append(", ");
-                fullLocation.append(vAddr);
-            }
-            if (city != null && !city.isEmpty()) {
-                if (fullLocation.length() > 0) fullLocation.append(", ");
-                fullLocation.append(city);
-            }
-            if (fullLocation.length() > 0) {
-                e.setLocation(fullLocation.toString());
-            }
+            Boolean featured = doc.getBoolean("is_featured");
+            if (Boolean.TRUE.equals(featured)) e.setFeatured(true);
 
             Long interest = doc.getLong("interest_count");
             if (interest != null) e.setInterestCount(interest.intValue());

@@ -59,14 +59,21 @@ public class TrendingEventAdapter extends RecyclerView.Adapter<TrendingEventAdap
     public void onBindViewHolder(@NonNull TrendingViewHolder holder, int position) {
         Event event = danhSachTrending.get(position);
 
-        // Landscape image
-        Object imageSource = event.getLocalImageResId() != 0
-                ? event.getLocalImageResId()
-                : R.drawable.ic_launcher_background;
+        // Ưu tiên local drawable, fallback URL Firebase (banner_url), rồi placeholder
+        Object imageSource;
+        if (event.getLocalImageResId() != 0) {
+            imageSource = event.getLocalImageResId();
+        } else if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+            imageSource = event.getImageUrl();
+        } else {
+            imageSource = R.drawable.ic_launcher_background;
+        }
 
         Glide.with(context)
                 .load(imageSource)
                 .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
                 .into(holder.imvTrendingImage);
 
         // Rank number (1-based)

@@ -260,8 +260,28 @@
 
             </LinearLayout>
 
+            <!-- Active filter chips — hiển thị khi có filter đang active -->
+            <HorizontalScrollView
+                android:id="@+id/scrollActiveFilters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="10dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/containerActiveFilters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+
+            </HorizontalScrollView>
+
             <!-- Browse by Category section — horizontal scroll RecyclerView -->
             <LinearLayout
+                android:id="@+id/sectionBrowseCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -290,6 +310,7 @@
 
             <!-- Browse by City section — horizontal scroll RecyclerView -->
             <LinearLayout
+                android:id="@+id/sectionBrowseCity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -316,13 +337,14 @@
 
             </LinearLayout>
 
-            <!-- Gợi ý dành cho bạn — vertical 2-column grid -->
+            <!-- Gợi ý / Kết quả tìm kiếm — vertical 2-column grid -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/txtSuggestionsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
