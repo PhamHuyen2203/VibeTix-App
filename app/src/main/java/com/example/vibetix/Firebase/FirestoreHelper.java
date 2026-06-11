@@ -32,8 +32,11 @@ public class FirestoreHelper {
     // Không hardcode UUID vì teammate thường xuyên tạo lại categories collection
     public static final Map<String, String> CAT_MAP      = new HashMap<>();
     public static final Map<String, String> CAT_KEY_TO_ID = new HashMap<>();
-    // Tên hiển thị: slug → Vietnamese name
     public static final Map<String, String> CAT_SLUG_TO_NAME = new HashMap<>();
+    public static final Map<String, String> CAT_NAME_MAP = new HashMap<>(); // Add missing
+    
+    public static final Map<String, String> VENUE_NAME_CACHE = new HashMap<>(); // Add missing
+    public static final Map<String, String> VENUE_ADDRESS_CACHE = new HashMap<>(); // Add missing
 
     /** Gọi 1 lần khi app khởi động để load category IDs thật từ Firestore */
     public static void loadCategoryCache(Runnable onDone) {

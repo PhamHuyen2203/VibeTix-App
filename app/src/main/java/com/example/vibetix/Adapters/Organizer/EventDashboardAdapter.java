@@ -135,9 +135,9 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         } else if (event.getStatus() != null) {
             // fallback: dùng enum
             holder.tvStatusBadge.setVisibility(View.VISIBLE);
-            switch (event.getStatus()) {
+            switch (event.getStatusEnum()) {
                 case APPROVED: case ONGOING:
-                    holder.tvStatusBadge.setText("● " + event.getStatus().name());
+                    holder.tvStatusBadge.setText("● " + event.getStatusEnum().name());
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;

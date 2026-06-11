@@ -10,6 +10,11 @@ public class Event {
         DRAFT, PENDING, APPROVED, ONGOING, COMPLETED, CANCELLED
     }
 
+    public static final String APPROVED = "approved";
+    public static final String ONGOING = "ongoing";
+    public static final String PENDING = "pending";
+    public static final String CANCELLED = "cancelled";
+
     private String eventId;
     private String organizerId;
     private String userId;
@@ -41,10 +46,10 @@ public class Event {
     private String location;
     private String category;
     private boolean isFree;
-    private String status;
     private String portraitImageUrl;
     private String organizerName;
     private int price;
+    private String status;
 
     public Event() {}
 
@@ -61,12 +66,18 @@ public class Event {
 
     public String getId() { return eventId; }
     public void setId(String id) { this.eventId = id; }
+    
+    public String getEventId() { return eventId; }
+    public void setEventId(String eventId) { this.eventId = eventId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
     public String getImageUrl() { return posterUrl; }
     public void setImageUrl(String imageUrl) { this.posterUrl = imageUrl; }
+    
+    public String getPosterUrl() { return posterUrl; }
+    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
     public String getDate() { return date != null ? date : getStartTime(); }
     public void setDate(String date) { this.date = date; }
@@ -76,9 +87,18 @@ public class Event {
 
     @Exclude public String getOrganizerId() { return organizerId; }
     @Exclude public void setOrganizerId(String v) { organizerId = v; }
+    
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
     public String getCategory() { return category != null ? category : categoryId; }
     public void setCategory(String category) { this.category = category; }
+    
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+
+    public String getVenueId() { return venueId; }
+    public void setVenueId(String venueId) { this.venueId = venueId; }
 
     public long getMinPrice() { return (long) minPrice; }
     public void setMinPrice(long minPrice) { this.minPrice = minPrice; }
@@ -141,6 +161,8 @@ public class Event {
         return null;
     }
     @Exclude public void setEndTime(Object v) { endTime = v; }
+    
+    @Exclude public String getEndDate() { return getEndTime(); }
     @Exclude public void setEndDate(String v) { endTime = v; }
 
     @PropertyName("status") public String getStatusStr() { return statusStr != null ? statusStr : status; }
@@ -155,6 +177,7 @@ public class Event {
         statusStr = s != null ? s.name().toLowerCase() : "draft";
         status = statusStr;
     }
+    
     public String getStatus() { return statusStr != null ? statusStr : status; }
     public void setStatus(String s) { status = s; statusStr = s; }
 
