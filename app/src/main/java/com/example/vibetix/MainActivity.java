@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vibetix.Activities.Auth.AuthActivity;
 import com.example.vibetix.Activities.Admin.AdminMainActivity;
-import com.example.vibetix.Activities.Organizer.OrganizerMainActivity;
 import com.example.vibetix.Activities.User.UserMainActivity;
 import com.example.vibetix.Utils.Constants;
 import com.example.vibetix.Utils.SessionManager;
@@ -24,11 +23,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent;
         if (sessionManager.isLoggedIn()) {
             String role = sessionManager.getUserRole();
-            if (Constants.ROLE_ORGANIZER.equalsIgnoreCase(role)) {
-                intent = new Intent(this, OrganizerMainActivity.class);
-            } else if (Constants.ROLE_ADMIN.equalsIgnoreCase(role)) {
+            if (Constants.ROLE_ADMIN.equalsIgnoreCase(role)) {
                 intent = new Intent(this, AdminMainActivity.class);
             } else {
+                // Cả user thường và organizer đều vào UserMainActivity
+                // (Organizer sẽ thấy tab OrganizerHubFragment khi nhấn nút +)
                 intent = new Intent(this, UserMainActivity.class);
             }
         } else {

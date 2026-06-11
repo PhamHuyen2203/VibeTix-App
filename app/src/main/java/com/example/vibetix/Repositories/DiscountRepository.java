@@ -73,7 +73,7 @@ public class DiscountRepository extends BaseRepository {
     public Task<Void> incrementUsageCount(String discountId) {
         return db.collection(FirebaseCollections.DISCOUNTS)
                 .document(discountId)
-                .update("usage_count",
+                .update("used_count",
                         com.google.firebase.firestore.FieldValue.increment(1));
     }
 

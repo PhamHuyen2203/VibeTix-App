@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vibetix.Models.Discount;
 import com.example.vibetix.R;
+import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,6 +30,7 @@ public class CreateDiscountActivity extends AppCompatActivity {
     private Calendar startCalendar = Calendar.getInstance();
     private Calendar expiryCalendar = Calendar.getInstance();
     private SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+    private SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,9 +97,9 @@ public class CreateDiscountActivity extends AppCompatActivity {
         }
 
         try {
-            double value = Double.parseDouble(valueStr);
-            double maxDiscount = maxDiscountStr.isEmpty() ? 0 : Double.parseDouble(maxDiscountStr);
-            double minOrder = minOrderStr.isEmpty() ? 0 : Double.parseDouble(minOrderStr);
+            long value = Long.parseLong(valueStr);
+            int maxDiscount = maxDiscountStr.isEmpty() ? 0 : Integer.parseInt(maxDiscountStr);
+            long minOrder = minOrderStr.isEmpty() ? 0 : Long.parseLong(minOrderStr);
 
             int selectedTypeId = rgType.getCheckedRadioButtonId();
             String type = (selectedTypeId == R.id.rb_percentage) ? "percentage" : "fixed";
@@ -115,8 +117,8 @@ public class CreateDiscountActivity extends AppCompatActivity {
             discount.setValue(value);
             discount.setMaxDiscount(maxDiscount);
             discount.setMinOrderValue(minOrder);
-            discount.setStartDate(startCalendar.getTimeInMillis());
-            discount.setExpiryDate(expiryCalendar.getTimeInMillis());
+            discount.setStartDate(new Timestamp(startCalendar.getTime()));
+            discount.setExpiryDate(new Timestamp(expiryCalendar.getTime()));
             discount.setCreatorType("admin");
             discount.setScope("global");
             discount.setEventId(null);

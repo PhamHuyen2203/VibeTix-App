@@ -8,6 +8,7 @@ public class Category {
     private String name;
     private String slug;
     private String iconUrl;
+    private boolean isActive = true;
 
     public Category() {}
 
@@ -26,6 +27,11 @@ public class Category {
     public String getIconUrl() { return iconUrl; }
     @PropertyName("icon_url")
     public void setIconUrl(String iconUrl) { this.iconUrl = iconUrl; }
+
+    @PropertyName("is_active")
+    public boolean isActive() { return isActive; }
+    @PropertyName("is_active")
+    public void setActive(boolean active) { isActive = active; }
 
     // Mock fields
     private int iconResId;

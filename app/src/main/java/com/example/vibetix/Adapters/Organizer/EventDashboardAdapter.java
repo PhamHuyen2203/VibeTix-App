@@ -43,38 +43,151 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         Event event = eventList.get(position);
 
         holder.tvTitle.setText(event.getTitle());
-        holder.tvDate.setText(event.getStartTime() != null ? event.getStartTime() : "Sắp diễn ra");
 
-        // Binding Status Badge
-        if (event.getStatus() != null) {
-            holder.tvStatusBadge.setVisibility(View.VISIBLE);
-            holder.tvStatusBadge.setText(event.getStatus().name());
-            
-            // Tạm thời set màu nền cho draft/pending/approved
-            switch (event.getStatus()) {
-                case DRAFT:
-                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
-                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.clr_text_black));
+        // Date
+        String dateStr = event.getStartTime();
+        holder.tvDate.setText(dateStr != null ? "📅 " + dateStr : "Sắp diễn ra");
+
+        // Venue
+        if (holder.tvVenue != null) {
+            String city = event.getVenueCity();
+            String venue = event.getVenueName();
+            if (city != null && !city.isEmpty()) {
+                holder.tvVenue.setText("📍 " + (venue != null && !venue.isEmpty() ? venue + ", " + city : city));
+                holder.tvVenue.setVisibility(View.VISIBLE);
+            } else if (venue != null && !venue.isEmpty()) {
+                holder.tvVenue.setText("📍 " + venue);
+                holder.tvVenue.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvVenue.setVisibility(View.GONE);
+            }
+        }
+
+        // Binding Role Badge — màu theo role
+        if (event.getUserRole() != null && !event.getUserRole().isEmpty()) {
+            holder.tvRoleBadge.setVisibility(View.VISIBLE);
+            String roleStr = event.getUserRole().toUpperCase();
+            switch (roleStr) {
+                case "OWNER":
+                    holder.tvRoleBadge.setText("👑 OWNER");
+                    holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_owner);
+                    holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
-                case APPROVED:
-                case ONGOING:
-                case COMPLETED:
+                case "MANAGER":
+                    holder.tvRoleBadge.setText("👔 MANAGER");
+                    holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_manager);
+                    holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
+                    break;
+                default:
+                    holder.tvRoleBadge.setText("🎫 STAFF");
+                    holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_staff);
+                    holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_black));
+                    
+                    // Hide stats for staff
+                    if (holder.layoutStats != null) {
+                        holder.layoutStats.setVisibility(View.GONE);
+                    }
+                    break;
+            }
+            
+            // Explicitly show stats for Owner/Manager if previously hidden by view recycling
+            if (roleStr.equals("OWNER") || roleStr.equals("MANAGER")) {
+                if (holder.layoutStats != null) {
+                    holder.layoutStats.setVisibility(View.VISIBLE);
+                }
+            }
+        } else {
+            holder.tvRoleBadge.setVisibility(View.GONE);
+        }
+
+        // Binding Status Badge — đúng màu theo spec
+        if (event.getStatusStr() != null) {
+            holder.tvStatusBadge.setVisibility(View.VISIBLE);
+            String s = event.getStatusStr().toLowerCase();
+            switch (s) {
+                case "approved":
+                case "ongoing":
+                    holder.tvStatusBadge.setText("● " + s.toUpperCase());
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active); // xanh
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
+                    break;
+                case "pending":
+                    holder.tvStatusBadge.setText("● PENDING");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
+                    break;
+                case "cancelled":
+                    holder.tvStatusBadge.setText("● CANCELLED");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+                    break;
+                case "completed":
+                    holder.tvStatusBadge.setText("● COMPLETED");
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
-                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.clr_text_white));
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
+                    break;
+                default: // draft
+                    holder.tvStatusBadge.setText("● DRAFT");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
+                    break;
+            }
+        } else if (event.getStatus() != null) {
+            // fallback: dùng enum
+            holder.tvStatusBadge.setVisibility(View.VISIBLE);
+            switch (event.getStatus()) {
+                case APPROVED: case ONGOING:
+                    holder.tvStatusBadge.setText("● " + event.getStatus().name());
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 case PENDING:
-                case CANCELLED:
+                    holder.tvStatusBadge.setText("● PENDING");
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
-                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.clr_error));
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
+                    break;
+                case CANCELLED:
+                    holder.tvStatusBadge.setText("● CANCELLED");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+                    break;
+                default:
+                    holder.tvStatusBadge.setText("● DRAFT");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
                     break;
             }
         } else {
             holder.tvStatusBadge.setVisibility(View.GONE);
         }
-        
-        holder.tvStatTickets.setText("0/0");
-        holder.tvStatRevenue.setText("0đ");
 
+        holder.tvStatTickets.setText("...");
+        holder.tvStatRevenue.setText("...");
+
+        // Fetch stats if OWNER or MANAGER
+        String finalRoleStr = (event.getUserRole() != null) ? event.getUserRole().toUpperCase() : "";
+        if (finalRoleStr.equals("OWNER") || finalRoleStr.equals("MANAGER")) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection(com.example.vibetix.Firebase.FirebaseCollections.ORDER_ITEMS)
+                .whereEqualTo("event_id", event.getId())
+                .get()
+                .addOnSuccessListener(snap -> {
+                    double totalRevenue = 0;
+                    int ticketCount = 0;
+                    if (snap != null) {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                            Double price = doc.getDouble("price_per_ticket");
+                            Long qty = doc.getLong("quantity");
+                            int itemQty = (qty != null) ? qty.intValue() : 1;
+                            ticketCount += itemQty;
+                            if (price != null) totalRevenue += price * itemQty;
+                        }
+                    }
+                    java.text.NumberFormat vndFmt = java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi", "VN"));
+                    holder.tvStatTickets.setText(String.valueOf(ticketCount));
+                    holder.tvStatRevenue.setText(vndFmt.format((long) totalRevenue) + " ₫");
+                });
+        }
         // Sử dụng Glide để load ảnh poster
         Glide.with(holder.itemView.getContext())
                 .load(event.getPosterUrl())
@@ -104,17 +217,21 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPoster, btnEventOptions;
-        TextView tvTitle, tvDate, tvStatusBadge, tvStatTickets, tvStatRevenue;
+        TextView tvTitle, tvDate, tvVenue, tvRoleBadge, tvStatusBadge, tvStatTickets, tvStatRevenue;
+        View layoutStats;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivPoster = itemView.findViewById(R.id.ivEventPoster);
-            tvTitle = itemView.findViewById(R.id.tvEventTitle);
-            tvDate = itemView.findViewById(R.id.tvEventDate);
-            tvStatusBadge = itemView.findViewById(R.id.tvStatusBadge);
-            tvStatTickets = itemView.findViewById(R.id.tvStatTickets);
-            tvStatRevenue = itemView.findViewById(R.id.tvStatRevenue);
+            ivPoster       = itemView.findViewById(R.id.ivEventPoster);
+            tvTitle        = itemView.findViewById(R.id.tvEventTitle);
+            tvDate         = itemView.findViewById(R.id.tvEventDate);
+            tvVenue        = itemView.findViewById(R.id.tvEventVenue);
+            tvRoleBadge    = itemView.findViewById(R.id.tvRoleBadge);
+            tvStatusBadge  = itemView.findViewById(R.id.tvStatusBadge);
+            tvStatTickets  = itemView.findViewById(R.id.tvStatTickets);
+            tvStatRevenue  = itemView.findViewById(R.id.tvStatRevenue);
             btnEventOptions = itemView.findViewById(R.id.btnEventOptions);
+            layoutStats    = itemView.findViewById(R.id.layoutStats);
         }
     }
 }

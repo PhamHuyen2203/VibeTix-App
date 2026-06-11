@@ -194,8 +194,8 @@ public class HomeFragment extends Fragment {
         layoutSearchBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() instanceof com.example.vibetix.Activities.UserMainActivity) {
-                    ((com.example.vibetix.Activities.UserMainActivity) getActivity()).openSearchFragment();
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSearchFragment();
                 }
             }
         });
@@ -567,7 +567,7 @@ public class HomeFragment extends Fragment {
                 if (tickets != null && !tickets.isEmpty()) {
                     ArrayList<Event> liveResale = new ArrayList<>();
                     for (Ticket t : tickets) {
-                        Event ev = new Event(t.getEventId(), t.getEventTitle(), null, t.getEventDate(), t.getEventLocation(), "resale", t.getResalePrice());
+                        Event ev = new Event(t.getEventId(), t.getEventTitle(), null, t.getEventDate(), t.getEventLocation(), "resale", (int) t.getResalePrice());
                         ev.setSoldOut(true);
                         
                         int coverResId = R.drawable.event_live_non_song;
@@ -656,8 +656,8 @@ public class HomeFragment extends Fragment {
         if (btnGo != null) {
             btnGo.setOnClickListener(v -> {
                 dialog.dismiss();
-                if (getActivity() instanceof com.example.vibetix.Activities.UserMainActivity) {
-                    ((com.example.vibetix.Activities.UserMainActivity) getActivity()).openEventsFragment();
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openEventsFragment();
                 }
             });
         }

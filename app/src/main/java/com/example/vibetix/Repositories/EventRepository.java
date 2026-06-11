@@ -122,4 +122,48 @@ public class EventRepository extends BaseRepository {
                 .limit(1)
                 .get();
     }
+
+    // ─── Legacy Callback methods (for backward compatibility) ───────────────────
+    public interface OnEventLoadedListener {
+        void onSuccess(Event event);
+        void onFailure(Exception e);
+    }
+
+    public interface OnTicketTypesLoadedListener {
+        void onSuccess(java.util.List<com.example.vibetix.Models.TicketType> ticketTypes);
+        void onFailure(Exception e);
+    }
+
+    public void getEventById(String eventId, OnEventLoadedListener listener) {
+        getEventById(eventId)
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Event event = documentSnapshot.toObject(Event.class);
+                        if (event != null) {
+                            if (event.getId() == null) event.setId(documentSnapshot.getId());
+                            listener.onSuccess(event);
+                            return;
+                        }
+                    }
+                    listener.onFailure(new Exception("Event not found"));
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    public void getTicketTypesForEvent(String eventId, OnTicketTypesLoadedListener listener) {
+        db.collection(FirebaseCollections.EVENTS).document(eventId)
+                .collection(FirebaseCollections.TICKET_TYPES)
+                .orderBy("sort_order", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    java.util.List<com.example.vibetix.Models.TicketType> list = new java.util.ArrayList<>();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        com.example.vibetix.Models.TicketType t = doc.toObject(com.example.vibetix.Models.TicketType.class);
+                        t.setTicketTypeId(doc.getId());
+                        list.add(t);
+                    }
+                    listener.onSuccess(list);
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
 }

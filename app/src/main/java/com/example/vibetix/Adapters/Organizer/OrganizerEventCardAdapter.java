@@ -273,13 +273,13 @@ public class OrganizerEventCardAdapter extends RecyclerView.Adapter<OrganizerEve
         ViewHolder(View itemView) {
             super(itemView);
             ivEventPoster      = itemView.findViewById(R.id.ivEventPoster);
-            ivEventMenu        = itemView.findViewById(R.id.ivEventMenu);
-            tvEventStatus      = itemView.findViewById(R.id.tvEventStatus);
+            ivEventMenu        = itemView.findViewById(R.id.btnEventOptions);
+            tvEventStatus      = itemView.findViewById(R.id.tvStatusBadge);
             tvEventTitle       = itemView.findViewById(R.id.tvEventTitle);
             tvEventDate        = itemView.findViewById(R.id.tvEventDate);
             tvEventVenue       = itemView.findViewById(R.id.tvEventVenue);
-            tvEventTicketStats = itemView.findViewById(R.id.tvEventTicketStats);
-            tvEventMinPrice    = itemView.findViewById(R.id.tvEventMinPrice);
+            tvEventTicketStats = itemView.findViewById(R.id.tvStatTickets);
+            tvEventMinPrice    = itemView.findViewById(R.id.tvStatRevenue);
         }
     }
 }

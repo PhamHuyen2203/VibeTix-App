@@ -127,7 +127,6 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
 
         db.collection(FirebaseCollections.TICKET_TYPES)
                 .whereEqualTo("event_id", eventId)
-                .orderBy("sort_order")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     binding.pbLoading.setVisibility(View.GONE);
@@ -140,19 +139,36 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
 
                     double totalRevenue = 0;
                     for (QueryDocumentSnapshot doc : querySnapshot) {
-                        TicketType tt = doc.toObject(TicketType.class);
-                        if (tt.getTicketTypeId() == null) {
-                            tt.setTicketTypeId(doc.getId());
+                        try {
+                            TicketType tt = doc.toObject(TicketType.class);
+                            if (tt != null) {
+                                if (tt.getTicketTypeId() == null) {
+                                    tt.setTicketTypeId(doc.getId());
+                                }
+                                ticketTypes.add(tt);
+                                totalRevenue += tt.getPrice() * tt.getSoldCount();
+                            }
+                        } catch (Exception e) {
+                            // Bỏ qua document bị lỗi parse data
+                            e.printStackTrace();
                         }
-                        ticketTypes.add(tt);
-                        totalRevenue += tt.getPrice() * tt.getSoldCount();
                     }
+                    
+                    // Sort locally to avoid Firestore composite index requirement
+                    java.util.Collections.sort(ticketTypes, (t1, t2) -> Long.compare(t1.getSortOrder(), t2.getSortOrder()));
+                    
                     adapter.notifyDataSetChanged();
 
                     // Update header stats
                     binding.tvTicketTypeCount.setText(ticketTypes.size() + " loại vé");
                     binding.tvTotalRevenue.setText("Tổng doanh thu: " + vndFmt.format((long) totalRevenue) + " ₫");
-                    binding.layoutEmpty.setVisibility(View.GONE);
+                    
+                    if (ticketTypes.isEmpty()) {
+                        showEmptyState();
+                    } else {
+                        binding.layoutEmpty.setVisibility(View.GONE);
+                        binding.rvTicketTypes.setVisibility(View.VISIBLE);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
@@ -170,7 +186,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
     // ADD / EDIT bottom sheet
     // ─────────────────────────────────────────────────────────────────────────
     private void openTicketTypeSheet(TicketType existing) {
-        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.ThemeOverlay_MaterialComponents_BottomSheetDialog);
+        BottomSheetDialog dialog = new BottomSheetDialog(this, com.google.android.material.R.style.ThemeOverlay_MaterialComponents_BottomSheetDialog);
         BottomSheetTicketTypeBinding sheetBinding =
                 BottomSheetTicketTypeBinding.inflate(getLayoutInflater());
         dialog.setContentView(sheetBinding.getRoot());
@@ -185,8 +201,8 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
             sheetBinding.etTicketPrice.setText(String.valueOf((long) existing.getPrice()));
             sheetBinding.etTotalQty.setText(String.valueOf(existing.getTotalQuantity()));
             sheetBinding.etTicketDesc.setText(existing.getDescription());
-            if (existing.getSaleStart() != null) sheetBinding.etSaleStart.setText(existing.getSaleStart());
-            if (existing.getSaleEnd() != null)   sheetBinding.etSaleEnd.setText(existing.getSaleEnd());
+            if (existing.getSaleStart() != null) sheetBinding.etSaleStart.setText(displayDate(existing.getSaleStart()));
+            if (existing.getSaleEnd() != null)   sheetBinding.etSaleEnd.setText(displayDate(existing.getSaleEnd()));
             sheetBinding.switchTransferable.setChecked(existing.isTransferable());
             sheetBinding.switchIsActive.setChecked(existing.isActive());
 
@@ -231,11 +247,11 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 return;
             }
 
-            double price;
-            int qty;
+            long price;
+            long qty;
             try {
-                price = Double.parseDouble(priceStr);
-                qty   = Integer.parseInt(qtyStr);
+                price = Long.parseLong(priceStr);
+                qty   = Long.parseLong(qtyStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Giá hoặc số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
@@ -248,6 +264,13 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
             sheetBinding.btnSaveTicketType.setText("Đang lưu…");
 
             if (isEdit) {
+                if (qty < existing.getSoldCount()) {
+                    sheetBinding.etTotalQty.setError("Không thể giảm số lượng xuống dưới số vé đã bán (" + existing.getSoldCount() + " vé)!");
+                    sheetBinding.etTotalQty.requestFocus();
+                    sheetBinding.btnSaveTicketType.setEnabled(true);
+                    sheetBinding.btnSaveTicketType.setText("LƯU THÔNG TIN");
+                    return;
+                }
                 updateTicketType(existing, name, price, qty, desc, saleStart, saleEnd,
                         transferable, isActive, dialog);
             } else {
@@ -259,13 +282,15 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void createTicketType(String name, double price, int qty, String desc,
+    private void createTicketType(String name, long price, long qty, String desc,
                                    String saleStart, String saleEnd,
                                    boolean transferable, boolean isActive,
                                    BottomSheetDialog dialog) {
         String id = UUID.randomUUID().toString();
+        com.google.firebase.Timestamp tsSaleStart = toTimestamp(saleStart);
+        com.google.firebase.Timestamp tsSaleEnd   = toTimestamp(saleEnd);
         Map<String, Object> data = buildTicketTypeMap(id, name, price, qty, desc,
-                saleStart, saleEnd, transferable, isActive);
+                tsSaleStart, tsSaleEnd, transferable, isActive);
 
         db.collection(FirebaseCollections.TICKET_TYPES).document(id)
                 .set(data)
@@ -280,7 +305,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateTicketType(TicketType existing, String name, double price, int qty,
+    private void updateTicketType(TicketType existing, String name, long price, long qty,
                                    String desc, String saleStart, String saleEnd,
                                    boolean transferable, boolean isActive,
                                    BottomSheetDialog dialog) {
@@ -289,12 +314,12 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
         // Only update price if field is enabled (no confirmed orders)
         updates.put("price", price);
         // Update available_quantity relative to how many were already sold
-        int sold = existing.getSoldCount();
+        long sold = existing.getSoldCount();
         updates.put("total_quantity", qty);
         updates.put("available_quantity", Math.max(0, qty - sold));
         updates.put("description", desc);
-        updates.put("sale_start", saleStart);
-        updates.put("sale_end", saleEnd);
+        updates.put("sale_start", toTimestamp(saleStart));
+        updates.put("sale_end", toTimestamp(saleEnd));
         updates.put("is_transferable", transferable);
         updates.put("is_active", isActive);
 
@@ -311,9 +336,9 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 });
     }
 
-    private Map<String, Object> buildTicketTypeMap(String id, String name, double price,
-                                                    int qty, String desc,
-                                                    String saleStart, String saleEnd,
+    private Map<String, Object> buildTicketTypeMap(String id, String name, long price,
+                                                    long qty, String desc,
+                                                    com.google.firebase.Timestamp saleStart, com.google.firebase.Timestamp saleEnd,
                                                     boolean transferable, boolean isActive) {
         Map<String, Object> data = new HashMap<>();
         data.put("ticket_type_id", id);
@@ -322,7 +347,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
         data.put("price", price);
         data.put("total_quantity", qty);
         data.put("available_quantity", qty);
-        data.put("sold_count", 0);
+        data.put("sold_quantity", 0L);
         data.put("description", TextUtils.isEmpty(desc) ? "" : desc);
         data.put("sale_start", saleStart);
         data.put("sale_end", saleEnd);
@@ -412,6 +437,26 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> callback.onResult(false));
     }
 
+    private String displayDate(com.google.firebase.Timestamp ts) {
+        if (ts == null) return "";
+        try {
+            SimpleDateFormat dispFmt = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            return dispFmt.format(ts.toDate());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private com.google.firebase.Timestamp toTimestamp(String displayDate) {
+        if (displayDate == null || displayDate.isEmpty()) return null;
+        try {
+            SimpleDateFormat dispFmt = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            return new com.google.firebase.Timestamp(dispFmt.parse(displayDate));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private void showDatePicker(com.google.android.material.textfield.TextInputEditText target) {
         Calendar cal = Calendar.getInstance();
         new DatePickerDialog(this,
@@ -485,8 +530,8 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
             }
 
             // Sold / total progress
-            int sold  = tt.getSoldCount();
-            int total = tt.getTotalQuantity();
+            long sold  = tt.getSoldCount();
+            long total = tt.getTotalQuantity();
             b.tvSoldCount.setText(sold + " / " + total + " vé");
             int progress = (total > 0) ? (int) ((sold * 100f) / total) : 0;
             b.pbTicketSales.setMax(100);

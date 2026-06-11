@@ -49,7 +49,7 @@ public class TicketTypeAdapter extends RecyclerView.Adapter<TicketTypeAdapter.Ti
         holder.tvTicketName.setText(ticketType.getName());
         holder.tvTicketPrice.setText(String.format("%,.0fđ", ticketType.getPrice()));
         
-        int sold = ticketType.getSoldCount();
+        long sold = ticketType.getSoldCount();
         holder.tvTicketQuantity.setText(sold + " / " + ticketType.getTotalQuantity());
         
         holder.swTicketActive.setOnCheckedChangeListener(null);

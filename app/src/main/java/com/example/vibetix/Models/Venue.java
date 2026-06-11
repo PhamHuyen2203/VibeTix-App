@@ -11,6 +11,7 @@ public class Venue {
     private Double longitude;
     private Integer capacity;
     private String imageUrl;
+    private boolean isActive = true;
 
     public Venue() {}
 
@@ -41,4 +42,9 @@ public class Venue {
     public String getImageUrl() { return imageUrl; }
     @PropertyName("image_url")
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    @PropertyName("is_active")
+    public boolean isActive() { return isActive; }
+    @PropertyName("is_active")
+    public void setActive(boolean active) { isActive = active; }
 }

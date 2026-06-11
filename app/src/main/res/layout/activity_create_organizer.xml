@@ -11,11 +11,11 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/clr_primary_blue"
-        app:title="Tạo hồ sơ Ban tổ chức"
-        app:titleTextColor="@color/clr_text_white"
-        app:navigationIcon="@drawable/ic_chevron_right"
-        app:navigationIconTint="@color/clr_text_white" />
+        android:background="@color/clr_bg_white"
+        app:title="Hồ sơ Ban tổ chức"
+        app:titleTextColor="@color/clr_text_black"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationIconTint="@color/clr_text_black" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -28,13 +28,29 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logo Ban tổ chức"
+                android:textColor="@color/clr_text_secondary"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivLogo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                android:src="@drawable/ic_organizer_placeholder" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tên thương hiệu / Tổ chức"
+                android:hint="Tên thương hiệu / Tổ chức (*)"
                 android:layout_marginBottom="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etBrandName"
                     android:layout_width="match_parent"
@@ -45,10 +61,9 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email liên hệ"
+                android:hint="Email liên hệ (*)"
                 android:layout_marginBottom="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etContactEmail"
                     android:layout_width="match_parent"
@@ -59,10 +74,9 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Số điện thoại"
+                android:hint="Số điện thoại (*)"
                 android:layout_marginBottom="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etContactPhone"
                     android:layout_width="match_parent"
@@ -73,10 +87,9 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Website (nếu có)"
+                android:hint="Website (Tùy chọn)"
                 android:layout_marginBottom="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etWebsite"
                     android:layout_width="match_parent"
@@ -87,31 +100,64 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Mô tả về tổ chức"
-                android:layout_marginBottom="24dp"
+                android:hint="Mô tả"
+                android:layout_marginBottom="16dp"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minLines="3"
-                    android:gravity="top"
+                    android:gravity="top|start"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardLicense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/clr_grey_1">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Giấy phép kinh doanh (Tùy chọn)"
+                        android:textColor="@color/clr_text_secondary"
+                        android:layout_marginBottom="8dp"/>
+                    <ImageView
+                        android:id="@+id/ivLicense"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:background="#F5F5F5"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cbIsDefault"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đặt làm hồ sơ mặc định"
+                android:checked="true"
+                android:layout_marginBottom="24dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Gửi hồ sơ đăng ký"
-                android:textAllCaps="false"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                android:backgroundTint="@color/clr_primary_blue" />
+                android:layout_height="52dp"
+                android:text="Lưu Hồ Sơ"
+                app:cornerRadius="8dp"
+                android:layout_marginBottom="16dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </LinearLayout>

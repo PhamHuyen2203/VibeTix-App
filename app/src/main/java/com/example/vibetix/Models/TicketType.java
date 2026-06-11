@@ -1,22 +1,25 @@
 package com.example.vibetix.Models;
 
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
+@IgnoreExtraProperties
 public class TicketType {
     private String ticketTypeId; // UUID v4
     private String typeId;       // alias field name
     private String eventId;
     private String name;
     private String description;
-    private double price;
-    private int totalQuantity;
-    private int availableQuantity;
-    private int soldCount;       // convenience counter
-    private String saleStart;
-    private String saleEnd;
+    private long price;
+    private long totalQuantity;
+    private long availableQuantity;
+    private long soldQuantity;
+    private com.google.firebase.Timestamp saleStart;
+    private com.google.firebase.Timestamp saleEnd;
     private boolean isTransferable = true;
     private boolean isActive = true;
-    private int sortOrder = 0;
+    private long sortOrder = 0;
 
     public TicketType() {}
 
@@ -36,28 +39,28 @@ public class TicketType {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public long getPrice() { return price; }
+    public void setPrice(long price) { this.price = price; }
 
     @PropertyName("total_quantity")
-    public int getTotalQuantity() { return totalQuantity; }
+    public long getTotalQuantity() { return totalQuantity; }
     @PropertyName("total_quantity")
-    public void setTotalQuantity(int totalQuantity) { this.totalQuantity = totalQuantity; }
+    public void setTotalQuantity(long totalQuantity) { this.totalQuantity = totalQuantity; }
 
     @PropertyName("available_quantity")
-    public int getAvailableQuantity() { return availableQuantity; }
+    public long getAvailableQuantity() { return availableQuantity; }
     @PropertyName("available_quantity")
-    public void setAvailableQuantity(int availableQuantity) { this.availableQuantity = availableQuantity; }
+    public void setAvailableQuantity(long availableQuantity) { this.availableQuantity = availableQuantity; }
 
     @PropertyName("sale_start")
-    public String getSaleStart() { return saleStart; }
+    public com.google.firebase.Timestamp getSaleStart() { return saleStart; }
     @PropertyName("sale_start")
-    public void setSaleStart(String saleStart) { this.saleStart = saleStart; }
+    public void setSaleStart(com.google.firebase.Timestamp saleStart) { this.saleStart = saleStart; }
 
     @PropertyName("sale_end")
-    public String getSaleEnd() { return saleEnd; }
+    public com.google.firebase.Timestamp getSaleEnd() { return saleEnd; }
     @PropertyName("sale_end")
-    public void setSaleEnd(String saleEnd) { this.saleEnd = saleEnd; }
+    public void setSaleEnd(com.google.firebase.Timestamp saleEnd) { this.saleEnd = saleEnd; }
 
     @PropertyName("is_transferable")
     public boolean isTransferable() { return isTransferable; }
@@ -70,20 +73,35 @@ public class TicketType {
     public void setActive(boolean active) { this.isActive = active; }
 
     @PropertyName("sort_order")
-    public int getSortOrder() { return sortOrder; }
+    public long getSortOrder() { return sortOrder; }
     @PropertyName("sort_order")
-    public void setSortOrder(int sortOrder) { this.sortOrder = sortOrder; }
+    public void setSortOrder(long sortOrder) { this.sortOrder = sortOrder; }
 
     // Convenience aliases
+    @Exclude
     public String getTypeId() { return typeId != null ? typeId : ticketTypeId; }
+    @Exclude
     public void setTypeId(String id) { this.typeId = id; this.ticketTypeId = id; }
 
     /** Alias for availableQuantity (used in some adapters). */
-    public int getQuantity() { return availableQuantity; }
+    @Exclude
+    public long getQuantity() { return availableQuantity; }
+    @Exclude
+    public long getRemainingQuantity() { return availableQuantity; }
+
+    @PropertyName("sold_quantity")
+    public long getSoldQuantity() { return soldQuantity; }
+    @PropertyName("sold_quantity")
+    public void setSoldQuantity(long soldQuantity) { this.soldQuantity = soldQuantity; }
 
     /** soldCount — how many sold so far. */
-    @PropertyName("sold_count")
-    public int getSoldCount() { return soldCount; }
-    @PropertyName("sold_count")
-    public void setSoldCount(int soldCount) { this.soldCount = soldCount; }
+    @Exclude
+    public long getSoldCount() { 
+        if (soldQuantity == 0 && totalQuantity > 0 && availableQuantity <= totalQuantity) {
+            return totalQuantity - availableQuantity;
+        }
+        return soldQuantity; 
+    }
+    @Exclude
+    public void setSoldCount(long soldCount) { this.soldQuantity = soldCount; }
 }

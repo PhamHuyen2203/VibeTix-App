@@ -198,9 +198,8 @@ public class RegisterFragment extends Fragment {
         Intent intent;
         if (Constants.ROLE_ADMIN.equals(role)) {
             intent = new Intent(requireContext(), com.example.vibetix.Activities.Admin.AdminMainActivity.class);
-        } else if (Constants.ROLE_ORGANIZER.equals(role)) {
-            intent = new Intent(requireContext(), com.example.vibetix.Activities.Organizer.OrganizerMainActivity.class);
         } else {
+            // Cả user thường và organizer đều vào UserMainActivity
             intent = new Intent(requireContext(), com.example.vibetix.Activities.User.UserMainActivity.class);
         }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

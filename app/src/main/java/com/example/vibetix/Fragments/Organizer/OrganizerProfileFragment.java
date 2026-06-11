@@ -25,8 +25,10 @@ import com.example.vibetix.R;
 import com.example.vibetix.Utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -190,8 +192,7 @@ public class OrganizerProfileFragment extends Fragment {
 
                         displayProfile(activeOrg, currentUser);
                         final String orgId = activeOrg.getOrganizerId();
-                        loadEventStats(orgId);
-                        loadRevenueStats(orgId);
+                        loadEventStats(orgId);  // also loads revenue inside
 
                     } else {
                         displayFallbackProfile(currentUser);
@@ -258,50 +259,130 @@ public class OrganizerProfileFragment extends Fragment {
     }
 
     private void loadEventStats(String organizerId) {
-        db.collection("events")
-                .whereEqualTo("organizer_id", organizerId)
-                .get()
+        // Query events where user created them (via event_staff as owner)
+        // Use organizer_id if available, fallback to user_id from session
+        String userId = sessionManager.getUserDetails() != null
+                ? sessionManager.getUserDetails().getUserId() : null;
+
+        com.google.firebase.firestore.Query eventsQuery = userId != null
+                ? db.collection("events").whereEqualTo("user_id", userId)
+                : db.collection("events").whereEqualTo("organizer_id", organizerId);
+
+        eventsQuery.get()
                 .addOnSuccessListener(snapshot -> {
+                    if (!isAdded()) return;
                     int totalEvents = snapshot != null ? snapshot.size() : 0;
                     tvTotalEvents.setText(String.valueOf(totalEvents));
 
-                    long totalTickets = 0;
-                    if (snapshot != null) {
-                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                            Long sold = doc.getLong("ticket_sold");
-                            if (sold != null) totalTickets += sold;
-                        }
+                    if (snapshot == null || snapshot.isEmpty()) {
+                        tvTotalTicketsSold.setText("0");
+                        tvMonthlyRevenue.setText("0đ");
+                        return;
                     }
-                    tvTotalTicketsSold.setText(formatCompact(totalTickets));
+
+                    // Collect all event IDs
+                    List<String> eventIds = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        eventIds.add(doc.getId());
+                    }
+
+                    loadRevenueFromOrderItems(eventIds);
                 })
                 .addOnFailureListener(e -> {
+                    if (!isAdded()) return;
                     tvTotalEvents.setText("—");
                     tvTotalTicketsSold.setText("—");
                 });
     }
 
     /**
-     * Load real revenue from orders collection where organizer_id == organizerId
-     * and status == "confirmed" or "completed".
+     * Tính doanh thu tổng bằng cách:
+     * 1. Query order_items WHERE event_id IN (eventIds) — chunk mỗi 10
+     * 2. Tính tổng price_per_ticket * quantity
      */
-    private void loadRevenueStats(String organizerId) {
-        db.collection("orders")
-                .whereEqualTo("organizer_id", organizerId)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    double totalRevenue = 0;
-                    if (snapshot != null) {
-                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                            String status = doc.getString("status");
-                            if ("confirmed".equals(status) || "completed".equals(status) || "paid".equals(status)) {
-                                Double amount = doc.getDouble("total_amount");
-                                if (amount != null) totalRevenue += amount;
-                            }
+    private void loadRevenueFromOrderItems(List<String> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            if (isAdded()) {
+                tvMonthlyRevenue.setText("0đ");
+                tvTotalTicketsSold.setText("0");
+            }
+            return;
+        }
+
+        List<com.google.android.gms.tasks.Task<QuerySnapshot>> tasks = new ArrayList<>();
+        for (int i = 0; i < eventIds.size(); i += 10) {
+            List<String> chunk = eventIds.subList(i, Math.min(i + 10, eventIds.size()));
+            tasks.add(db.collection(com.example.vibetix.Firebase.FirebaseCollections.ORDER_ITEMS)
+                    .whereIn("event_id", chunk)
+                    .get());
+        }
+
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+            if (!isAdded()) return;
+            
+            List<com.example.vibetix.Models.OrderItem> allItems = new ArrayList<>();
+            java.util.Set<String> orderIds = new java.util.HashSet<>();
+            for (Object result : results) {
+                QuerySnapshot snap = (QuerySnapshot) result;
+                for (DocumentSnapshot doc : snap.getDocuments()) {
+                    com.example.vibetix.Models.OrderItem item = doc.toObject(com.example.vibetix.Models.OrderItem.class);
+                    if (item != null) {
+                        allItems.add(item);
+                        if (item.getOrderId() != null) {
+                            orderIds.add(item.getOrderId());
                         }
                     }
-                    tvMonthlyRevenue.setText(formatRevenue(totalRevenue));
-                })
-                .addOnFailureListener(e -> tvMonthlyRevenue.setText("—"));
+                }
+            }
+
+            if (orderIds.isEmpty()) {
+                tvMonthlyRevenue.setText("0đ");
+                tvTotalTicketsSold.setText("0");
+                return;
+            }
+
+            List<String> orderIdList = new ArrayList<>(orderIds);
+            List<com.google.android.gms.tasks.Task<QuerySnapshot>> orderTasks = new ArrayList<>();
+            for (int i = 0; i < orderIdList.size(); i += 10) {
+                List<String> chunk = orderIdList.subList(i, Math.min(i + 10, orderIdList.size()));
+                orderTasks.add(db.collection(com.example.vibetix.Firebase.FirebaseCollections.ORDERS)
+                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
+                        .get());
+            }
+
+            Tasks.whenAllSuccess(orderTasks).addOnSuccessListener(orderResults -> {
+                if (!isAdded()) return;
+                
+                java.util.Map<String, String> orderStatusMap = new java.util.HashMap<>();
+                for (Object orderResult : orderResults) {
+                    QuerySnapshot orderSnap = (QuerySnapshot) orderResult;
+                    for (DocumentSnapshot doc : orderSnap.getDocuments()) {
+                        String status = doc.getString("status");
+                        orderStatusMap.put(doc.getId(), status != null ? status.toLowerCase() : "pending");
+                    }
+                }
+
+                double totalRevenue = 0;
+                long totalTickets = 0;
+                for (com.example.vibetix.Models.OrderItem item : allItems) {
+                    String status = orderStatusMap.get(item.getOrderId());
+                    boolean isPaid = status != null && (status.equals("completed") || status.equals("confirmed") || status.equals("paid"));
+                    
+                    if (isPaid) {
+                        long q = item.getQuantity();
+                        totalTickets += q;
+                        totalRevenue += item.getPricePerTicket() * q;
+                    }
+                }
+
+                tvMonthlyRevenue.setText(formatRevenue(totalRevenue));
+                tvTotalTicketsSold.setText(formatCompact(totalTickets));
+            });
+        }).addOnFailureListener(e -> {
+            if (!isAdded()) return;
+            tvMonthlyRevenue.setText("—");
+            tvTotalTicketsSold.setText("—");
+        });
     }
 
     private void displayMockStats() {

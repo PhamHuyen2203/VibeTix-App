@@ -22,6 +22,11 @@ public class FirebaseCollections {
     // Communication
     public static final String NOTIFICATIONS = "notifications";
 
+    // Stars & Performers
+    public static final String STARS             = "stars";
+    public static final String EVENT_STARS       = "event_stars";
+    public static final String USER_STAR_FOLLOWS = "user_star_follows";
+
     // Legacy (kept for Admin screens — to be migrated later)
     public static final String CATEGORIES    = "categories";
     public static final String VENUES        = "venues";

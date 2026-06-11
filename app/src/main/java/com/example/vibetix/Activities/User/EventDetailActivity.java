@@ -159,16 +159,19 @@ public class EventDetailActivity extends AppCompatActivity {
     private void loadTicketTypes(String eId) {
         db.collection(FirebaseCollections.TICKET_TYPES)
                 .whereEqualTo("event_id", eId)
-                .whereEqualTo("is_active", true)
                 .get()
                 .addOnSuccessListener(snap -> {
                     ticketTypes.clear();
                     if (snap != null) {
                         for (QueryDocumentSnapshot doc : snap) {
-                            TicketType tt = doc.toObject(TicketType.class);
-                            if (tt != null) {
-                                if (tt.getTypeId() == null) tt.setTypeId(doc.getId());
-                                ticketTypes.add(tt);
+                            try {
+                                TicketType tt = doc.toObject(TicketType.class);
+                                if (tt != null && tt.isActive()) { // Lọc locally để tránh lỗi index
+                                    if (tt.getTypeId() == null) tt.setTypeId(doc.getId());
+                                    ticketTypes.add(tt);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -223,7 +226,7 @@ public class EventDetailActivity extends AppCompatActivity {
         @Override @androidx.annotation.NonNull
         public VH onCreateViewHolder(@androidx.annotation.NonNull android.view.ViewGroup p, int t) {
             View v = android.view.LayoutInflater.from(p.getContext())
-                    .inflate(R.layout.item_ticket_type, p, false);
+                    .inflate(R.layout.item_ticket_selection, p, false);
             return new VH(v);
         }
 
@@ -232,22 +235,89 @@ public class EventDetailActivity extends AppCompatActivity {
             TicketType tt = items.get(pos);
             h.tvName.setText(tt.getName() != null ? tt.getName() : "Vé");
             h.tvPrice.setText(tt.getPrice() == 0 ? "Miễn phí" :
-                    NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(tt.getPrice()) + "đ");
-            int qty = tt.getQuantity() - tt.getSoldCount();
-            h.tvQty.setText(qty > 0 ? qty + " còn lại" : "Hết vé");
-            h.tvQty.setTextColor(qty > 0 ? 0xFF27AE60 : 0xFFEB5757);
+                    NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(tt.getPrice()) + " ₫");
+
+            if (tt.getDescription() != null && !tt.getDescription().trim().isEmpty()) {
+                h.tvDesc.setText(tt.getDescription());
+                h.tvDesc.setVisibility(View.VISIBLE);
+            } else {
+                h.tvDesc.setVisibility(View.GONE);
+            }
+
+            long qty = tt.getTotalQuantity() - tt.getSoldCount();
+
+            // Check sale dates
+            boolean isBeforeSale = false;
+            boolean isAfterSale = false;
+            java.util.Date now = new java.util.Date();
+
+            try {
+                if (tt.getSaleStart() != null) {
+                    java.util.Date start = tt.getSaleStart().toDate();
+                    if (start != null && now.before(start)) isBeforeSale = true;
+                }
+                if (tt.getSaleEnd() != null) {
+                    java.util.Date end = tt.getSaleEnd().toDate();
+                    if (end != null) {
+                        end = new java.util.Date(end.getTime() + 24L * 60 * 60 * 1000 - 1);
+                        if (now.after(end)) isAfterSale = true;
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            if (isBeforeSale) {
+                h.tvStatus.setText("Sắp mở bán");
+                h.tvStatus.setTextColor(0xFFF2994A); // Orange
+                h.tvQty.setText(formatDateForDisplay(tt.getSaleStart()));
+                h.tvQty.setTextColor(0xFFF2994A);
+            } else if (isAfterSale) {
+                h.tvStatus.setText("Đã kết thúc bán");
+                h.tvStatus.setTextColor(0xFFEB5757); // Red
+                h.tvQty.setText("");
+            } else if (qty <= 0) {
+                h.tvStatus.setText("Hết vé");
+                h.tvStatus.setTextColor(0xFFEB5757); // Red
+                h.tvQty.setText("");
+            } else {
+                h.tvStatus.setText("Đang mở bán");
+                h.tvStatus.setTextColor(0xFF27AE60); // Green
+                h.tvQty.setText("Còn " + qty + " vé");
+                h.tvQty.setTextColor(0xFF27AE60);
+            }
         }
 
         @Override public int getItemCount() { return items.size(); }
 
         static class VH extends RecyclerView.ViewHolder {
-            TextView tvName, tvPrice, tvQty;
+            TextView tvName, tvPrice, tvQty, tvDesc, tvStatus;
             VH(View v) {
                 super(v);
-                tvName  = v.findViewById(R.id.tvTicketTypeName);
-                tvPrice = v.findViewById(R.id.tvTicketTypePrice);
-                tvQty   = v.findViewById(R.id.tvTicketTypeQty);
+                tvName  = v.findViewById(R.id.tvTicketName);
+                tvPrice = v.findViewById(R.id.tvTicketPrice);
+                tvQty   = v.findViewById(R.id.tvTicketQuantity);
+                tvDesc  = v.findViewById(R.id.tvTicketDesc);
+                tvStatus= v.findViewById(R.id.tvTicketStatus);
             }
         }
+    }
+    private static java.util.Date parseIsoOrDate(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) return null;
+        try {
+            if (dateStr.contains("T")) {
+                java.text.SimpleDateFormat isoFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                return isoFormat.parse(dateStr.split("\\.")[0]);
+            } else {
+                java.text.SimpleDateFormat displayFmt = new java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                return displayFmt.parse(dateStr);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static String formatDateForDisplay(com.google.firebase.Timestamp ts) {
+        if (ts == null) return "";
+        return new java.text.SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(ts.toDate());
     }
 }

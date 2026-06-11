@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,6 +28,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -62,6 +64,19 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private AutoCompleteTextView ddCategory, ddOrganizer;
     private ShapeableImageView ivEventPoster;
     private MaterialButton btnSaveDraft, btnSubmitForApproval;
+    private MaterialButton btnNextStep, btnPreviousStep;
+    private android.widget.ViewFlipper viewFlipper;
+    private android.widget.TextView tvStepIndicator;
+    private LinearProgressIndicator stepProgressIndicator;
+    private int currentStep = 0;
+
+    // Step 3 preview views and Organizer Mode views
+    private android.widget.TextView tvPreviewTitle, tvPreviewTime, tvPreviewVenue;
+    private RadioGroup rgOrganizerMode;
+    private android.widget.LinearLayout layoutSavedOrganizer, layoutNewOrganizer;
+    private com.google.android.material.card.MaterialCardView cardSelectedOrgInfo;
+    private android.widget.TextView tvSelectedOrgEmail, tvSelectedOrgPhone, tvSelectedOrgWebsite;
+    private TextInputEditText etNewOrgName, etNewOrgEmail, etNewOrgPhone, etNewOrgWebsite;
 
     // Data
     private SessionManager sessionManager;
@@ -96,13 +111,14 @@ public class CreateEditEventActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
+        // Check xem đang tạo mới hay sửa — phải đọc TRƯỚC setupToolbar()
+        existingEventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
+
         bindViews();
         setupToolbar();
         setupImagePicker();
         setupDateTimePickers();
 
-        // Check xem đang tạo mới hay sửa
-        existingEventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
         if (existingEventId != null) {
             loadExistingEvent(existingEventId);
         } else {
@@ -111,6 +127,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
         }
 
         setupButtons();
+        setupStepper();
     }
 
     private void bindViews() {
@@ -126,6 +143,41 @@ public class CreateEditEventActivity extends AppCompatActivity {
         ivEventPoster  = findViewById(R.id.ivEventPoster);
         btnSaveDraft   = findViewById(R.id.btnSaveDraft);
         btnSubmitForApproval = findViewById(R.id.btnSubmitForApproval);
+        btnNextStep = findViewById(R.id.btnNextStep);
+        btnPreviousStep = findViewById(R.id.btnPreviousStep);
+        viewFlipper = findViewById(R.id.viewFlipper);
+        tvStepIndicator = findViewById(R.id.tvStepIndicator);
+        stepProgressIndicator = findViewById(R.id.stepProgressIndicator);
+
+        // Views Step 3 preview and Organizer setup
+        tvPreviewTitle        = findViewById(R.id.tvPreviewTitle);
+        tvPreviewTime         = findViewById(R.id.tvPreviewTime);
+        tvPreviewVenue        = findViewById(R.id.tvPreviewVenue);
+
+        rgOrganizerMode = findViewById(R.id.rgOrganizerMode);
+        layoutSavedOrganizer = findViewById(R.id.layoutSavedOrganizer);
+        layoutNewOrganizer = findViewById(R.id.layoutNewOrganizer);
+        cardSelectedOrgInfo = findViewById(R.id.cardSelectedOrgInfo);
+        tvSelectedOrgEmail = findViewById(R.id.tvSelectedOrgEmail);
+        tvSelectedOrgPhone = findViewById(R.id.tvSelectedOrgPhone);
+        tvSelectedOrgWebsite = findViewById(R.id.tvSelectedOrgWebsite);
+
+        etNewOrgName = findViewById(R.id.etNewOrgName);
+        etNewOrgEmail = findViewById(R.id.etNewOrgEmail);
+        etNewOrgPhone = findViewById(R.id.etNewOrgPhone);
+        etNewOrgWebsite = findViewById(R.id.etNewOrgWebsite);
+
+        if (rgOrganizerMode != null) {
+            rgOrganizerMode.setOnCheckedChangeListener((group, checkedId) -> {
+                if (checkedId == R.id.rbSavedOrganizer) {
+                    if (layoutSavedOrganizer != null) layoutSavedOrganizer.setVisibility(android.view.View.VISIBLE);
+                    if (layoutNewOrganizer != null) layoutNewOrganizer.setVisibility(android.view.View.GONE);
+                } else if (checkedId == R.id.rbNewOrganizer) {
+                    if (layoutSavedOrganizer != null) layoutSavedOrganizer.setVisibility(android.view.View.GONE);
+                    if (layoutNewOrganizer != null) layoutNewOrganizer.setVisibility(android.view.View.VISIBLE);
+                }
+            });
+        }
     }
 
     private void setupToolbar() {
@@ -134,6 +186,47 @@ public class CreateEditEventActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(existingEventId != null ? "Chỉnh sửa sự kiện" : "Tạo sự kiện mới");
+        }
+    }
+
+    private void setupStepper() {
+        if (btnNextStep == null) return;
+        updateStepperUI();
+        btnNextStep.setOnClickListener(v -> {
+            if (currentStep < 2) {
+                if (!validateCurrentStep()) return;
+                currentStep++;
+                viewFlipper.setDisplayedChild(currentStep);
+                updateStepperUI();
+                // Khi vào Step 3: cập nhật preview card
+                if (currentStep == 2) updatePreviewCard();
+            }
+        });
+        btnPreviousStep.setOnClickListener(v -> {
+            if (currentStep > 0) {
+                currentStep--;
+                viewFlipper.setDisplayedChild(currentStep);
+                updateStepperUI();
+            }
+        });
+    }
+
+    private void updateStepperUI() {
+        if (currentStep == 0) {
+            tvStepIndicator.setText("Bước 1/3: Thông tin cơ bản");
+            if (stepProgressIndicator != null) stepProgressIndicator.setProgress(33);
+            btnPreviousStep.setVisibility(android.view.View.GONE);
+            btnNextStep.setVisibility(android.view.View.VISIBLE);
+        } else if (currentStep == 1) {
+            tvStepIndicator.setText("Bước 2/3: Lịch trình & Địa điểm");
+            if (stepProgressIndicator != null) stepProgressIndicator.setProgress(66);
+            btnPreviousStep.setVisibility(android.view.View.VISIBLE);
+            btnNextStep.setVisibility(android.view.View.VISIBLE);
+        } else if (currentStep == 2) {
+            tvStepIndicator.setText("Bước 3/3: Ban tổ chức");
+            if (stepProgressIndicator != null) stepProgressIndicator.setProgress(100);
+            btnPreviousStep.setVisibility(android.view.View.VISIBLE);
+            btnNextStep.setVisibility(android.view.View.GONE); // Use submit buttons instead
         }
     }
 
@@ -196,18 +289,16 @@ public class CreateEditEventActivity extends AppCompatActivity {
                         }
                     }
                     setupOrganizerDropdown();
-                    // Pre-select default organizer
-                    String defaultId = sessionManager.getActiveOrganizerId();
-                    for (Organizer org : myOrganizers) {
-                        if (org.getOrganizerId().equals(defaultId)) {
-                            selectedOrganizer = org;
-                            if (ddOrganizer != null) ddOrganizer.setText(org.getBrandName(), false);
-                            break;
+                    if (existingEventId == null) {
+                        // Pre-select default organizer if creating new
+                        String defaultId = sessionManager.getActiveOrganizerId();
+                        for (Organizer org : myOrganizers) {
+                            if (org.getOrganizerId().equals(defaultId)) {
+                                selectedOrganizer = org;
+                                if (ddOrganizer != null) ddOrganizer.setText(org.getBrandName(), false);
+                                break;
+                            }
                         }
-                    }
-                    if (selectedOrganizer == null && !myOrganizers.isEmpty()) {
-                        selectedOrganizer = myOrganizers.get(0);
-                        if (ddOrganizer != null) ddOrganizer.setText(selectedOrganizer.getBrandName(), false);
                     }
                 });
     }
@@ -243,23 +334,6 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private void setupOrganizerDropdown() {
         if (ddOrganizer == null) return;
         
-        if (myOrganizers.isEmpty()) {
-            // Hiển thị thông báo yêu cầu tạo hồ sơ Ban tổ chức
-            new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Chưa có hồ sơ Ban tổ chức")
-                .setMessage("Bạn cần tạo ít nhất một hồ sơ Ban tổ chức trước khi có thể tạo sự kiện. Bạn có muốn tạo ngay bây giờ không?")
-                .setPositiveButton("Tạo ngay", (dialog, which) -> {
-                    startActivity(new android.content.Intent(this, com.example.vibetix.Activities.User.CreateOrganizerActivity.class));
-                    finish();
-                })
-                .setNegativeButton("Hủy", (dialog, which) -> {
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
-            return;
-        }
-        
         List<String> names = new ArrayList<>();
         for (Organizer org : myOrganizers) names.add(org.getBrandName());
 
@@ -268,6 +342,12 @@ public class CreateEditEventActivity extends AppCompatActivity {
         ddOrganizer.setAdapter(adapter);
         ddOrganizer.setOnItemClickListener((parent, view, position, id) -> {
             selectedOrganizer = myOrganizers.get(position);
+            if (cardSelectedOrgInfo != null) {
+                cardSelectedOrgInfo.setVisibility(android.view.View.VISIBLE);
+                if (tvSelectedOrgEmail != null) tvSelectedOrgEmail.setText("Email: " + (selectedOrganizer.getContactEmail() != null ? selectedOrganizer.getContactEmail() : "—"));
+                if (tvSelectedOrgPhone != null) tvSelectedOrgPhone.setText("SĐT: " + (selectedOrganizer.getContactPhone() != null ? selectedOrganizer.getContactPhone() : "—"));
+                if (tvSelectedOrgWebsite != null) tvSelectedOrgWebsite.setText("Web: " + (selectedOrganizer.getWebsiteUrl() != null && !selectedOrganizer.getWebsiteUrl().isEmpty() ? selectedOrganizer.getWebsiteUrl() : "—"));
+            }
         });
     }
 
@@ -280,14 +360,58 @@ public class CreateEditEventActivity extends AppCompatActivity {
         }
     }
 
+    /** Cập nhật preview card ở Step 3 với dữ liệu từ Step 1 & 2. */
+    private void updatePreviewCard() {
+        if (tvPreviewTitle != null && etTitle != null && etTitle.getText() != null) {
+            String t = etTitle.getText().toString().trim();
+            tvPreviewTitle.setText(t.isEmpty() ? "—" : t);
+        }
+        if (tvPreviewTime != null) {
+            String start = (etStartTime != null && etStartTime.getText() != null)
+                    ? etStartTime.getText().toString().trim() : "";
+            String end   = (etEndTime != null && etEndTime.getText() != null)
+                    ? etEndTime.getText().toString().trim() : "";
+            String time = start.isEmpty() ? "—" : (end.isEmpty() ? start : start + " → " + end);
+            tvPreviewTime.setText(time);
+        }
+        if (tvPreviewVenue != null) {
+            String name = (etVenueName != null && etVenueName.getText() != null)
+                    ? etVenueName.getText().toString().trim() : "";
+            String city = (etVenueCity != null && etVenueCity.getText() != null)
+                    ? etVenueCity.getText().toString().trim() : "";
+            String venue = name.isEmpty() && city.isEmpty() ? "—"
+                    : (city.isEmpty() ? name : (name.isEmpty() ? city : name + ", " + city));
+            tvPreviewVenue.setText(venue);
+        }
+    }
+
     private void loadExistingEvent(String eventId) {
         db.collection(FirebaseCollections.EVENTS).document(eventId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         editingEvent = doc.toObject(Event.class);
-                        loadOrganizerProfiles();
                         loadCategories();
-                        if (editingEvent != null) populateForm(editingEvent);
+                        
+                        String userId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : null;
+                        if (userId != null) {
+                            organizerRepository.getOrganizersByUserId(userId)
+                                    .addOnSuccessListener(snapshot -> {
+                                        myOrganizers.clear();
+                                        if (snapshot != null) {
+                                            for (QueryDocumentSnapshot orgDoc : snapshot) {
+                                                Organizer org = orgDoc.toObject(Organizer.class);
+                                                if (org != null) {
+                                                    if (org.getOrganizerId() == null) org.setOrganizerId(orgDoc.getId());
+                                                    myOrganizers.add(org);
+                                                }
+                                            }
+                                        }
+                                        setupOrganizerDropdown();
+                                        if (editingEvent != null) populateForm(editingEvent);
+                                    });
+                        } else {
+                            if (editingEvent != null) populateForm(editingEvent);
+                        }
                     }
                 });
     }
@@ -295,9 +419,55 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private void populateForm(Event event) {
         if (etTitle != null) etTitle.setText(event.getTitle());
         if (etDescription != null) etDescription.setText(event.getDescription());
-        if (etVenueName != null) etVenueName.setText(event.getVenueName());
-        if (etVenueAddress != null) etVenueAddress.setText(event.getVenueAddress());
-        if (etVenueCity != null) etVenueCity.setText(event.getVenueCity());
+        
+        if (event.getOrganizerId() != null) {
+            for (Organizer org : myOrganizers) {
+                if (org.getOrganizerId().equals(event.getOrganizerId())) {
+                    selectedOrganizer = org;
+                    if (ddOrganizer != null) {
+                        ddOrganizer.setText(org.getBrandName(), false);
+                        if (cardSelectedOrgInfo != null) {
+                            cardSelectedOrgInfo.setVisibility(android.view.View.VISIBLE);
+                            if (tvSelectedOrgEmail != null) tvSelectedOrgEmail.setText("Email: " + (selectedOrganizer.getContactEmail() != null ? selectedOrganizer.getContactEmail() : "—"));
+                            if (tvSelectedOrgPhone != null) tvSelectedOrgPhone.setText("SĐT: " + (selectedOrganizer.getContactPhone() != null ? selectedOrganizer.getContactPhone() : "—"));
+                            if (tvSelectedOrgWebsite != null) tvSelectedOrgWebsite.setText("Web: " + (selectedOrganizer.getWebsiteUrl() != null && !selectedOrganizer.getWebsiteUrl().isEmpty() ? selectedOrganizer.getWebsiteUrl() : "—"));
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        
+        if (event.getCategoryId() != null && ddCategory != null) {
+            for (com.example.vibetix.Models.Category cat : categoryList) {
+                if (cat.getCategoryId().equals(event.getCategoryId())) {
+                    selectedCategory = cat;
+                    ddCategory.setText(cat.getName(), false);
+                    break;
+                }
+            }
+        }
+        
+        // Fetch venue details if venueId exists
+        if (event.getVenueId() != null && !event.getVenueId().isEmpty()) {
+            db.collection(FirebaseCollections.VENUES).document(event.getVenueId()).get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            if (etVenueName != null) etVenueName.setText(doc.getString("name"));
+                            if (etVenueAddress != null) etVenueAddress.setText(doc.getString("address"));
+                            if (etVenueCity != null) etVenueCity.setText(doc.getString("city"));
+                            updatePreviewCard();
+                        } else {
+                            if (etVenueName != null) etVenueName.setText(event.getVenueName());
+                            if (etVenueAddress != null) etVenueAddress.setText(event.getVenueAddress());
+                            if (etVenueCity != null) etVenueCity.setText(event.getVenueCity());
+                        }
+                    });
+        } else {
+            if (etVenueName != null) etVenueName.setText(event.getVenueName());
+            if (etVenueAddress != null) etVenueAddress.setText(event.getVenueAddress());
+            if (etVenueCity != null) etVenueCity.setText(event.getVenueCity());
+        }
         if (etStartTime != null && event.getStartTime() != null) etStartTime.setText(event.getStartTime());
         if (etEndTime != null && event.getEndTime() != null) etEndTime.setText(event.getEndTime());
         
@@ -305,6 +475,17 @@ public class CreateEditEventActivity extends AppCompatActivity {
         
         if (ivEventPoster != null && event.getPosterUrl() != null) {
             Glide.with(this).load(event.getPosterUrl()).into(ivEventPoster);
+        }
+
+        // Khóa các trường nhạy cảm nếu event đã được duyệt hoặc đang diễn ra
+        if (event.getStatusStr() != null && (event.getStatusStr().equals("approved") || event.getStatusStr().equals("ongoing"))) {
+            if (etStartTime != null) etStartTime.setEnabled(false);
+            if (etEndTime != null) etEndTime.setEnabled(false);
+            if (etVenueName != null) etVenueName.setEnabled(false);
+            if (etVenueAddress != null) etVenueAddress.setEnabled(false);
+            if (etVenueCity != null) etVenueCity.setEnabled(false);
+            // Optionally disable the dropdown as well
+            if (ddCategory != null) ddCategory.setEnabled(false);
         }
     }
 
@@ -319,11 +500,63 @@ public class CreateEditEventActivity extends AppCompatActivity {
         String startTime   = etStartTime.getText() != null ? etStartTime.getText().toString() : "";
         String endTime     = etEndTime.getText() != null ? etEndTime.getText().toString() : "";
 
+        boolean isNewOrgMode = rgOrganizerMode != null && rgOrganizerMode.getCheckedRadioButtonId() == R.id.rbNewOrganizer;
+        if (isNewOrgMode) {
+            String newOrgName = etNewOrgName.getText() != null ? etNewOrgName.getText().toString().trim() : "";
+            String newOrgEmail = etNewOrgEmail.getText() != null ? etNewOrgEmail.getText().toString().trim() : "";
+            String newOrgPhone = etNewOrgPhone.getText() != null ? etNewOrgPhone.getText().toString().trim() : "";
+            String newOrgWebsite = etNewOrgWebsite.getText() != null ? etNewOrgWebsite.getText().toString().trim() : "";
+
+            if (newOrgName.isEmpty() || newOrgEmail.isEmpty() || newOrgPhone.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập Tên, Email và Số điện thoại Ban tổ chức", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            createNewOrganizerAndSaveFull(newOrgName, newOrgEmail, newOrgPhone, newOrgWebsite, title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
+            return;
+        } else {
+            if (selectedOrganizer == null) {
+                Toast.makeText(this, "Vui lòng chọn Ban tổ chức đã lưu", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        continueSaveFlow(title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
+    }
+
+    private void createNewOrganizerAndSaveFull(String name, String email, String phone, String website, String title, String desc, String venueName, String venueAddr, String venueCity, String startTime, String endTime, String status) {
+        btnSaveDraft.setEnabled(false);
+        btnSubmitForApproval.setEnabled(false);
+        
+        String userId = sessionManager.getUserDetails().getUserId();
+        String newOrgId = UUID.randomUUID().toString();
+        
+        Organizer org = new Organizer();
+        org.setOrganizerId(newOrgId);
+        org.setUserId(userId);
+        org.setBrandName(name);
+        org.setContactEmail(email);
+        org.setContactPhone(phone);
+        org.setWebsiteUrl(website);
+        org.setVerified(false);
+        
+        db.collection("organizers").document(newOrgId).set(org)
+                .addOnSuccessListener(v -> {
+                    selectedOrganizer = org; // Fake selection to continue
+                    continueSaveFlow(title, desc, venueName, venueAddr, venueCity, startTime, endTime, status);
+                })
+                .addOnFailureListener(e -> {
+                    btnSaveDraft.setEnabled(true);
+                    btnSubmitForApproval.setEnabled(true);
+                    Toast.makeText(this, "Lỗi tạo Ban tổ chức: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void continueSaveFlow(String title, String desc, String venueName, String venueAddr, String venueCity, String startTime, String endTime, String status) {
         if (selectedPosterUri != null) {
-            uploadPosterThenSave(title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
+            uploadPosterThenSave(title, desc, venueName, venueAddr, venueCity, startTime, endTime, status);
         } else {
             String existingPoster = editingEvent != null ? editingEvent.getPosterUrl() : null;
-            buildAndSaveEvent(title, description, venueName, venueAddr, venueCity, startTime, endTime, status, existingPoster);
+            buildAndSaveEvent(title, desc, venueName, venueAddr, venueCity, startTime, endTime, status, existingPoster);
         }
     }
 
@@ -354,6 +587,27 @@ public class CreateEditEventActivity extends AppCompatActivity {
                                    String venueAddr, String venueCity,
                                    String startTime, String endTime, String status, String posterUrl) {
         String eventId = existingEventId != null ? existingEventId : UUID.randomUUID().toString();
+        String venueId = (editingEvent != null && editingEvent.getVenueId() != null && !editingEvent.getVenueId().isEmpty()) ? editingEvent.getVenueId() : UUID.randomUUID().toString();
+
+        java.util.Map<String, Object> venueMap = new java.util.HashMap<>();
+        venueMap.put("name", venueName);
+        venueMap.put("address", venueAddr);
+        venueMap.put("city", venueCity);
+
+        db.collection(FirebaseCollections.VENUES).document(venueId).set(venueMap)
+                .addOnSuccessListener(v -> {
+                    saveEventObject(eventId, venueId, title, desc, venueName, venueAddr, venueCity, startTime, endTime, status, posterUrl);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi lưu địa điểm: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    btnSaveDraft.setEnabled(true);
+                    btnSubmitForApproval.setEnabled(true);
+                });
+    }
+
+    private void saveEventObject(String eventId, String venueId, String title, String desc, String venueName,
+                                 String venueAddr, String venueCity,
+                                 String startTime, String endTime, String status, String posterUrl) {
         String organizerId = selectedOrganizer != null ? selectedOrganizer.getOrganizerId() :
                 sessionManager.getActiveOrganizerId();
         String userId = sessionManager.getUserDetails().getUserId();
@@ -362,6 +616,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
         Event event = new Event();
         event.setEventId(eventId);
+        event.setVenueId(venueId);
         event.setOrganizerId(organizerId);
         event.setUserId(userId);
         event.setTitle(title);
@@ -371,7 +626,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
         event.setVenueCity(venueCity);
         event.setStartTime(startTime);
         event.setEndTime(endTime);
-        event.setStatusStr(status);
+        String finalStatus = status;
+        if ("pending".equals(status) && selectedOrganizer != null && selectedOrganizer.isVerified()) {
+            finalStatus = "approved";
+        }
+        event.setStatusStr(finalStatus);
         event.setPosterUrl(posterUrl);
         if (selectedCategory != null) {
             event.setCategoryId(selectedCategory.getCategoryId());
@@ -380,12 +639,32 @@ public class CreateEditEventActivity extends AppCompatActivity {
         }
         if (existingEventId == null) event.setCreatedAt(now);
 
+        boolean wasPending = editingEvent != null && "pending".equals(editingEvent.getStatusStr());
+        boolean isNowApproved = "approved".equals(finalStatus);
+        boolean shouldTriggerApproved = wasPending && isNowApproved;
+
         eventRepository.createEvent(event)
                 .addOnSuccessListener(v -> {
-                    String msg = "draft".equals(status) ? "Đã lưu nháp!" : "Đã gửi duyệt!";
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-                    setResult(RESULT_OK);
-                    finish();
+                    if (shouldTriggerApproved) {
+                        com.example.vibetix.Utils.NotificationTriggerManager.triggerEventApproved(eventId, title);
+                    }
+                    if (existingEventId == null) {
+                        String staffId = java.util.UUID.randomUUID().toString();
+                        com.example.vibetix.Models.EventStaff ownerStaff = new com.example.vibetix.Models.EventStaff();
+                        ownerStaff.setStaffId(staffId);
+                        ownerStaff.setEventId(eventId);
+                        ownerStaff.setUserId(userId);
+                        ownerStaff.setRoleStr("owner");
+                        ownerStaff.setAssignedBy(userId);
+                        ownerStaff.setAssignedAt(com.google.firebase.Timestamp.now());
+                        ownerStaff.setActive(true);
+                        
+                        db.collection("event_staff").document(staffId).set(ownerStaff)
+                                .addOnSuccessListener(doc -> finishSaving(status))
+                                .addOnFailureListener(e -> finishSaving(status));
+                    } else {
+                        finishSaving(status);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -394,13 +673,52 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 });
     }
 
+    private void finishSaving(String status) {
+        String msg = "draft".equals(status) ? "Đã lưu nháp!" : "Đã gửi duyệt!";
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    /** Kiểm tra dữ liệu hợp lệ cho step hiện tại trước khi Next. */
+    private boolean validateCurrentStep() {
+        switch (currentStep) {
+            case 0: // Thông tin cơ bản
+                if (etTitle == null || etTitle.getText() == null
+                        || etTitle.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập tiêu đề sự kiện", Toast.LENGTH_SHORT).show();
+                    if (etTitle != null) etTitle.requestFocus();
+                    return false;
+                }
+                break;
+            case 1: // Lịch trình & Địa điểm
+                if (etStartTime == null || etStartTime.getText() == null
+                        || etStartTime.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(this, "Vui lòng chọn thời gian bắt đầu", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                if (etVenueName == null || etVenueName.getText() == null
+                        || etVenueName.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập địa điểm tổ chức", Toast.LENGTH_SHORT).show();
+                    if (etVenueName != null) etVenueName.requestFocus();
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
     private boolean validateForm() {
         if (etTitle == null || etTitle.getText() == null || etTitle.getText().toString().trim().isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập tiêu đề sự kiện", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (selectedOrganizer == null) {
-            Toast.makeText(this, "Vui lòng chọn Ban tổ chức", Toast.LENGTH_SHORT).show();
+        
+        boolean hasSelectedOrganizer = selectedOrganizer != null;
+        boolean hasTypedOrganizer = etNewOrgName != null && etNewOrgName.getText() != null && !etNewOrgName.getText().toString().trim().isEmpty();
+        
+        if (!hasSelectedOrganizer && !hasTypedOrganizer) {
+            Toast.makeText(this, "Vui lòng chọn hoặc nhập Ban tổ chức", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

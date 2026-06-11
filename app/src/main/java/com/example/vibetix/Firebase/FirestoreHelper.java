@@ -147,8 +147,14 @@ public class FirestoreHelper {
             Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
             e.setVenueCity(city);
             e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
-            // Lưu poster_url riêng cho portrait sections (Featured)
             if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
+            
+            long maxPrice = 0;
+            Object pMax = doc.get("max_price");
+            if (pMax instanceof Long)   maxPrice = (Long) pMax;
+            else if (pMax instanceof Double) maxPrice = ((Double) pMax).longValue();
+            
+            e.setMaxPrice((double) maxPrice);
             
             // Description
             e.setDescription(doc.getString("description"));

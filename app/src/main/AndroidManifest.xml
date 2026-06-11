@@ -34,9 +34,9 @@
             android:name=".Activities.User.UserMainActivity"
             android:exported="false" />
 
-        <!-- Organizer main screen -->
+        <!-- EventHub: Trung tâm quản lý từng sự kiện (thay thế OrganizerMainActivity) -->
         <activity
-            android:name=".Activities.Organizer.OrganizerMainActivity"
+            android:name=".Activities.Organizer.EventHubActivity"
             android:exported="false" />
 
         <!-- Admin main screen -->
@@ -56,6 +56,36 @@
             android:exported="false" />
 
         <activity
+            android:name=".Activities.Organizer.OrderManagementActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name=".Activities.Organizer.EventStarManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.OrganizerBlastActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.EventStarStatsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.DiscountManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activities.Organizer.AttendeesActivity"
+            android:exported="false" />
+
+
+        <activity
+            android:name=".Activities.Organizer.TicketTypeManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activities.Organizer.SendNotificationActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Activities.Admin.CreateDiscountActivity"
             android:exported="false" />
 
@@ -65,9 +95,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name=".Activities.Organizer.TicketTypeActivity"
-            android:exported="false" />
 
         <activity
             android:name=".Activities.Organizer.StaffManagementActivity"

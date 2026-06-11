@@ -33,10 +33,10 @@ public class EventStaff {
     private String staffId;       // UUID v4
     private String userId;        // FK → users/{user_id} (người được assign)
     private String eventId;       // FK → events/{event_id}
-    private String organizerId;   // FK → organizers/{organizer_id}
     private String roleStr;       // "manager" | "check_in_staff"
     private String assignedBy;    // user_id của owner gán
-    private String assignedAt;    // ISO 8601 timestamp
+    private com.google.firebase.Timestamp assignedAt;    // Timestamp
+    private boolean isActive = true;
 
     // Transient fields cho UI (không lưu Firestore)
     private String staffName;
@@ -46,11 +46,10 @@ public class EventStaff {
     public EventStaff() {}
 
     public EventStaff(String staffId, String userId, String eventId,
-                      String organizerId, Role role, String assignedBy, String assignedAt) {
+                      Role role, String assignedBy, com.google.firebase.Timestamp assignedAt) {
         this.staffId = staffId;
         this.userId = userId;
         this.eventId = eventId;
-        this.organizerId = organizerId;
         this.roleStr = role.toValue();
         this.assignedBy = assignedBy;
         this.assignedAt = assignedAt;
@@ -71,17 +70,14 @@ public class EventStaff {
     @PropertyName("event_id")
     public void setEventId(String eventId) { this.eventId = eventId; }
 
-    @PropertyName("organizer_id")
-    public String getOrganizerId() { return organizerId; }
-    @PropertyName("organizer_id")
-    public void setOrganizerId(String organizerId) { this.organizerId = organizerId; }
-
     @PropertyName("role")
     public String getRoleStr() { return roleStr; }
     @PropertyName("role")
     public void setRoleStr(String roleStr) { this.roleStr = roleStr; }
 
+    @com.google.firebase.firestore.Exclude
     public Role getRole() { return Role.fromValue(roleStr); }
+    @com.google.firebase.firestore.Exclude
     public void setRole(Role role) { this.roleStr = role.toValue(); }
 
     @PropertyName("assigned_by")
@@ -90,9 +86,14 @@ public class EventStaff {
     public void setAssignedBy(String assignedBy) { this.assignedBy = assignedBy; }
 
     @PropertyName("assigned_at")
-    public String getAssignedAt() { return assignedAt; }
+    public com.google.firebase.Timestamp getAssignedAt() { return assignedAt; }
     @PropertyName("assigned_at")
-    public void setAssignedAt(String assignedAt) { this.assignedAt = assignedAt; }
+    public void setAssignedAt(com.google.firebase.Timestamp assignedAt) { this.assignedAt = assignedAt; }
+
+    @PropertyName("is_active")
+    public boolean isActive() { return isActive; }
+    @PropertyName("is_active")
+    public void setActive(boolean active) { this.isActive = active; }
 
     // UI-only transient fields
     @com.google.firebase.firestore.Exclude

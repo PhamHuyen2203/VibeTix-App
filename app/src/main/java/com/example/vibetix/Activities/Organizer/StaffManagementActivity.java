@@ -1,46 +1,41 @@
 package com.example.vibetix.Activities.Organizer;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vibetix.Adapters.Organizer.StaffAdapter;
 import com.example.vibetix.Models.EventStaff;
 import com.example.vibetix.Models.User;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.SessionManager;
+import com.example.vibetix.databinding.ActivityStaffManagementBinding;
+import com.example.vibetix.databinding.BottomSheetAddStaffBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class StaffManagementActivity extends AppCompatActivity {
 
     public static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
 
-    private Toolbar toolbarStaff;
-    private RecyclerView rvStaffList;
-    private LinearLayout layoutEmptyStaff;
-    private ExtendedFloatingActionButton fabAddStaff;
-
+    private ActivityStaffManagementBinding binding;
     private StaffAdapter staffAdapter;
     private final List<EventStaff> staffList = new ArrayList<>();
 
@@ -51,7 +46,8 @@ public class StaffManagementActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_staff_management);
+        binding = ActivityStaffManagementBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         db = FirebaseFirestore.getInstance();
         sessionManager = new SessionManager(this);
@@ -65,43 +61,49 @@ public class StaffManagementActivity extends AppCompatActivity {
 
         initViews();
         setupRecyclerView();
+        loadEventDetails();
         loadStaffList();
     }
 
     private void initViews() {
-        toolbarStaff = findViewById(R.id.toolbarStaff);
-        setSupportActionBar(toolbarStaff);
+        setSupportActionBar(binding.toolbarStaff);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-        toolbarStaff.setNavigationOnClickListener(v -> finish());
+        binding.toolbarStaff.setNavigationOnClickListener(v -> finish());
 
-        rvStaffList = findViewById(R.id.rvStaffList);
-        layoutEmptyStaff = findViewById(R.id.layoutEmptyStaff);
-        fabAddStaff = findViewById(R.id.fabAddStaff);
-
-        fabAddStaff.setOnClickListener(v -> showAddStaffBottomSheet());
+        binding.fabAddStaff.setOnClickListener(v -> showAddStaffBottomSheet());
     }
 
     private void setupRecyclerView() {
         staffAdapter = new StaffAdapter(staffList, new StaffAdapter.OnStaffInteractionListener() {
             @Override
             public void onOptionsClick(EventStaff staff, View anchor) {
-                showStaffOptions(staff, anchor);
+                // Not strictly needed since we toggle active state, but kept for future expansion
             }
 
             @Override
             public void onStatusChange(EventStaff staff, boolean isActive) {
-                Toast.makeText(StaffManagementActivity.this, 
-                        "Staff status changed", Toast.LENGTH_SHORT).show();
+                updateStaffStatus(staff, isActive);
             }
         });
-        rvStaffList.setLayoutManager(new LinearLayoutManager(this));
-        rvStaffList.setAdapter(staffAdapter);
+        binding.rvStaffList.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvStaffList.setAdapter(staffAdapter);
+    }
+
+    private void loadEventDetails() {
+        db.collection("events").document(eventId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("title");
+                        binding.tvEventName.setText(name != null ? name : "Sự kiện");
+                    }
+                });
     }
 
     private void loadStaffList() {
+        binding.pbLoading.setVisibility(View.VISIBLE);
         db.collection("event_staff")
                 .whereEqualTo("event_id", eventId)
                 .get()
@@ -111,7 +113,6 @@ public class StaffManagementActivity extends AppCompatActivity {
                         for (DocumentSnapshot doc : query.getDocuments()) {
                             EventStaff staff = doc.toObject(EventStaff.class);
                             if (staff != null) {
-                                // Load thêm user info
                                 loadStaffUserInfo(staff);
                             }
                         }
@@ -120,6 +121,7 @@ public class StaffManagementActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    binding.pbLoading.setVisibility(View.GONE);
                     Toast.makeText(this, "Lỗi tải danh sách: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
@@ -142,33 +144,37 @@ public class StaffManagementActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
+        binding.pbLoading.setVisibility(View.GONE);
         staffAdapter.notifyDataSetChanged();
+        binding.tvStaffCount.setText(staffList.size() + " nhân sự");
+        
         if (staffList.isEmpty()) {
-            layoutEmptyStaff.setVisibility(View.VISIBLE);
-            rvStaffList.setVisibility(View.GONE);
+            binding.layoutEmptyStaff.setVisibility(View.VISIBLE);
+            binding.rvStaffList.setVisibility(View.GONE);
         } else {
-            layoutEmptyStaff.setVisibility(View.GONE);
-            rvStaffList.setVisibility(View.VISIBLE);
+            binding.layoutEmptyStaff.setVisibility(View.GONE);
+            binding.rvStaffList.setVisibility(View.VISIBLE);
         }
     }
 
     private void showAddStaffBottomSheet() {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-        View view = LayoutInflater.from(this).inflate(R.layout.bottom_sheet_add_staff, null);
-        bottomSheetDialog.setContentView(view);
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this, com.google.android.material.R.style.ThemeOverlay_MaterialComponents_BottomSheetDialog);
+        BottomSheetAddStaffBinding sheetBinding = BottomSheetAddStaffBinding.inflate(getLayoutInflater());
+        bottomSheetDialog.setContentView(sheetBinding.getRoot());
 
-        EditText etStaffEmail = view.findViewById(R.id.etStaffEmail);
-        RadioGroup rgStaffRole = view.findViewById(R.id.rgStaffRole);
-        MaterialButton btnSaveStaff = view.findViewById(R.id.btnSaveStaff);
+        // Default role selection
+        sheetBinding.rgStaffRole.check(R.id.rbRoleScanner);
 
-        btnSaveStaff.setOnClickListener(v -> {
-            String email = etStaffEmail.getText().toString().trim();
-            if (email.isEmpty()) {
-                etStaffEmail.setError("Vui lòng nhập email");
+        sheetBinding.btnSaveStaff.setOnClickListener(v -> {
+            String email = sheetBinding.etStaffEmail.getText() != null ? 
+                    sheetBinding.etStaffEmail.getText().toString().trim() : "";
+                    
+            if (TextUtils.isEmpty(email)) {
+                sheetBinding.etStaffEmail.setError("Vui lòng nhập email");
                 return;
             }
 
-            EventStaff.Role role = rgStaffRole.getCheckedRadioButtonId() == R.id.rbRoleManager 
+            EventStaff.Role role = sheetBinding.rgStaffRole.getCheckedRadioButtonId() == R.id.rbRoleManager 
                     ? EventStaff.Role.MANAGER : EventStaff.Role.CHECK_IN_STAFF;
 
             addStaffByEmail(email, role, bottomSheetDialog);
@@ -187,24 +193,23 @@ public class StaffManagementActivity extends AppCompatActivity {
                         // Check if already in list
                         for (EventStaff s : staffList) {
                             if (s.getUserId() != null && s.getUserId().equals(targetUserId)) {
-                                Toast.makeText(this, "Nhân sự này đã tồn tại", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Nhân sự này đã tồn tại trong sự kiện", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
 
-                        // Add to event_staff
-                        String activeOrgId = sessionManager.getActiveOrganizerId();
                         String currentUserId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : "";
                         String staffId = UUID.randomUUID().toString();
-                        String now = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault()).format(new Date());
+                        com.google.firebase.Timestamp now = com.google.firebase.Timestamp.now();
                         
                         EventStaff newStaff = new EventStaff(
-                                staffId, targetUserId, eventId, activeOrgId, role, currentUserId, now
+                                staffId, targetUserId, eventId, role, currentUserId, now
                         );
+                        newStaff.setActive(true);
 
                         db.collection("event_staff").document(staffId).set(newStaff)
                                 .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Đã thêm nhân sự", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Đã thêm nhân sự thành công", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                     loadStaffList(); // Reload
                                 })
@@ -216,21 +221,18 @@ public class StaffManagementActivity extends AppCompatActivity {
                 });
     }
 
-    private void showStaffOptions(EventStaff staff, View anchor) {
-        PopupMenu popupMenu = new PopupMenu(this, anchor);
-        popupMenu.getMenu().add(0, 1, 0, "Xóa nhân sự");
-        popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == 1) {
-                db.collection("event_staff").document(staff.getStaffId()).delete()
-                        .addOnSuccessListener(unused -> {
-                            Toast.makeText(this, "Đã xóa", Toast.LENGTH_SHORT).show();
-                            staffList.remove(staff);
-                            updateUI();
-                        });
-                return true;
-            }
-            return false;
-        });
-        popupMenu.show();
+    private void updateStaffStatus(EventStaff staff, boolean isActive) {
+        staff.setActive(isActive);
+        db.collection("event_staff").document(staff.getStaffId())
+                .update("is_active", isActive)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Đã " + (isActive ? "mở khóa" : "tạm ngưng") + " nhân sự", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi cập nhật trạng thái", Toast.LENGTH_SHORT).show();
+                    // Revert locally if failed
+                    staff.setActive(!isActive);
+                    staffAdapter.notifyDataSetChanged();
+                });
     }
 }

@@ -74,10 +74,10 @@ public class OrganizerProfileFragment extends Fragment {
 
     // ── View binding ───────────────────────────────────────────────────────────
     private void bindViews(View v) {
-        btnOrgBack       = v.findViewById(R.id.btnOrgBack);
-        sectionNoOrg     = v.findViewById(R.id.sectionNoOrg);
-        containerOrgList = v.findViewById(R.id.containerOrgList);
-        btnAddNewOrg     = v.findViewById(R.id.btnAddNewOrg);
+        // btnOrgBack       = v.findViewById(R.id.btnOrgBack);
+        // sectionNoOrg     = v.findViewById(R.id.sectionNoOrg);
+        // containerOrgList = v.findViewById(R.id.containerOrgList);
+        // btnAddNewOrg     = v.findViewById(R.id.btnAddNewOrg);
     }
 
     // ── Insets ─────────────────────────────────────────────────────────────────
@@ -199,6 +199,7 @@ public class OrganizerProfileFragment extends Fragment {
 
     // ── UI ─────────────────────────────────────────────────────────────────────
     private void refreshUI() {
+        /*
         containerOrgList.removeAllViews();
 
         if (orgList.isEmpty()) {
@@ -211,6 +212,7 @@ public class OrganizerProfileFragment extends Fragment {
                 containerOrgList.addView(buildOrgCard(orgList.get(i), i));
             }
         }
+        */
     }
 
     /** Tạo card cho một BTC profile */
@@ -469,6 +471,7 @@ public class OrganizerProfileFragment extends Fragment {
 
     // ── Listeners ──────────────────────────────────────────────────────────────
     private void setupListeners() {
+        /*
         if (btnOrgBack != null)
             btnOrgBack.setOnClickListener(v -> {
                 if (getParentFragmentManager().getBackStackEntryCount() > 0)
@@ -477,6 +480,7 @@ public class OrganizerProfileFragment extends Fragment {
 
         if (btnAddNewOrg != null)
             btnAddNewOrg.setOnClickListener(v -> showAddDialog());
+        */
     }
 
     // ── Dialogs ────────────────────────────────────────────────────────────────

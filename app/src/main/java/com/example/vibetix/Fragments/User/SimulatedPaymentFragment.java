@@ -242,30 +242,16 @@ public class SimulatedPaymentFragment extends Fragment {
         SharedPreferences prefs = requireContext().getSharedPreferences(Constants.PREFS_AUTH, Context.MODE_PRIVATE);
         String loggedInEmail = prefs.getString(Constants.KEY_USER_EMAIL, email);
 
-        Order order = new Order(
-                orderId,
-                loggedInEmail, // link order to account
-                eventId,
-                txtPaymentEventTitle.getText().toString(),
-                ticketTypeName,
-                quantity,
-                totalPrice,
-                platformFee,
-                finalTotal,
-                paymentMethod,
-                Constants.ORDER_STATUS_PAID,
-                now,
-                name,
-                email, // contact email
-                phone,
-                company,
-                role,
-                notes
-        );
+        Order order = new Order();
+        order.setOrderId(orderId);
+        order.setUserId(loggedInEmail); // Note: using email for now
+        order.setOrderDate(new com.google.firebase.Timestamp(new Date(now)));
+        order.setTotalAmount(finalTotal);
+        order.setStatusStr(Constants.ORDER_STATUS_PAID);
 
         orderRepository.saveOrder(order, new OrderRepository.OnOrderActionListener() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(String savedOrderId) {
                 if (!isAdded()) return;
                 saveBoughtTickets(orderId, paymentMethod, now, loggedInEmail);
             }

@@ -154,10 +154,10 @@ public class EventsFragment extends Fragment {
 
     private void addEvent(String id, String title, String date, String city,
                           String category, long price, int imgRes) {
-        Event e = new Event(id, title, null, date, city, category, price);
+        Event e = new Event(id, title, null, date, city, category, (int) price);
         e.setVenueCity(city);
+        e.setStatus(Event.Status.APPROVED);
         e.setLocalImageResId(imgRes);
-        e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
         allEvents.add(e);
     }
 
@@ -335,8 +335,8 @@ public class EventsFragment extends Fragment {
         View layoutSearchBar = requireView().findViewById(R.id.layoutSearchBar);
         if (layoutSearchBar != null) {
             layoutSearchBar.setOnClickListener(v -> {
-                if (getActivity() instanceof com.example.vibetix.Activities.UserMainActivity) {
-                    ((com.example.vibetix.Activities.UserMainActivity) getActivity()).openSearchFragment();
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSearchFragment();
                 }
             });
         }
@@ -534,10 +534,10 @@ public class EventsFragment extends Fragment {
                 Collections.sort(displayList, (a, b) -> safeDate(a).compareTo(safeDate(b)));
                 break;
             case "price_asc":
-                Collections.sort(displayList, (a, b) -> Long.compare(a.getMinPrice(), b.getMinPrice()));
+                Collections.sort(displayList, (a, b) -> Double.compare(a.getMinPrice(), b.getMinPrice()));
                 break;
             case "price_desc":
-                Collections.sort(displayList, (a, b) -> Long.compare(b.getMinPrice(), a.getMinPrice()));
+                Collections.sort(displayList, (a, b) -> Double.compare(b.getMinPrice(), a.getMinPrice()));
                 break;
             default: // newest — sort descending by date string (dd/MM/yyyy → reverse)
                 Collections.sort(displayList, (a, b) -> safeDate(b).compareTo(safeDate(a)));

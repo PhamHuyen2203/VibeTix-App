@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="menu_view_detail" type="id" />
+    <item name="menu_edit" type="id" />
+    <item name="menu_manage_tickets" type="id" />
+    <item name="menu_submit" type="id" />
+    <item name="menu_cancel_event" type="id" />
+</resources>

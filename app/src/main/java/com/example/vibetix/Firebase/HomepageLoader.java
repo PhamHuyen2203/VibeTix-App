@@ -228,9 +228,9 @@ public class HomepageLoader {
                                 Object p = doc.get("min_price");
                                 if (p instanceof Long) price = (Long) p;
                                 else if (p instanceof Double) price = ((Double) p).longValue();
-                                Event e = new Event(doc.getId(), title, imgUrl, date, city, cat, price);
+                                Event e = new Event(doc.getId(), title, imgUrl, date, city, cat, (int) price);
                                 e.setVenueCity(city);
-                                e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
+                                e.setStatus(Event.Status.APPROVED);
                                 Boolean feat = doc.getBoolean("is_featured");
                                 if (Boolean.TRUE.equals(feat)) e.setFeatured(true);
                                 if (posterUrl != null) e.setPortraitImageUrl(posterUrl);

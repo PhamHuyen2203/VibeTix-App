@@ -19,8 +19,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.vibetix.Activities.AuthActivity;
-import com.example.vibetix.Activities.UserMainActivity;
+import com.example.vibetix.Activities.Auth.AuthActivity;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -257,9 +257,11 @@ public class ProfileFragment extends Fragment {
                 .remove(Constants.KEY_USER_PHONE)
                 .remove(Constants.KEY_USER_ROLE)
                 .apply();
+        Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
 
-        Intent intent = new Intent(requireContext(), AuthActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        // Start AuthActivity and clear backstack
+        Intent intent = new Intent(requireContext(), com.example.vibetix.Activities.Auth.AuthActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

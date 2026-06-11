@@ -1,90 +1,358 @@
 package com.example.vibetix.Activities.Organizer;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraControl;
+import android.os.Vibrator;
+import android.media.ToneGenerator;
+import android.media.AudioManager;
+import android.content.Context;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.example.vibetix.R;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.mlkit.vision.common.InputImage;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class QrScannerActivity extends AppCompatActivity {
 
-    private TextView tvDisplayCode;
-    private View scannerPreview;
+    private static final int REQUEST_CODE_PERMISSIONS = 10;
+    private static final String[] REQUIRED_PERMISSIONS = new String[]{Manifest.permission.CAMERA};
+    private static final String TAG = "QrScannerActivity";
+
+    private PreviewView cameraPreview;
+    private View scannerFrame;
+    private TextView tvInstruction;
+    private FrameLayout btnBack;
+    
+    private LinearLayout panelResult;
+    private TextView tvResultIcon, tvResultName, tvResultTicketType, tvResultMessage;
+    private Button btnScanNext;
+    
+    private LinearLayout btnFlashlight, btnManualEntry;
+    private ImageView ivFlashlightIcon;
+    private Camera camera;
+    private boolean isFlashOn = false;
+
+    private ExecutorService cameraExecutor;
+    private BarcodeScanner scanner;
+    private boolean isScanning = true;
+
+    public static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
+    private String eventId;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_scanner);
 
+        eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
+        if (eventId == null) {
+            Toast.makeText(this, "Thiếu Event ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        db = FirebaseFirestore.getInstance();
+
         initViews();
+        setupMLKit();
+
+        if (allPermissionsGranted()) {
+            startCamera();
+        } else {
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+        }
+
+        cameraExecutor = Executors.newSingleThreadExecutor();
     }
 
     private void initViews() {
-        tvDisplayCode = findViewById(R.id.tvDisplayCode);
-        scannerPreview = findViewById(R.id.scannerPreview);
+        cameraPreview = findViewById(R.id.cameraPreview);
+        scannerFrame = findViewById(R.id.scannerFrame);
+        tvInstruction = findViewById(R.id.tvInstruction);
+        btnBack = findViewById(R.id.btnBack);
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        panelResult = findViewById(R.id.panelResult);
+        tvResultIcon = findViewById(R.id.tvResultIcon);
+        tvResultName = findViewById(R.id.tvResultName);
+        tvResultTicketType = findViewById(R.id.tvResultTicketType);
+        tvResultMessage = findViewById(R.id.tvResultMessage);
+        btnScanNext = findViewById(R.id.btnScanNext);
         
-        // Giả lập quét được mã sau 2 giây để demo UI phản hồi
-        new Handler().postDelayed(() -> {
-            handleQrScanned("550e8400-e29b-41d4-a716-446655440000"); // Ví dụ mã UUID
-        }, 2000);
-    }
+        btnFlashlight = findViewById(R.id.btnFlashlight);
+        btnManualEntry = findViewById(R.id.btnManualEntry);
+        ivFlashlightIcon = findViewById(R.id.ivFlashlightIcon);
 
-    /**
-     * Xử lý sau khi camera đọc được mã QR
-     * @param rawTicketCode Chuỗi UUID v4 từ mã QR
-     */
-    private void handleQrScanned(String rawTicketCode) {
-        // 1. Tạo Display Code rút gọn (Lấy 4 ký tự đầu và 4 ký tự cuối)
-        // Ví dụ: 550e...0000 -> 550E-0000
-        String displayCode = "----";
-        if (rawTicketCode != null && rawTicketCode.length() > 8) {
-            displayCode = (rawTicketCode.substring(0, 4) + "-" + 
-                          rawTicketCode.substring(rawTicketCode.length() - 4)).toUpperCase();
+        btnBack.setOnClickListener(v -> finish());
+        btnScanNext.setOnClickListener(v -> resumeScanning());
+        
+        btnFlashlight.setOnClickListener(v -> toggleFlashlight());
+        btnManualEntry.setOnClickListener(v -> showManualEntryDialog());
+    }
+    
+    private void toggleFlashlight() {
+        if (camera != null) {
+            CameraControl cameraControl = camera.getCameraControl();
+            isFlashOn = !isFlashOn;
+            cameraControl.enableTorch(isFlashOn);
+            if (isFlashOn) {
+                ivFlashlightIcon.setColorFilter(ContextCompat.getColor(this, R.color.clr_warning));
+            } else {
+                ivFlashlightIcon.setColorFilter(ContextCompat.getColor(this, R.color.clr_text_white));
+            }
         }
-        tvDisplayCode.setText(displayCode);
-
-        // 2. Kiểm tra tính hợp lệ (Giả lập logic)
-        boolean isValid = rawTicketCode.startsWith("550e"); // Demo: mã bắt đầu bằng 550e là hợp lệ
-        
-        showResultDialog(isValid);
     }
-
-    /**
-     * Hiển thị Dialog phản hồi kết quả trực quan trong 1.5 giây
-     */
-    private void showResultDialog(boolean isValid) {
+    
+    private void showManualEntryDialog() {
+        isScanning = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_checkin_result, null);
-        builder.setView(dialogView);
+        builder.setTitle("Nhập mã vé thủ công");
+        
+        final EditText input = new EditText(this);
+        input.setHint("Nhập mã vé (VD: VTX-1234)");
+        builder.setView(input);
+        
+        builder.setPositiveButton("Kiểm tra", (dialog, which) -> {
+            String code = input.getText().toString().trim();
+            if (!code.isEmpty()) {
+                handleScanResult(code);
+            } else {
+                resumeScanning();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> {
+            dialog.cancel();
+            resumeScanning();
+        });
+        builder.setOnCancelListener(dialog -> resumeScanning());
+        builder.show();
+    }
 
-        AlertDialog dialog = builder.create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    private void setupMLKit() {
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                        .build();
+        scanner = BarcodeScanning.getClient(options);
+    }
+
+    private boolean allPermissionsGranted() {
+        for (String permission : REQUIRED_PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is required to scan QR codes.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    private void startCamera() {
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+
+                Preview preview = new Preview.Builder().build();
+                preview.setSurfaceProvider(cameraPreview.getSurfaceProvider());
+
+                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
+
+                imageAnalysis.setAnalyzer(cameraExecutor, this::analyzeImage);
+
+                CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
+
+                cameraProvider.unbindAll();
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis);
+
+            } catch (ExecutionException | InterruptedException e) {
+                Log.e(TAG, "Use case binding failed", e);
+            }
+        }, ContextCompat.getMainExecutor(this));
+    }
+
+    @SuppressLint("UnsafeOptInUsageError")
+    private void analyzeImage(ImageProxy imageProxy) {
+        if (!isScanning) {
+            imageProxy.close();
+            return;
         }
 
-        View rootLayout = dialogView.findViewById(R.id.rootResultLayout);
-        TextView tvStatus = dialogView.findViewById(R.id.tvResultStatus);
+        if (imageProxy.getImage() != null) {
+            InputImage image = InputImage.fromMediaImage(imageProxy.getImage(), imageProxy.getImageInfo().getRotationDegrees());
 
-        if (isValid) {
-            rootLayout.setBackgroundResource(R.drawable.bg_result_success);
-            tvStatus.setText(getString(R.string.qr_valid_ticket));
+            scanner.process(image)
+                    .addOnSuccessListener(barcodes -> {
+                        if (!barcodes.isEmpty()) {
+                            Barcode barcode = barcodes.get(0);
+                            String rawValue = barcode.getRawValue();
+                            if (rawValue != null && isScanning) {
+                                isScanning = false;
+                                runOnUiThread(() -> handleScanResult(rawValue));
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e(TAG, "Barcode scanning failed", e))
+                    .addOnCompleteListener(task -> imageProxy.close());
         } else {
-            rootLayout.setBackgroundResource(R.drawable.bg_result_error);
-            tvStatus.setText(getString(R.string.qr_invalid_ticket));
+            imageProxy.close();
         }
+    }
 
-        dialog.show();
+    private void handleScanResult(String code) {
+        tvInstruction.setText("Đang kiểm tra...");
+        
+        db.collection("user_tickets").document(code).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        com.example.vibetix.Models.UserTicket ticket = documentSnapshot.toObject(com.example.vibetix.Models.UserTicket.class);
+                        if (ticket != null) {
+                            if (!eventId.equals(ticket.getEventId())) {
+                                showScanError("Vé này không thuộc sự kiện hiện tại!");
+                                return;
+                            }
+                            
+                            tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
+                            tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
+                            
+                            if (ticket.isUsed()) {
+                                showScanError("Vé đã được sử dụng (Check-in rồi)!");
+                            } else {
+                                // Cập nhật trạng thái
+                                documentSnapshot.getReference().update(
+                                        "is_used", true,
+                                        "checked_in_at", new java.util.Date()
+                                ).addOnSuccessListener(aVoid -> {
+                                    showScanSuccess("Check-in thành công!");
+                                }).addOnFailureListener(e -> showScanError("Lỗi cập nhật vé!"));
+                            }
+                        } else {
+                            showScanError("Lỗi dữ liệu vé!");
+                        }
+                    } else {
+                        showScanError("Không tìm thấy vé trong hệ thống!");
+                    }
+                })
+                .addOnFailureListener(e -> showScanError("Lỗi kết nối kiểm tra vé!"));
+    }
+    
+    private void showScanSuccess(String msg) {
+        playBeepAndVibrate(true);
+        tvResultIcon.setText("✅");
+        tvResultMessage.setText(msg);
+        tvResultMessage.setTextColor(ContextCompat.getColor(this, R.color.clr_success));
+        showResultPanel();
+    }
+    
+    private void showScanError(String msg) {
+        playBeepAndVibrate(false);
+        tvResultName.setText("Mã vé không hợp lệ");
+        tvResultIcon.setText("❌");
+        tvResultTicketType.setText("Không xác định");
+        tvResultMessage.setText(msg);
+        tvResultMessage.setTextColor(ContextCompat.getColor(this, R.color.clr_error));
+        showResultPanel();
+    }
 
-        // Tự động đóng dialog sau 1.5 giây
-        new Handler().postDelayed(dialog::dismiss, 1500);
+    private void showResultPanel() {
+        tvInstruction.setVisibility(View.GONE);
+        panelResult.setVisibility(View.VISIBLE);
+
+        PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 400f, 0f);
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(panelResult, pvhY);
+        animator.setDuration(400);
+        animator.start();
+    }
+    
+    private void playBeepAndVibrate(boolean success) {
+        try {
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (v != null) {
+                if (success) {
+                    v.vibrate(100);
+                } else {
+                    v.vibrate(500); // Rung dài hơn nếu lỗi
+                }
+            }
+            ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+            if (success) {
+                toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200); 
+            } else {
+                toneG.startTone(ToneGenerator.TONE_SUP_ERROR, 400); 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void resumeScanning() {
+        PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 0f, 400f);
+        ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(panelResult, pvhY);
+        animator.setDuration(250);
+        animator.start();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            panelResult.setVisibility(View.GONE);
+            tvInstruction.setVisibility(View.VISIBLE);
+            isScanning = true;
+        }, 250);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (cameraExecutor != null) {
+            cameraExecutor.shutdown();
+        }
     }
 }

@@ -16,12 +16,13 @@ import com.example.vibetix.R;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     Context context;
-    ArrayList<Event> danhSachEvent;
+    List<Event> danhSachEvent;
     OnEventClickListener listener;
     private int layoutResId;
 
@@ -29,11 +30,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         void onEventClick(Event event);
     }
 
-    public EventAdapter(Context context, ArrayList<Event> danhSachEvent, OnEventClickListener listener) {
+    public EventAdapter(Context context, List<Event> danhSachEvent, OnEventClickListener listener) {
         this(context, danhSachEvent, listener, R.layout.item_event_card);
     }
 
-    public EventAdapter(Context context, ArrayList<Event> danhSachEvent,
+    public EventAdapter(Context context, List<Event> danhSachEvent,
                         OnEventClickListener listener, int layoutResId) {
         this.context       = context;
         this.danhSachEvent = danhSachEvent;
@@ -108,7 +109,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return danhSachEvent.size();
     }
 
-    public void updateData(ArrayList<Event> data) {
+    public void updateData(List<Event> data) {
         danhSachEvent.clear();
         danhSachEvent.addAll(data);
         notifyDataSetChanged();

@@ -17,6 +17,7 @@ public class User {
     private String avatarUrl;
     private boolean isActive = true;
     private Object createdAt;
+    private Object updatedAt;
     private String defaultOrganizerId; // UUID của organizer profile mặc định (nullable)
 
     // Role dùng nội bộ để điều hướng (không lưu trên Firestore, gán sau login)
@@ -63,9 +64,14 @@ public class User {
     @PropertyName("created_at")
     public void setCreatedAt(Object createdAt) { this.createdAt = createdAt; }
 
-    @PropertyName("default_organizer_id")
+    @PropertyName("updated_at")
+    public Object getUpdatedAt() { return updatedAt; }
+    @PropertyName("updated_at")
+    public void setUpdatedAt(Object updatedAt) { this.updatedAt = updatedAt; }
+
+    @com.google.firebase.firestore.Exclude
     public String getDefaultOrganizerId() { return defaultOrganizerId; }
-    @PropertyName("default_organizer_id")
+    @com.google.firebase.firestore.Exclude
     public void setDefaultOrganizerId(String defaultOrganizerId) { this.defaultOrganizerId = defaultOrganizerId; }
 
     // App-only role, not persisted to Firestore

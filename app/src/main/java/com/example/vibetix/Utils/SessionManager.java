@@ -23,7 +23,9 @@ public class SessionManager {
     private static final String KEY_ACTIVE_ORG_NAME   = "active_organizer_name";
     private static final String KEY_ACTIVE_ORG_LOGO   = "active_organizer_logo";
     private static final String KEY_STAFF_ROLE        = "staff_role";    // "owner" | "manager" | "check_in_staff"
-    private static final String KEY_STAFF_EVENT_ID    = "staff_event_id"; // Event user được assign (nếu là staff)
+    private static final String KEY_STAFF_EVENT_ID    = "staff_event_id"; // Event user được assign
+    private static final String KEY_ACTIVE_EVENT_ID   = "active_event_id"; // Event đang được xem trong EventHub
+    private static final String KEY_ACTIVE_EVENT_ROLE = "active_event_role"; // Role trong event đó
 
     private final SharedPreferences pref;
     private final SharedPreferences.Editor editor;
@@ -129,6 +131,40 @@ public class SessionManager {
     public void clearStaffRole() {
         editor.remove(KEY_STAFF_ROLE);
         editor.remove(KEY_STAFF_EVENT_ID);
+        editor.apply();
+    }
+
+    // ─── Active Event Context (dùng bởi EventHubActivity và các fragment con) ──
+
+    /**
+     * Lưu context sự kiện đang xem trong EventHub.
+     * @param eventId ID sự kiện
+     * @param role    "owner" | "manager" | "check_in_staff"
+     */
+    public void setActiveEvent(String eventId, String role) {
+        editor.putString(KEY_ACTIVE_EVENT_ID, eventId != null ? eventId : "");
+        editor.putString(KEY_ACTIVE_EVENT_ROLE, role != null ? role : "");
+        // Sync with staff role keys for backward compatibility
+        editor.putString(KEY_STAFF_ROLE, role != null ? role : "");
+        editor.putString(KEY_STAFF_EVENT_ID, eventId != null ? eventId : "");
+        editor.apply();
+    }
+
+    /** @return ID sự kiện đang được xem trong EventHub, hoặc null */
+    public String getActiveEventId() {
+        String id = pref.getString(KEY_ACTIVE_EVENT_ID, null);
+        return (id != null && !id.isEmpty()) ? id : null;
+    }
+
+    /** @return Role trong sự kiện đang active, hoặc null */
+    public String getActiveEventRole() {
+        String r = pref.getString(KEY_ACTIVE_EVENT_ROLE, null);
+        return (r != null && !r.isEmpty()) ? r : null;
+    }
+
+    public void clearActiveEvent() {
+        editor.remove(KEY_ACTIVE_EVENT_ID);
+        editor.remove(KEY_ACTIVE_EVENT_ROLE);
         editor.apply();
     }
 

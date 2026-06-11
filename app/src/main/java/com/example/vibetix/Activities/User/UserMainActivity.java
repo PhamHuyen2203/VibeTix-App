@@ -1,42 +1,33 @@
 package com.example.vibetix.Activities.User;
 
 import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.vibetix.Activities.BaseActivity;
-import com.example.vibetix.Fragments.User.AllEventsFragment;
+import com.example.vibetix.Fragments.User.CreateEventFragment;
+import com.example.vibetix.Fragments.User.OrganizerHubFragment;
+import com.example.vibetix.Fragments.User.EventsFragment;
 import com.example.vibetix.Fragments.User.HomeFragment;
 import com.example.vibetix.Fragments.User.MyTicketsFragment;
-import com.example.vibetix.Fragments.User.OrganizerHubFragment;
 import com.example.vibetix.Fragments.User.ProfileFragment;
 import com.example.vibetix.Fragments.User.SearchFragment;
 import com.example.vibetix.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-/**
- * UserMainActivity — Màn hình chính, dùng cho tất cả user (mua vé & tổ chức).
- *
- * 5 tabs:
- *   Home        → HomeFragment        (khám phá sự kiện)
- *   Events      → AllEventsFragment   (tất cả sự kiện, lọc được)
- *   My Tickets  → MyTicketsFragment   (vé đã mua)
- *   Organizer   → OrganizerHubFragment (hub tổ chức — có điều kiện)
- *   Profile     → ProfileFragment     (hồ sơ + quản lý BTC)
- */
-public class UserMainActivity extends BaseActivity {
+public class UserMainActivity extends AppCompatActivity {
 
-    BottomNavigationView bottomNavCustomer;
+    // Custom nav tabs
+    private LinearLayout tabHome, tabEvents, tabCreate, tabTickets, tabProfile;
+    private ImageView    icHome, icEvents, icTickets, icProfile;
+    private TextView     txtHome, txtEvents, txtCreate, txtTickets, txtProfile;
 
-    // Giữ instance fragment để tránh recreate khi switch tab
-    private HomeFragment homeFragment;
-    private AllEventsFragment allEventsFragment;
-    private MyTicketsFragment myTicketsFragment;
-    private OrganizerHubFragment organizerHubFragment;
-    private ProfileFragment profileFragment;
-
-    private Fragment activeFragment;
+    private int activeTabId = R.id.tabHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,83 +35,106 @@ public class UserMainActivity extends BaseActivity {
         androidx.activity.EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_main);
 
-        checkLoginStatus();
+        bindViews();
+        applyNavBarInset();
+        setupNavListeners();
 
-        addViews();
-        initFragments();
-        addEvents();
-
-        // Tab mặc định: Home
         if (savedInstanceState == null) {
-            showTab(homeFragment);
-            bottomNavCustomer.setSelectedItemId(R.id.nav_home);
+            selectTab(R.id.tabHome);
         }
     }
 
-    private void addViews() {
-        bottomNavCustomer = findViewById(R.id.bottomNavCustomer);
-    }
-
-    /**
-     * Tạo tất cả fragment instances và add vào FragmentManager (hidden).
-     * Cách này giữ trạng thái fragment khi switch tab (không recreate).
-     */
-    private void initFragments() {
-        homeFragment        = new HomeFragment();
-        allEventsFragment   = new AllEventsFragment();
-        myTicketsFragment   = new MyTicketsFragment();
-        organizerHubFragment = new OrganizerHubFragment();
-        profileFragment     = new ProfileFragment();
-
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction()
-                .add(R.id.frameContainerMain, homeFragment)
-                .add(R.id.frameContainerMain, allEventsFragment).hide(allEventsFragment)
-                .add(R.id.frameContainerMain, myTicketsFragment).hide(myTicketsFragment)
-                .add(R.id.frameContainerMain, organizerHubFragment).hide(organizerHubFragment)
-                .add(R.id.frameContainerMain, profileFragment).hide(profileFragment)
-                .commit();
-
-        activeFragment = homeFragment;
-    }
-
-    private void addEvents() {
-        bottomNavCustomer.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                showTab(homeFragment);
-                return true;
-            } else if (id == R.id.nav_events) {
-                showTab(allEventsFragment);
-                return true;
-            } else if (id == R.id.nav_my_tickets) {
-                showTab(myTicketsFragment);
-                return true;
-            } else if (id == R.id.nav_organizer) {
-                showTab(organizerHubFragment);
-                return true;
-            } else if (id == R.id.nav_profile) {
-                showTab(profileFragment);
-                return true;
-            }
-            return false;
+    /** Chß+ë apply navigation bar bottom inset GÇö KH+öNG apply status bar top inset */
+    private void applyNavBarInset() {
+        LinearLayout nav = findViewById(R.id.customBottomNav);
+        if (nav == null) return;
+        ViewCompat.setOnApplyWindowInsetsListener(nav, (v, insets) -> {
+            int bottomInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            v.setPadding(0, 0, 0, bottomInset);
+            return insets;
         });
     }
 
-    /**
-     * Show/hide fragments để giữ trạng thái (không dùng replace).
-     */
-    private void showTab(Fragment target) {
-        if (activeFragment == target) return;
-        getSupportFragmentManager()
-                .beginTransaction()
-                .hide(activeFragment)
-                .show(target)
-                .commit();
-        activeFragment = target;
+    private void bindViews() {
+        tabHome    = findViewById(R.id.tabHome);
+        tabEvents  = findViewById(R.id.tabEvents);
+        tabCreate  = findViewById(R.id.tabCreate);
+        tabTickets = findViewById(R.id.tabTickets);
+        tabProfile = findViewById(R.id.tabProfile);
+
+        icHome    = findViewById(R.id.icHome);
+        icEvents  = findViewById(R.id.icEvents);
+        icTickets = findViewById(R.id.icTickets);
+        icProfile = findViewById(R.id.icProfile);
+
+        txtHome    = findViewById(R.id.txtHome);
+        txtEvents  = findViewById(R.id.txtEvents);
+        txtCreate  = findViewById(R.id.txtCreate);
+        txtTickets = findViewById(R.id.txtTickets);
+        txtProfile = findViewById(R.id.txtProfile);
     }
 
-    /** Được gọi từ HomeFragment khi tap search bar. */
+    private void setupNavListeners() {
+        tabHome   .setOnClickListener(v -> selectTab(R.id.tabHome));
+        tabEvents .setOnClickListener(v -> selectTab(R.id.tabEvents));
+        tabCreate .setOnClickListener(v -> openSubFragment(new OrganizerHubFragment()));
+        tabTickets.setOnClickListener(v -> selectTab(R.id.tabTickets));
+        tabProfile.setOnClickListener(v -> selectTab(R.id.tabProfile));
+    }
+
+    public void selectTab(int tabId) {
+        activeTabId = tabId;
+        updateTabStyles();
+
+        if (tabId == R.id.tabHome)    openFragment(new HomeFragment());
+        else if (tabId == R.id.tabEvents)  openFragment(new EventsFragment());
+        else if (tabId == R.id.tabTickets) openFragment(new MyTicketsFragment());
+        else if (tabId == R.id.tabProfile) openFragment(new ProfileFragment());
+    }
+
+    private void updateTabStyles() {
+        int blue = ContextCompat.getColor(this, R.color.clr_primary_blue);
+        int grey = 0xFF808E92;
+
+        // Reset all to grey
+        setTabStyle(icHome,    txtHome,    R.drawable.ic_nav_home,    grey, false);
+        setTabStyle(icEvents,  txtEvents,  R.drawable.ic_nav_events,  grey, false);
+        setTabStyle(icTickets, txtTickets, R.drawable.ic_nav_ticket,  grey, false);
+        setTabStyle(icProfile, txtProfile, R.drawable.ic_nav_profile, grey, false);
+
+        // Highlight active tab
+        if (activeTabId == R.id.tabHome)
+            setTabStyle(icHome,    txtHome,    R.drawable.ic_nav_home,   blue, true);
+        else if (activeTabId == R.id.tabEvents)
+            setTabStyle(icEvents,  txtEvents,  R.drawable.ic_nav_events, blue, true);
+        else if (activeTabId == R.id.tabTickets)
+            setTabStyle(icTickets, txtTickets, R.drawable.ic_nav_ticket, blue, true);
+        else if (activeTabId == R.id.tabProfile)
+            setTabStyle(icProfile, txtProfile, R.drawable.ic_nav_profile,blue, true);
+
+        // "Tß¦ío sß+¦ kiß+çn" tab text m+áu x+ím (kh+¦ng c+¦ active state)
+        if (txtCreate != null) txtCreate.setTextColor(grey);
+    }
+
+    private void setTabStyle(ImageView icon, TextView label, int iconRes, int color, boolean bold) {
+        if (icon  != null) { icon.setImageResource(iconRes); icon.setColorFilter(color); }
+        if (label != null) {
+            label.setTextColor(color);
+            label.setTypeface(null, bold
+                    ? android.graphics.Typeface.BOLD
+                    : android.graphics.Typeface.NORMAL);
+        }
+    }
+
+    // GöÇGöÇ Fragment navigation GöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇ
+
+    private void openFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContainerMain, fragment)
+                .commit();
+    }
+
     public void openSearchFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -129,13 +143,15 @@ public class UserMainActivity extends BaseActivity {
                 .commit();
     }
 
-    /** Được gọi từ OrganizerHubFragment khi muốn về tab Events. */
-    public void switchToEventsTab() {
-        bottomNavCustomer.setSelectedItemId(R.id.nav_events);
+    public void openEventsFragment() {
+        selectTab(R.id.tabEvents);
     }
 
-    /** Được gọi từ bất kỳ đâu để switch sang tab cụ thể. */
-    public void switchToTab(int navItemId) {
-        bottomNavCustomer.setSelectedItemId(navItemId);
+    public void openSubFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContainerMain, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

@@ -1,7 +1,10 @@
 package com.example.vibetix.Models;
 
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
+@IgnoreExtraProperties
 public class UserTicket {
     public enum Status {
         VALID, USED, EXPIRED, TRANSFERRED, CANCELLED
@@ -13,7 +16,7 @@ public class UserTicket {
     private String ownerId;
     private String ticketCode;
     private String displayCode;
-    private String statusStr = "valid";
+    private boolean isUsed = false;
     private Object checkedInAt;
     private Object issuedAt;
 
@@ -34,9 +37,9 @@ public class UserTicket {
     @PropertyName("event_id")
     public void setEventId(String eventId) { this.eventId = eventId; }
 
-    @PropertyName("owner_id")
+    @PropertyName("user_id")
     public String getOwnerId() { return ownerId; }
-    @PropertyName("owner_id")
+    @PropertyName("user_id")
     public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
 
     @PropertyName("ticket_code")
@@ -49,23 +52,10 @@ public class UserTicket {
     @PropertyName("display_code")
     public void setDisplayCode(String displayCode) { this.displayCode = displayCode; }
 
-    @PropertyName("status")
-    public String getStatusStr() { return statusStr; }
-    @PropertyName("status")
-    public void setStatusStr(String statusStr) { this.statusStr = statusStr; }
-
-    public Status getStatusEnum() {
-        if (statusStr == null) return Status.VALID;
-        try {
-            return Status.valueOf(statusStr.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return Status.VALID;
-        }
-    }
-
-    public void setStatus(Status status) {
-        this.statusStr = status != null ? status.name().toLowerCase() : Status.VALID.name().toLowerCase();
-    }
+    @PropertyName("is_used")
+    public boolean isUsed() { return isUsed; }
+    @PropertyName("is_used")
+    public void setUsed(boolean used) { this.isUsed = used; }
 
     @PropertyName("checked_in_at")
     public Object getCheckedInAt() { return checkedInAt; }
@@ -79,20 +69,45 @@ public class UserTicket {
 
     // ─── Convenience aliases ─────────────────────────────────────────────────
     /** Alias for ownerId — used when Firestore field is user_id. */
+    @Exclude
     public String getUserId() { return ownerId; }
+    @Exclude
     public void setUserId(String userId) { this.ownerId = userId; }
 
     /** Alias for userTicketId. */
+    @Exclude
     public String getTicketId() { return userTicketId; }
+    @Exclude
     public void setTicketId(String id) { this.userTicketId = id; }
 
-    /** Alias for statusStr — plain string status. */
-    public String getStatus() { return statusStr; }
+
 
     /** created_at field (for ordering). */
     private Object createdAt;
-    @PropertyName("created_at")
+    @Exclude
     public Object getCreatedAt() { return createdAt; }
-    @PropertyName("created_at")
+    @Exclude
     public void setCreatedAt(Object createdAt) { this.createdAt = createdAt; }
+
+    // UI-only denormalized fields (NOT in DB schema — loaded separately from users collection)
+    private String fullName;
+    private String email;
+    private String ticketTypeName;
+
+    @com.google.firebase.firestore.Exclude
+    public String getFullName() { return fullName; }
+    @com.google.firebase.firestore.Exclude
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    @com.google.firebase.firestore.Exclude
+    public String getEmail() { return email; }
+    @com.google.firebase.firestore.Exclude
+    public void setEmail(String email) { this.email = email; }
+
+    @com.google.firebase.firestore.Exclude
+    public String getTicketTypeName() { return ticketTypeName; }
+    @com.google.firebase.firestore.Exclude
+    public void setTicketTypeName(String ticketTypeName) { this.ticketTypeName = ticketTypeName; }
+
+
 }

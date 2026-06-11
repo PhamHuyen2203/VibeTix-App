@@ -26,7 +26,7 @@ public class TicketRepository {
 
     public TicketRepository() {
         db = FirebaseFirestore.getInstance();
-        ticketsRef = db.collection(FirebaseCollections.TICKETS);
+        ticketsRef = db.collection(FirebaseCollections.USER_TICKETS);
     }
 
     // Get active (upcoming) tickets bought by the user

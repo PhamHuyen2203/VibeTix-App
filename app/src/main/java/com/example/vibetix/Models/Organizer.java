@@ -19,6 +19,8 @@ public class Organizer {
     private String contactEmail; // Email liên hệ BTC (có thể khác email user)
     private String contactPhone; // SĐT liên hệ BTC
     private boolean isVerified = false;
+    private boolean isDefault = false;
+    private String businessLicenseUrl;
     private Object createdAt;
 
     public Organizer() {}
@@ -64,20 +66,30 @@ public class Organizer {
     @PropertyName("website_url")
     public void setWebsiteUrl(String websiteUrl) { this.websiteUrl = websiteUrl; }
 
-    @PropertyName("contact_email")
+    @com.google.firebase.firestore.Exclude
     public String getContactEmail() { return contactEmail; }
-    @PropertyName("contact_email")
+    @com.google.firebase.firestore.Exclude
     public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
 
-    @PropertyName("contact_phone")
+    @com.google.firebase.firestore.Exclude
     public String getContactPhone() { return contactPhone; }
-    @PropertyName("contact_phone")
+    @com.google.firebase.firestore.Exclude
     public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
 
     @PropertyName("is_verified")
     public boolean isVerified() { return isVerified; }
     @PropertyName("is_verified")
     public void setVerified(boolean verified) { this.isVerified = verified; }
+
+    @PropertyName("is_default")
+    public boolean isDefault() { return isDefault; }
+    @PropertyName("is_default")
+    public void setDefault(boolean aDefault) { isDefault = aDefault; }
+
+    @com.google.firebase.firestore.Exclude
+    public String getBusinessLicenseUrl() { return businessLicenseUrl; }
+    @com.google.firebase.firestore.Exclude
+    public void setBusinessLicenseUrl(String businessLicenseUrl) { this.businessLicenseUrl = businessLicenseUrl; }
 
     @PropertyName("created_at")
     public Object getCreatedAt() { return createdAt; }

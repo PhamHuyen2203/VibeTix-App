@@ -3,14 +3,12 @@ package com.example.vibetix.Adapters.Organizer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vibetix.Models.EventStaff;
 import com.example.vibetix.R;
-import com.google.android.material.materialswitch.MaterialSwitch;
+import com.example.vibetix.databinding.ItemStaffRowBinding;
 
 import java.util.List;
 
@@ -32,34 +30,47 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     @NonNull
     @Override
     public StaffViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_staff_row, parent, false);
-        return new StaffViewHolder(view);
+        ItemStaffRowBinding binding = ItemStaffRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new StaffViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull StaffViewHolder holder, int position) {
         EventStaff staff = staffList.get(position);
+        ItemStaffRowBinding b = holder.binding;
 
-        holder.tvStaffName.setText(staff.getStaffName() != null ? staff.getStaffName() : "Unknown User");
-        holder.tvStaffEmail.setText(staff.getStaffEmail() != null ? staff.getStaffEmail() : "No email");
+        b.tvStaffName.setText(staff.getStaffName() != null ? staff.getStaffName() : "Tài khoản VibeTix");
+        b.tvStaffEmail.setText(staff.getStaffEmail() != null ? staff.getStaffEmail() : "No email");
         
-        holder.tvRoleBadge.setText(staff.getRole() == EventStaff.Role.MANAGER ? "Quản lý" : "Soát vé");
+        b.tvRoleBadge.setText(staff.getRole() == EventStaff.Role.MANAGER ? "Quản lý" : "Soát vé");
         
         // Cập nhật giao diện theo role
         if (staff.getRole() == EventStaff.Role.MANAGER) {
-            holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
-            holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_primary));
+            b.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_badge_manager);
+            b.tvRoleBadge.setTextColor(b.getRoot().getContext().getColor(R.color.clr_primary));
         } else {
-            holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
-            holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
+            b.tvRoleBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+            b.tvRoleBadge.setTextColor(b.getRoot().getContext().getColor(R.color.clr_warning));
         }
 
-        holder.btnStaffOptions.setOnClickListener(v -> listener.onOptionsClick(staff, v));
+        b.btnStaffOptions.setVisibility(View.GONE); // Ẩn nút 3 chấm vì chỉ dùng switch bật/tắt
         
-        // Hiện tại EventStaff chưa có field isActive, ta giả sử luôn true hoặc thêm logic sau
-        holder.swStaffActive.setChecked(true);
-        holder.swStaffActive.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        // Remove listener temporarily to avoid triggering when setting state programmatically
+        b.swStaffActive.setOnCheckedChangeListener(null);
+        
+        b.swStaffActive.setChecked(staff.isActive());
+        b.swStaffActive.setText(staff.isActive() ? "Đang bật" : "Tạm ngưng");
+        if (!staff.isActive()) {
+            b.ivStaffAvatar.setImageTintList(android.content.res.ColorStateList.valueOf(b.getRoot().getContext().getColor(R.color.clr_grey_1)));
+            b.tvStaffName.setTextColor(b.getRoot().getContext().getColor(R.color.clr_grey_1));
+            b.swStaffActive.setTextColor(b.getRoot().getContext().getColor(R.color.clr_error));
+        } else {
+            b.ivStaffAvatar.setImageTintList(android.content.res.ColorStateList.valueOf(b.getRoot().getContext().getColor(R.color.clr_primary)));
+            b.tvStaffName.setTextColor(b.getRoot().getContext().getColor(R.color.clr_text_black));
+            b.swStaffActive.setTextColor(b.getRoot().getContext().getColor(R.color.clr_text_black));
+        }
+
+        b.swStaffActive.setOnCheckedChangeListener((buttonView, isChecked) -> {
             listener.onStatusChange(staff, isChecked);
         });
     }
@@ -70,17 +81,11 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
     }
 
     static class StaffViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStaffName, tvStaffEmail, tvRoleBadge;
-        ImageView btnStaffOptions;
-        MaterialSwitch swStaffActive;
+        final ItemStaffRowBinding binding;
 
-        public StaffViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvStaffName = itemView.findViewById(R.id.tvStaffName);
-            tvStaffEmail = itemView.findViewById(R.id.tvStaffEmail);
-            tvRoleBadge = itemView.findViewById(R.id.tvRoleBadge);
-            btnStaffOptions = itemView.findViewById(R.id.btnStaffOptions);
-            swStaffActive = itemView.findViewById(R.id.swStaffActive);
+        public StaffViewHolder(@NonNull ItemStaffRowBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

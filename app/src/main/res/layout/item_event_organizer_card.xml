@@ -52,6 +52,23 @@
                     android:gravity="center_vertical">
                     
                     <TextView
+                        android:id="@+id/tvRoleBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_chip_active"
+                        android:text="Owner"
+                        android:textColor="@color/clr_text_white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:id="@+id/tvStatusBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -103,6 +120,20 @@
                     android:drawablePadding="4dp"
                     android:drawableTint="@color/clr_text_secondary" />
 
+                <TextView
+                    android:id="@+id/tvEventVenue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Venue Location"
+                    android:textColor="@color/clr_text_secondary"
+                    android:textSize="12sp"
+                    android:drawableStart="@drawable/ic_location_pin"
+                    android:drawablePadding="4dp"
+                    android:drawableTint="@color/clr_text_secondary"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -113,6 +144,7 @@
 
         <!-- Footer: Stats -->
         <LinearLayout
+            android:id="@+id/layoutStats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
