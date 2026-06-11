@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -52,10 +53,10 @@ public class MyTicketsFragment extends Fragment {
 
     // Views
     private TextView tabCategoryBought, tabCategoryReselling, tabCategoryMembership;
-    
+
     // Sub-tab layouts
     private LinearLayout layoutSubTabsBought, layoutSubTabsResale;
-    
+
     // Sub-tabs for Bought
     private LinearLayout tabSubUpcoming, tabSubEnded;
     private TextView txtSubUpcoming, txtSubEnded;
@@ -95,16 +96,16 @@ public class MyTicketsFragment extends Fragment {
     }
 
     private void bindViews(View view) {
-        // We temporarily comment out views that do not exist in the stub fragment_my_tickets.xml 
-        // to fix compilation errors, since Huyen forgot to commit the updated XML layout.
-        /*
+        // Categories
         tabCategoryBought = view.findViewById(R.id.tabCategoryBought);
         tabCategoryReselling = view.findViewById(R.id.tabCategoryReselling);
         tabCategoryMembership = view.findViewById(R.id.tabCategoryMembership);
 
+        // Sub tab groups
         layoutSubTabsBought = view.findViewById(R.id.layoutSubTabsBought);
         layoutSubTabsResale = view.findViewById(R.id.layoutSubTabsResale);
 
+        // Bought sub tabs
         tabSubUpcoming = view.findViewById(R.id.tabSubUpcoming);
         tabSubEnded = view.findViewById(R.id.tabSubEnded);
         txtSubUpcoming = view.findViewById(R.id.txtSubUpcoming);
@@ -112,6 +113,7 @@ public class MyTicketsFragment extends Fragment {
         indicatorSubUpcoming = view.findViewById(R.id.indicatorSubUpcoming);
         indicatorSubEnded = view.findViewById(R.id.indicatorSubEnded);
 
+        // Resale sub tabs
         tabResaleActive = view.findViewById(R.id.tabResaleActive);
         tabResalePending = view.findViewById(R.id.tabResalePending);
         tabResalePaid = view.findViewById(R.id.tabResalePaid);
@@ -127,21 +129,29 @@ public class MyTicketsFragment extends Fragment {
         indicatorResalePaid = view.findViewById(R.id.indicatorResalePaid);
         indicatorResaleCancelled = view.findViewById(R.id.indicatorResaleCancelled);
 
+        // Resale extra info
         layoutResaleInfoRow = view.findViewById(R.id.layoutResaleInfoRow);
         txtResaleEarningsLabel = view.findViewById(R.id.txtResaleEarningsLabel);
 
+        // Container views
+        rvMyTicketsList = view.findViewById(R.id.rvMyTicketsList);
         layoutMyTicketsEmptyState = view.findViewById(R.id.layoutMyTicketsEmptyState);
         txtEmptyStateTitle = view.findViewById(R.id.txtEmptyStateTitle);
         txtEmptyStateSubtitle = view.findViewById(R.id.txtEmptyStateSubtitle);
         btnEmptyStateAction = view.findViewById(R.id.btnEmptyStateAction);
         layoutEmptyRecommendationsHeader = view.findViewById(R.id.layoutEmptyRecommendationsHeader);
         rvEmptyRecommendationsList = view.findViewById(R.id.rvEmptyRecommendationsList);
-        */
-        rvMyTicketsList = view.findViewById(R.id.rvMyTickets); // mapped to existing ID
     }
 
     private void applyWindowInsets(View view) {
-        // View header = view.findViewById(R.id.layoutMyTicketsHeader);
+        View header = view.findViewById(R.id.layoutMyTicketsHeader);
+        if (header != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(header, (v, windowInsets) -> {
+                int top = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+                v.setPadding(0, top, 0, 0);
+                return windowInsets;
+            });
+        }
     }
 
     private void restoreUserSession() {
@@ -150,24 +160,165 @@ public class MyTicketsFragment extends Fragment {
     }
 
     private void setupTabs() {
-        /*
-        tabCategoryBought.setOnClickListener(v -> { ... });
-        */
+        // Main categories click listeners
+        tabCategoryBought.setOnClickListener(v -> {
+            selectMainTab(MainTab.BOUGHT);
+            loadTickets();
+        });
+
+        tabCategoryReselling.setOnClickListener(v -> {
+            selectMainTab(MainTab.RESELLING);
+            loadTickets();
+        });
+
+        tabCategoryMembership.setOnClickListener(v -> {
+            selectMainTab(MainTab.MEMBERSHIP);
+            loadTickets();
+        });
+
+        // Sub tabs click listeners (Bought)
+        tabSubUpcoming.setOnClickListener(v -> {
+            selectSubTabBought(SubTabBought.UPCOMING);
+            loadTickets();
+        });
+
+        tabSubEnded.setOnClickListener(v -> {
+            selectSubTabBought(SubTabBought.ENDED);
+            loadTickets();
+        });
+
+        // Sub tabs click listeners (Resale)
+        tabResaleActive.setOnClickListener(v -> {
+            selectSubTabResale(SubTabResale.ACTIVE);
+            loadTickets();
+        });
+
+        tabResalePending.setOnClickListener(v -> {
+            selectSubTabResale(SubTabResale.PENDING);
+            loadTickets();
+        });
+
+        tabResalePaid.setOnClickListener(v -> {
+            selectSubTabResale(SubTabResale.PAID);
+            loadTickets();
+        });
+
+        tabResaleCancelled.setOnClickListener(v -> {
+            selectSubTabResale(SubTabResale.CANCELLED);
+            loadTickets();
+        });
+
+        // Empty state primary action click listener
+        btnEmptyStateAction.setOnClickListener(v -> {
+            if (currentMainTab == MainTab.BOUGHT) {
+                // Navigate to home tab
+                if (getActivity() instanceof UserMainActivity) {
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.frameContainerMain, new HomeFragment())
+                            .commit();
+                }
+            } else if (currentMainTab == MainTab.RESELLING && currentSubTabResale == SubTabResale.ACTIVE) {
+                // Guide the user to go to bought tickets and pass them
+                Toast.makeText(requireContext(), "Chọn vé bạn đã mua ở tab 'Vé đã mua' rồi bấm 'Bán lại vé' để đăng bán!", Toast.LENGTH_LONG).show();
+                selectMainTab(MainTab.BOUGHT);
+                selectSubTabBought(SubTabBought.UPCOMING);
+                loadTickets();
+            }
+        });
     }
 
     private void selectMainTab(MainTab tab) {
         currentMainTab = tab;
+
+        // Reset styling for category outline buttons (Figma/Styleguide specs)
+        tabCategoryBought.setBackgroundResource(R.drawable.bg_chip_filter);
+        tabCategoryBought.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+        tabCategoryBought.setTypeface(null, android.graphics.Typeface.NORMAL);
+
+        tabCategoryReselling.setBackgroundResource(R.drawable.bg_chip_filter);
+        tabCategoryReselling.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+        tabCategoryReselling.setTypeface(null, android.graphics.Typeface.NORMAL);
+
+        tabCategoryMembership.setBackgroundResource(R.drawable.bg_chip_filter);
+        tabCategoryMembership.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+        tabCategoryMembership.setTypeface(null, android.graphics.Typeface.NORMAL);
+
+        // Toggle sub tab bars and info bar
+        layoutSubTabsBought.setVisibility(View.GONE);
+        layoutSubTabsResale.setVisibility(View.GONE);
+        layoutResaleInfoRow.setVisibility(View.GONE);
+
+        if (tab == MainTab.BOUGHT) {
+            tabCategoryBought.setBackgroundResource(R.drawable.bg_tab_active_outline);
+            tabCategoryBought.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+            tabCategoryBought.setTypeface(null, android.graphics.Typeface.BOLD);
+            layoutSubTabsBought.setVisibility(View.VISIBLE);
+        } else if (tab == MainTab.RESELLING) {
+            tabCategoryReselling.setBackgroundResource(R.drawable.bg_tab_active_outline);
+            tabCategoryReselling.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+            tabCategoryReselling.setTypeface(null, android.graphics.Typeface.BOLD);
+            layoutSubTabsResale.setVisibility(View.VISIBLE);
+
+            // Toggle resale billing totals row based on sub-tab
+            toggleResaleInfoRow();
+        } else {
+            tabCategoryMembership.setBackgroundResource(R.drawable.bg_tab_active_outline);
+            tabCategoryMembership.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+            tabCategoryMembership.setTypeface(null, android.graphics.Typeface.BOLD);
+        }
     }
 
     private void toggleResaleInfoRow() {
+        // Image 2 shows info row (Tổng thực nhận) is visible in pending resale sub-tab
+        if (currentMainTab == MainTab.RESELLING && currentSubTabResale != SubTabResale.ACTIVE) {
+            layoutResaleInfoRow.setVisibility(View.VISIBLE);
+        } else {
+            layoutResaleInfoRow.setVisibility(View.GONE);
+        }
     }
 
     private void selectSubTabBought(SubTabBought sub) {
         currentSubTabBought = sub;
+
+        txtSubUpcoming.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+        txtSubUpcoming.setTypeface(null, android.graphics.Typeface.NORMAL);
+        indicatorSubUpcoming.setBackgroundResource(android.R.color.transparent);
+
+        txtSubEnded.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+        txtSubEnded.setTypeface(null, android.graphics.Typeface.NORMAL);
+        indicatorSubEnded.setBackgroundResource(android.R.color.transparent);
+
+        if (sub == SubTabBought.UPCOMING) {
+            txtSubUpcoming.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+            txtSubUpcoming.setTypeface(null, android.graphics.Typeface.BOLD);
+            indicatorSubUpcoming.setBackgroundResource(R.color.clr_primary_blue);
+        } else {
+            txtSubEnded.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+            txtSubEnded.setTypeface(null, android.graphics.Typeface.BOLD);
+            indicatorSubEnded.setBackgroundResource(R.color.clr_primary_blue);
+        }
     }
 
     private void selectSubTabResale(SubTabResale sub) {
         currentSubTabResale = sub;
+
+        // Reset all resale sub tabs
+        TextView[] textViews = {txtResaleActive, txtResalePending, txtResalePaid, txtResaleCancelled};
+        View[] indicators = {indicatorResaleActive, indicatorResalePending, indicatorResalePaid, indicatorResaleCancelled};
+
+        for (int i = 0; i < textViews.length; i++) {
+            textViews[i].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
+            textViews[i].setTypeface(null, android.graphics.Typeface.NORMAL);
+            indicators[i].setBackgroundResource(android.R.color.transparent);
+        }
+
+        // Active selection
+        int activeIndex = sub.ordinal();
+        textViews[activeIndex].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+        textViews[activeIndex].setTypeface(null, android.graphics.Typeface.BOLD);
+        indicators[activeIndex].setBackgroundResource(R.color.clr_primary_blue);
+
+        toggleResaleInfoRow();
     }
 
     private void setupRecyclerView() {
@@ -250,9 +401,8 @@ public class MyTicketsFragment extends Fragment {
     private void updateEmptyStateUI() {
         if (displayTickets.isEmpty()) {
             rvMyTicketsList.setVisibility(View.GONE);
-            /*
             layoutMyTicketsEmptyState.setVisibility(View.VISIBLE);
-            
+
             // Customize text and buttons according to Styleguide, active main tab, and sub-tab selection
             btnEmptyStateAction.setVisibility(View.GONE);
             layoutEmptyRecommendationsHeader.setVisibility(View.GONE);
@@ -264,7 +414,7 @@ public class MyTicketsFragment extends Fragment {
                     txtEmptyStateSubtitle.setText("Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn.");
                     btnEmptyStateAction.setText("🎟  Mua vé ngay");
                     btnEmptyStateAction.setVisibility(View.VISIBLE);
-                    
+
                     // Show suggestions on main empty screen
                     layoutEmptyRecommendationsHeader.setVisibility(View.VISIBLE);
                     rvEmptyRecommendationsList.setVisibility(View.VISIBLE);
@@ -292,10 +442,9 @@ public class MyTicketsFragment extends Fragment {
                 txtEmptyStateTitle.setText("Không có thẻ thành viên");
                 txtEmptyStateSubtitle.setText("Các chương trình thành viên VIP đang được chuẩn bị ra mắt!");
             }
-            */
         } else {
             rvMyTicketsList.setVisibility(View.VISIBLE);
-            // layoutMyTicketsEmptyState.setVisibility(View.GONE);
+            layoutMyTicketsEmptyState.setVisibility(View.GONE);
         }
     }
 
@@ -317,9 +466,7 @@ public class MyTicketsFragment extends Fragment {
                     .commit();
         });
 
-        /*
         rvEmptyRecommendationsList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvEmptyRecommendationsList.setAdapter(suggestionsAdapter);
-        */
     }
 }
