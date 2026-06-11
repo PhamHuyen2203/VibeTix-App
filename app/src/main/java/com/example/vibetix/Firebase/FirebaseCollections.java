@@ -10,10 +10,11 @@ public class FirebaseCollections {
     public static final String EVENTS        = "events";
 
     // Ticket & Order
-    public static final String TICKET_TYPES  = "ticket_types";
-    public static final String ORDERS        = "orders";
-    public static final String ORDER_ITEMS   = "order_items";
-    public static final String USER_TICKETS  = "user_tickets";
+    public static final String TICKET_TYPES     = "ticket_types";
+    public static final String ORDERS           = "orders";
+    public static final String ORDER_ITEMS      = "order_items";
+    public static final String USER_TICKETS     = "user_tickets";
+    public static final String TICKET_TRANSFERS = "ticket_transfers";
 
     // Promotion & Access
     public static final String DISCOUNTS     = "discounts";

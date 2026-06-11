@@ -34,6 +34,7 @@ public class FirestoreHelper {
     public static final Map<String, String> CAT_KEY_TO_ID = new HashMap<>();
     // Tên hiển thị: slug → Vietnamese name
     public static final Map<String, String> CAT_SLUG_TO_NAME = new HashMap<>();
+    public static final Map<String, String> CAT_NAME_MAP = new HashMap<>();
 
     /** Gọi 1 lần khi app khởi động để load category IDs thật từ Firestore */
     public static void loadCategoryCache(Runnable onDone) {
@@ -41,7 +42,7 @@ public class FirestoreHelper {
             .collection("categories")
             .get()
             .addOnSuccessListener(snap -> {
-                CAT_MAP.clear(); CAT_KEY_TO_ID.clear(); CAT_SLUG_TO_NAME.clear();
+                CAT_MAP.clear(); CAT_KEY_TO_ID.clear(); CAT_SLUG_TO_NAME.clear(); CAT_NAME_MAP.clear();
                 for (QueryDocumentSnapshot doc : snap) {
                     String catId = doc.getString("category_id");
                     String slug  = doc.getString("slug");
@@ -50,7 +51,10 @@ public class FirestoreHelper {
                     String appKey = slugToKey(slug);
                     CAT_MAP.put(catId, appKey);
                     CAT_KEY_TO_ID.put(appKey, catId);
-                    if (name != null) CAT_SLUG_TO_NAME.put(slug, name);
+                    if (name != null) {
+                        CAT_SLUG_TO_NAME.put(slug, name);
+                        CAT_NAME_MAP.put(catId, name);
+                    }
                 }
                 if (onDone != null) onDone.run();
             })
@@ -69,6 +73,8 @@ public class FirestoreHelper {
 
     // ── Venue cache (public để HomepageLoader dùng chung) ────────────────────
     public static final Map<String, String> VENUE_CACHE = new HashMap<>();
+    public static final Map<String, String> VENUE_NAME_CACHE = new HashMap<>();
+    public static final Map<String, String> VENUE_ADDRESS_CACHE = new HashMap<>();
 
     /**
      * Load toàn bộ published events (approved + ongoing).

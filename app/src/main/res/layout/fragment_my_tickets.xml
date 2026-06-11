@@ -1,117 +1,447 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/clr_bg_light">
 
-    <!-- Header -->
+    <!-- Top Dashboard Header -->
     <LinearLayout
+        android:id="@+id/layoutMyTicketsHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/clr_primary"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="52dp"
-        android:paddingBottom="0dp"
-        android:orientation="vertical">
+        android:background="@color/clr_bg_white"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vé của tôi"
-            android:textColor="@color/clr_text_white"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Tabs -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabMyTickets"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            app:tabTextColor="#80FFFFFF"
-            app:tabSelectedTextColor="@color/clr_text_white"
-            app:tabIndicatorColor="@color/clr_text_white"
-            app:tabIndicatorHeight="3dp"
-            app:tabMode="fixed"
-            android:background="@null">
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
 
-            <com.google.android.material.tabs.TabItem
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sắp diễn ra" />
+                android:layout_centerInParent="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Vé của tôi  ✨"
+                android:textColor="@color/clr_text_black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
+            <!-- VibeTix App Icon in Header -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnHeaderAppIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/app_icon" />
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
+
+        <!-- Category Horizontal Outlined pill tabs -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="12dp"
+            android:paddingHorizontal="16dp">
+
+            <TextView
+                android:id="@+id/tabCategoryBought"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Đã xem" />
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_tab_active_outline"
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:text="Vé đã mua"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tabCategoryReselling"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Đã huỷ" />
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_chip_filter"
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:text="Vé bán lại"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
 
-        </com.google.android.material.tabs.TabLayout>
+            <TextView
+                android:id="@+id/tabCategoryMembership"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_chip_filter"
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:text="Thẻ thành viên"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Dynamic Sub-Tabs Frame Container -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Sub-Tabs Row for "Vé đã mua" (Sắp diễn ra | Đã kết thúc) -->
+            <LinearLayout
+                android:id="@+id/layoutSubTabsBought"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/tabSubUpcoming"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtSubUpcoming"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Sắp diễn ra"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <View
+                        android:id="@+id/indicatorSubUpcoming"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/clr_primary_blue" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabSubEnded"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtSubEnded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Đã kết thúc"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp" />
+                    <View
+                        android:id="@+id/indicatorSubEnded"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Sub-Tabs Row for "Vé bán lại" (Đang bán | Chờ thanh toán | Đã thanh toán | Đã hủy) -->
+            <LinearLayout
+                android:id="@+id/layoutSubTabsResale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <!-- Đang bán -->
+                <LinearLayout
+                    android:id="@+id/tabResaleActive"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtResaleActive"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Đang bán"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <View
+                        android:id="@+id/indicatorResaleActive"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/clr_primary_blue" />
+                </LinearLayout>
+
+                <!-- Chờ thanh toán -->
+                <LinearLayout
+                    android:id="@+id/tabResalePending"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtResalePending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Chờ thanh toán"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp" />
+                    <View
+                        android:id="@+id/indicatorResalePending"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Đã thanh toán -->
+                <LinearLayout
+                    android:id="@+id/tabResalePaid"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.4"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtResalePaid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Đã thanh toán"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp" />
+                    <View
+                        android:id="@+id/indicatorResalePaid"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+
+                <!-- Đã hủy -->
+                <LinearLayout
+                    android:id="@+id/tabResaleCancelled"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/txtResaleCancelled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="10dp"
+                        android:text="Đã hủy"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp" />
+                    <View
+                        android:id="@+id/indicatorResaleCancelled"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@android:color/transparent" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
-    <!-- Content -->
+    <!-- Resale pricing/info bar + Filter (visible under "Vé bán lại" tab) -->
+    <RelativeLayout
+        android:id="@+id/layoutResaleInfoRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/clr_bg_light"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/layoutMyTicketsHeader">
+
+        <!-- Tổng thực nhận label -->
+        <TextView
+            android:id="@+id/txtResaleEarningsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-medium"
+            android:text="Tổng thực nhận: 0 đ"
+            android:textColor="@color/clr_text_black"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Blue outlined filter icon button with red dot -->
+        <FrameLayout
+            android:id="@+id/btnResaleFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/clr_bg_white">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_filter"
+                    app:tint="@color/clr_primary_blue" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- Red Notification Dot -->
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_auth_header"
+                android:backgroundTint="@color/clr_red" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- Main Content Container -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutResaleInfoRow"
+        tools:layout_editor_absoluteX="0dp">
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshTickets"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvMyTickets"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="24dp" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <!-- Empty State -->
-        <LinearLayout
-            android:id="@+id/layoutEmptyTickets"
+        <!-- RecyclerView for ticket listings -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMyTicketsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="32dp"
-            android:visibility="gone">
+            android:clipToPadding="false"
+            android:padding="16dp"
+            android:visibility="gone" />
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="🎫" android:textSize="64sp" android:layout_marginBottom="16dp" />
+        <!-- Empty State Container -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/layoutMyTicketsEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-            <TextView
-                android:id="@+id/tvEmptyTicketMsg"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bạn chưa có vé nào\nHãy khám phá sự kiện!"
-                android:textSize="16sp"
-                android:textColor="@color/clr_text_secondary"
-                android:gravity="center"
-                android:layout_marginBottom="20dp" />
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="Khám phá sự kiện"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                app:cornerRadius="24dp" />
+                <!-- Cartoon Illustration Card -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/clr_bg_white">
 
-        </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="32dp">
 
+                        <ImageView
+                            android:id="@+id/imvEmptyStateMascot"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:src="@drawable/img_vibetix_mascot" />
+
+                        <TextView
+                            android:id="@+id/txtEmptyStateTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Bạn chưa có vé nào cả!"
+                            android:textColor="@color/clr_text_black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:gravity="center" />
+
+                        <TextView
+                            android:id="@+id/txtEmptyStateSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn."
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="12sp" />
+
+                        <!-- Dynamic action button (can be buy now or resell tickets based on category tab) -->
+                        <Button
+                            android:id="@+id/btnEmptyStateAction"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginTop="20dp"
+                            android:background="@drawable/bg_btn_gradient"
+                            android:backgroundTint="@null"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="🎟  Mua vé ngay"
+                            android:textColor="@color/clr_text_white"
+                            app:cornerRadius="24dp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Recommendation header (visible under empty bought tab) -->
+                <RelativeLayout
+                    android:id="@+id/layoutEmptyRecommendationsHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Có thể bạn cũng thích"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtEmptyRecommendationsSeeAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="Xem tất cả ›"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="13sp" />
+                </RelativeLayout>
+
+                <!-- Horizontal suggestions RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvEmptyRecommendationsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="16dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

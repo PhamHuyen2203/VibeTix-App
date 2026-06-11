@@ -5,9 +5,11 @@ public class Event {
     private String title;
     private String imageUrl;
     private String date;
+    private String endDate;
     private String location;
     private String category;
     private long minPrice;
+    private long maxPrice;
     private boolean isFree;
     private boolean isSoldOut;
     private String status;
@@ -45,6 +47,9 @@ public class Event {
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
 
+    public String getEndDate() { return endDate; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
+
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
@@ -53,6 +58,9 @@ public class Event {
 
     public long getMinPrice() { return minPrice; }
     public void setMinPrice(long minPrice) { this.minPrice = minPrice; }
+
+    public long getMaxPrice() { return maxPrice; }
+    public void setMaxPrice(long maxPrice) { this.maxPrice = maxPrice; }
 
     public boolean isFree() { return isFree; }
     public void setFree(boolean free) { isFree = free; }

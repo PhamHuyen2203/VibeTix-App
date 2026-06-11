@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.vibetix.Activities.UserMainActivity;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import com.example.vibetix.R;
 
 import java.text.DecimalFormat;

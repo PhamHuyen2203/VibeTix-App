@@ -3,7 +3,6 @@ package com.example.vibetix.Repositories;
 import com.example.vibetix.Firebase.FirebaseCollections;
 import com.example.vibetix.Models.Event;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -16,12 +15,63 @@ import java.util.Map;
  */
 public class EventRepository extends BaseRepository {
 
+    public interface OnEventLoadedListener {
+        void onSuccess(Event event);
+        void onFailure(Exception e);
+    }
+
+    public interface OnTicketTypesLoadedListener {
+        void onSuccess(java.util.List<com.example.vibetix.Models.TicketType> ticketTypes);
+        void onFailure(Exception e);
+    }
+
     /**
-     * Tạo event mới. Document ID = eventId (UUID v4).
+     * Lấy 1 event theo ID (với callback).
+     */
+    public void getEventById(String eventId, OnEventLoadedListener listener) {
+        db.collection(FirebaseCollections.EVENTS)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        Event e = doc.toObject(Event.class);
+                        if (e != null && e.getId() == null) e.setId(doc.getId());
+                        listener.onSuccess(e);
+                    } else {
+                        listener.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    /**
+     * Lấy danh sách loại vé của một event.
+     */
+    public void getTicketTypesForEvent(String eventId, OnTicketTypesLoadedListener listener) {
+        db.collection(FirebaseCollections.TICKET_TYPES)
+                .whereEqualTo("event_id", eventId)
+                .orderBy("sort_order", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    java.util.List<com.example.vibetix.Models.TicketType> list = new java.util.ArrayList<>();
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : queryDocumentSnapshots) {
+                        com.example.vibetix.Models.TicketType tt = doc.toObject(com.example.vibetix.Models.TicketType.class);
+                        if (tt != null) {
+                            if (tt.getTicketTypeId() == null) tt.setTicketTypeId(doc.getId());
+                            list.add(tt);
+                        }
+                    }
+                    listener.onSuccess(list);
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
+    /**
+     * Tạo event mới.
      */
     public Task<Void> createEvent(Event event) {
         return db.collection(FirebaseCollections.EVENTS)
-                .document(event.getEventId())
+                .document(event.getId())
                 .set(event);
     }
 
@@ -30,7 +80,7 @@ public class EventRepository extends BaseRepository {
      */
     public Task<Void> updateEvent(Event event) {
         return db.collection(FirebaseCollections.EVENTS)
-                .document(event.getEventId())
+                .document(event.getId())
                 .set(event);
     }
 
@@ -44,7 +94,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Xóa event vĩnh viễn (owner only, chỉ khi chưa có orders confirmed).
+     * Xóa event vĩnh viễn.
      */
     public Task<Void> deleteEvent(String eventId) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -53,7 +103,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Lấy 1 event theo ID.
+     * Lấy 1 event theo ID (Task version).
      */
     public Task<DocumentSnapshot> getEventById(String eventId) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -62,7 +112,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Lấy tất cả events của một organizer, sort theo start_time DESC.
+     * Lấy tất cả events của một organizer.
      */
     public Task<QuerySnapshot> getEventsByOrganizerId(String organizerId) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -72,7 +122,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Lấy events sắp diễn ra (APPROVED | ONGOING) của organizer, giới hạn số lượng.
+     * Lấy events sắp diễn ra.
      */
     public Task<QuerySnapshot> getUpcomingEventsByOrganizerId(String organizerId, int limit) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -84,7 +134,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Lấy events do user tạo (dùng user_id làm creator).
+     * Lấy events do user tạo.
      */
     public Task<QuerySnapshot> getEventsByCreatorUserId(String userId) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -94,7 +144,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Cập nhật chỉ 1 field status.
+     * Cập nhật status.
      */
     public Task<Void> updateEventStatus(String eventId, String newStatus) {
         return db.collection(FirebaseCollections.EVENTS)
@@ -103,7 +153,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Cập nhật poster_url sau khi upload lên Storage.
+     * Cập nhật poster_url.
      */
     public Task<Void> updateEventPosterUrl(String eventId, String posterUrl) {
         Map<String, Object> updates = new HashMap<>();
@@ -114,7 +164,7 @@ public class EventRepository extends BaseRepository {
     }
 
     /**
-     * Kiểm tra xem organizer có ít nhất 1 event không (để xác định "là organizer").
+     * Kiểm tra xem organizer có ít nhất 1 event không.
      */
     public Task<QuerySnapshot> checkHasEvents(String organizerId) {
         return db.collection(FirebaseCollections.EVENTS)

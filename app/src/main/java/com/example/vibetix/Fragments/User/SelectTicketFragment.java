@@ -146,7 +146,7 @@ public class SelectTicketFragment extends Fragment {
                 if (ticketTypes != null && !ticketTypes.isEmpty()) {
                     TicketType type = ticketTypes.get(0); // Take first available ticket type
                     ticketTypeName = type.getName();
-                    ticketPrice = type.getPrice();
+                    ticketPrice = (long) type.getPrice();
                     txtSelectTicketTypeName.setText(ticketTypeName);
                     txtSelectTicketPrice.setText(formatter.format(ticketPrice) + " đ");
                     

@@ -14,13 +14,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.vibetix.Activities.UserMainActivity;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import com.example.vibetix.Adapters.FeaturedEventAdapter;
 import com.example.vibetix.Adapters.TicketAdapter;
 import com.example.vibetix.Models.Event;
@@ -231,15 +232,15 @@ public class MyTicketsFragment extends Fragment {
 
         // Reset styling for category outline buttons (Figma/Styleguide specs)
         tabCategoryBought.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabCategoryBought.setTextColor(getResources().getColor(R.color.clr_text_secondary));
+        tabCategoryBought.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
         tabCategoryBought.setTypeface(null, android.graphics.Typeface.NORMAL);
 
         tabCategoryReselling.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabCategoryReselling.setTextColor(getResources().getColor(R.color.clr_text_secondary));
+        tabCategoryReselling.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
         tabCategoryReselling.setTypeface(null, android.graphics.Typeface.NORMAL);
 
         tabCategoryMembership.setBackgroundResource(R.drawable.bg_chip_filter);
-        tabCategoryMembership.setTextColor(getResources().getColor(R.color.clr_text_secondary));
+        tabCategoryMembership.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
         tabCategoryMembership.setTypeface(null, android.graphics.Typeface.NORMAL);
 
         // Toggle sub tab bars and info bar
@@ -249,12 +250,12 @@ public class MyTicketsFragment extends Fragment {
 
         if (tab == MainTab.BOUGHT) {
             tabCategoryBought.setBackgroundResource(R.drawable.bg_tab_active_outline);
-            tabCategoryBought.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+            tabCategoryBought.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
             tabCategoryBought.setTypeface(null, android.graphics.Typeface.BOLD);
             layoutSubTabsBought.setVisibility(View.VISIBLE);
         } else if (tab == MainTab.RESELLING) {
             tabCategoryReselling.setBackgroundResource(R.drawable.bg_tab_active_outline);
-            tabCategoryReselling.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+            tabCategoryReselling.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
             tabCategoryReselling.setTypeface(null, android.graphics.Typeface.BOLD);
             layoutSubTabsResale.setVisibility(View.VISIBLE);
             
@@ -262,7 +263,7 @@ public class MyTicketsFragment extends Fragment {
             toggleResaleInfoRow();
         } else {
             tabCategoryMembership.setBackgroundResource(R.drawable.bg_tab_active_outline);
-            tabCategoryMembership.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+            tabCategoryMembership.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
             tabCategoryMembership.setTypeface(null, android.graphics.Typeface.BOLD);
         }
     }
@@ -279,20 +280,20 @@ public class MyTicketsFragment extends Fragment {
     private void selectSubTabBought(SubTabBought sub) {
         currentSubTabBought = sub;
 
-        txtSubUpcoming.setTextColor(getResources().getColor(R.color.clr_text_secondary));
+        txtSubUpcoming.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
         txtSubUpcoming.setTypeface(null, android.graphics.Typeface.NORMAL);
         indicatorSubUpcoming.setBackgroundResource(android.R.color.transparent);
 
-        txtSubEnded.setTextColor(getResources().getColor(R.color.clr_text_secondary));
+        txtSubEnded.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
         txtSubEnded.setTypeface(null, android.graphics.Typeface.NORMAL);
         indicatorSubEnded.setBackgroundResource(android.R.color.transparent);
 
         if (sub == SubTabBought.UPCOMING) {
-            txtSubUpcoming.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+            txtSubUpcoming.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
             txtSubUpcoming.setTypeface(null, android.graphics.Typeface.BOLD);
             indicatorSubUpcoming.setBackgroundResource(R.color.clr_primary_blue);
         } else {
-            txtSubEnded.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+            txtSubEnded.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
             txtSubEnded.setTypeface(null, android.graphics.Typeface.BOLD);
             indicatorSubEnded.setBackgroundResource(R.color.clr_primary_blue);
         }
@@ -306,14 +307,14 @@ public class MyTicketsFragment extends Fragment {
         View[] indicators = {indicatorResaleActive, indicatorResalePending, indicatorResalePaid, indicatorResaleCancelled};
 
         for (int i = 0; i < textViews.length; i++) {
-            textViews[i].setTextColor(getResources().getColor(R.color.clr_text_secondary));
+            textViews[i].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
             textViews[i].setTypeface(null, android.graphics.Typeface.NORMAL);
             indicators[i].setBackgroundResource(android.R.color.transparent);
         }
 
         // Active selection
         int activeIndex = sub.ordinal();
-        textViews[activeIndex].setTextColor(getResources().getColor(R.color.clr_primary_blue));
+        textViews[activeIndex].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
         textViews[activeIndex].setTypeface(null, android.graphics.Typeface.BOLD);
         indicators[activeIndex].setBackgroundResource(R.color.clr_primary_blue);
 

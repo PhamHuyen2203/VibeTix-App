@@ -81,6 +81,8 @@ public class TicketType {
     /** Alias for availableQuantity (used in some adapters). */
     public int getQuantity() { return availableQuantity; }
 
+    public int getRemainingQuantity() { return availableQuantity; }
+
     /** soldCount — how many sold so far. */
     @PropertyName("sold_count")
     public int getSoldCount() { return soldCount; }

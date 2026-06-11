@@ -111,7 +111,9 @@ public class PassTicketDialogFragment extends DialogFragment {
             btnPassConfirm.setEnabled(false);
             Toast.makeText(requireContext(), "Đang xử lý...", Toast.LENGTH_SHORT).show();
 
-            ticketRepository.resellTicket(ticket.getId(), resalePrice, new TicketRepository.OnTicketActionListener() {
+            String sellerId = ticket.getUserEmail(); // Sử dụng email làm ID người bán
+            
+            ticketRepository.resellTicket(ticket.getId(), sellerId, resalePrice, new TicketRepository.OnTicketActionListener() {
                 @Override
                 public void onSuccess() {
                     if (isAdded()) {

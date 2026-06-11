@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -204,7 +206,7 @@ public class EventDetailFragment extends Fragment {
 
         // ── Description ─────────────────────────────────────────────────
         if (event.getDescription() != null && !event.getDescription().isEmpty()) {
-            txtDetailEventDescription.setText(event.getDescription());
+            txtDetailEventDescription.setText(HtmlCompat.fromHtml(event.getDescription(), HtmlCompat.FROM_HTML_MODE_COMPACT));
         } else {
             txtDetailEventDescription.setText("Chưa có mô tả cho sự kiện này.");
         }
@@ -369,7 +371,7 @@ public class EventDetailFragment extends Fragment {
 
     private void updateFavoriteUI() {
         if (btnDetailFavorite == null) return;
-        int color = isFavorited ? getResources().getColor(R.color.clr_red) : getResources().getColor(R.color.clr_grey_1);
+        int color = isFavorited ? ContextCompat.getColor(requireContext(), R.color.clr_red) : ContextCompat.getColor(requireContext(), R.color.clr_grey_1);
         btnDetailFavorite.setImageTintList(ColorStateList.valueOf(color));
     }
 
