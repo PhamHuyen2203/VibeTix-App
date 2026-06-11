@@ -265,12 +265,12 @@ public class QrScannerActivity extends AppCompatActivity {
                             tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
                             tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
                             
-                            if (ticket.isUsed()) {
+                            if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
                                 showScanError("Vé đã được sử dụng (Check-in rồi)!");
                             } else {
                                 // Cập nhật trạng thái
                                 documentSnapshot.getReference().update(
-                                        "is_used", true,
+                                        "status", "used",
                                         "checked_in_at", new java.util.Date()
                                 ).addOnSuccessListener(aVoid -> {
                                     showScanSuccess("Check-in thành công!");

@@ -77,9 +77,43 @@ public class UserMainActivity extends AppCompatActivity {
     private void setupNavListeners() {
         tabHome   .setOnClickListener(v -> selectTab(R.id.tabHome));
         tabEvents .setOnClickListener(v -> selectTab(R.id.tabEvents));
-        tabCreate .setOnClickListener(v -> openSubFragment(new OrganizerHubFragment()));
+        tabCreate .setOnClickListener(v -> handleCreateTabClick());
         tabTickets.setOnClickListener(v -> selectTab(R.id.tabTickets));
         tabProfile.setOnClickListener(v -> selectTab(R.id.tabProfile));
+    }
+
+    private void handleCreateTabClick() {
+        String currentUserId = null;
+        com.example.vibetix.Utils.SessionManager sessionManager = new com.example.vibetix.Utils.SessionManager(this);
+        if (sessionManager.getUserDetails() != null) {
+            currentUserId = sessionManager.getUserDetails().getUserId();
+        } else {
+            com.google.firebase.auth.FirebaseUser fbUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            currentUserId = fbUser != null ? fbUser.getUid() : null;
+        }
+
+        if (currentUserId == null) {
+            startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
+            return;
+        }
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance().collection(com.example.vibetix.Firebase.FirebaseCollections.EVENT_STAFF)
+                .whereEqualTo("user_id", currentUserId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Người dùng đã có role trong event_staff -> hiển thị danh sách các sự kiện của người dùng
+                        openSubFragment(new com.example.vibetix.Fragments.Organizer.MyEventsListFragment());
+                    } else {
+                        // Người dùng chưa có role -> hiển thị giao diện tạo sự kiện
+                        startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Mặc định cho phép tạo sự kiện nếu lỗi kiểm tra
+                    startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
+                });
     }
 
     public void selectTab(int tabId) {

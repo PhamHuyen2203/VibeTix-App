@@ -37,7 +37,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHo
         if ("percentage".equals(d.getType())) {
             holder.tvValue.setText(d.getValue() + "%");
         } else {
-            holder.tvValue.setText(String.format("%,d đ", d.getValue()));
+            holder.tvValue.setText(String.format("%,.0f đ", d.getValue()));
         }
         
         String limit = d.getUsageLimit() > 0 ? String.valueOf(d.getUsageLimit()) : "∞";

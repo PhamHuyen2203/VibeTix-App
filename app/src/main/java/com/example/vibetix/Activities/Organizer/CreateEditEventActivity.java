@@ -272,8 +272,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
      * Load danh sách organizer profiles của user để hiện trong dropdown.
      */
     private void loadOrganizerProfiles() {
-        String userId = sessionManager.getUserDetails() != null
-                ? sessionManager.getUserDetails().getUserId() : null;
+        String userId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : null;
+        if (userId == null) {
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            userId = user != null ? user.getUid() : null;
+        }
         if (userId == null) return;
 
         organizerRepository.getOrganizersByUserId(userId)
@@ -527,7 +530,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
         btnSaveDraft.setEnabled(false);
         btnSubmitForApproval.setEnabled(false);
         
-        String userId = sessionManager.getUserDetails().getUserId();
+        String userId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : null;
+        if (userId == null) {
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            userId = user != null ? user.getUid() : "";
+        }
         String newOrgId = UUID.randomUUID().toString();
         
         Organizer org = new Organizer();
@@ -566,7 +573,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
         btnSaveDraft.setEnabled(false);
         btnSubmitForApproval.setEnabled(false);
 
-        String userId = sessionManager.getUserDetails().getUserId();
+        String userId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : null;
+        if (userId == null) {
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            userId = user != null ? user.getUid() : "";
+        }
         StorageReference ref = storage.getReference()
                 .child("event_posters/" + userId + "/" + UUID.randomUUID() + ".jpg");
 
@@ -610,7 +621,12 @@ public class CreateEditEventActivity extends AppCompatActivity {
                                  String startTime, String endTime, String status, String posterUrl) {
         String organizerId = selectedOrganizer != null ? selectedOrganizer.getOrganizerId() :
                 sessionManager.getActiveOrganizerId();
-        String userId = sessionManager.getUserDetails().getUserId();
+        String tempUserId = sessionManager.getUserDetails() != null ? sessionManager.getUserDetails().getUserId() : null;
+        if (tempUserId == null) {
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            tempUserId = user != null ? user.getUid() : "";
+        }
+        final String userId = tempUserId;
         String now = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
                 .format(Calendar.getInstance().getTime());
 

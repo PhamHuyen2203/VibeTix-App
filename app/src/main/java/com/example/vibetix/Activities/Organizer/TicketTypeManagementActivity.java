@@ -137,16 +137,14 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                         return;
                     }
 
-                    double totalRevenue = 0;
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : querySnapshot) {
                         try {
-                            TicketType tt = doc.toObject(TicketType.class);
+                            com.example.vibetix.Models.TicketType tt = doc.toObject(com.example.vibetix.Models.TicketType.class);
                             if (tt != null) {
                                 if (tt.getTicketTypeId() == null) {
                                     tt.setTicketTypeId(doc.getId());
                                 }
                                 ticketTypes.add(tt);
-                                totalRevenue += tt.getPrice() * tt.getSoldCount();
                             }
                         } catch (Exception e) {
                             // Bỏ qua document bị lỗi parse data
@@ -161,7 +159,10 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
 
                     // Update header stats
                     binding.tvTicketTypeCount.setText(ticketTypes.size() + " loại vé");
-                    binding.tvTotalRevenue.setText("Tổng doanh thu: " + vndFmt.format((long) totalRevenue) + " ₫");
+
+                    com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(eventId, (totalTickets, totalRevenue) -> {
+                        binding.tvTotalRevenue.setText(getString(R.string.dash_total_revenue_vnd, vndFmt.format(totalRevenue)));
+                    });
                     
                     if (ticketTypes.isEmpty()) {
                         showEmptyState();

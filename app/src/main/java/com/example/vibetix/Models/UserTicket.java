@@ -16,7 +16,7 @@ public class UserTicket {
     private String ownerId;
     private String ticketCode;
     private String displayCode;
-    private boolean isUsed = false;
+    private String statusStr = "valid";
     private Object checkedInAt;
     private Object issuedAt;
 
@@ -52,10 +52,25 @@ public class UserTicket {
     @PropertyName("display_code")
     public void setDisplayCode(String displayCode) { this.displayCode = displayCode; }
 
-    @PropertyName("is_used")
-    public boolean isUsed() { return isUsed; }
-    @PropertyName("is_used")
-    public void setUsed(boolean used) { this.isUsed = used; }
+    @PropertyName("status")
+    public String getStatusStr() { return statusStr; }
+    @PropertyName("status")
+    public void setStatusStr(String statusStr) { this.statusStr = statusStr; }
+
+    @Exclude
+    public Status getStatus() {
+        if (statusStr == null) return Status.VALID;
+        try {
+            return Status.valueOf(statusStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return Status.VALID;
+        }
+    }
+
+    @Exclude
+    public void setStatus(Status status) {
+        this.statusStr = status != null ? status.name().toLowerCase() : Status.VALID.name().toLowerCase();
+    }
 
     @PropertyName("checked_in_at")
     public Object getCheckedInAt() { return checkedInAt; }

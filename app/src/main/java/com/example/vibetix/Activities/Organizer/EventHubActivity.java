@@ -387,70 +387,10 @@ public class EventHubActivity extends AppCompatActivity {
     private void loadStats() {
         if ("check_in_staff".equalsIgnoreCase(role)) return;
 
-        db.collection(FirebaseCollections.ORDER_ITEMS)
-                .whereEqualTo("event_id", eventId)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    if (snap == null || snap.isEmpty()) {
-                        if (tvStatRevenue != null) tvStatRevenue.setText("0 ₫");
-                        if (tvStatTickets != null) tvStatTickets.setText("0");
-                        return;
-                    }
-
-                    List<com.example.vibetix.Models.OrderItem> allItems = new ArrayList<>();
-                    java.util.Set<String> orderIds = new java.util.HashSet<>();
-                    for (DocumentSnapshot doc : snap.getDocuments()) {
-                        com.example.vibetix.Models.OrderItem item = doc.toObject(com.example.vibetix.Models.OrderItem.class);
-                        if (item != null) {
-                            allItems.add(item);
-                            if (item.getOrderId() != null) orderIds.add(item.getOrderId());
-                        }
-                    }
-
-                    if (orderIds.isEmpty()) {
-                        if (tvStatRevenue != null) tvStatRevenue.setText("0 ₫");
-                        if (tvStatTickets != null) tvStatTickets.setText("0");
-                        return;
-                    }
-
-                    List<String> orderIdList = new ArrayList<>(orderIds);
-                    List<com.google.android.gms.tasks.Task<QuerySnapshot>> orderTasks = new ArrayList<>();
-                    for (int i = 0; i < orderIdList.size(); i += 10) {
-                        List<String> chunk = orderIdList.subList(i, Math.min(i + 10, orderIdList.size()));
-                        orderTasks.add(db.collection(FirebaseCollections.ORDERS)
-                                .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
-                                .get());
-                    }
-
-                    com.google.android.gms.tasks.Tasks.whenAllSuccess(orderTasks).addOnSuccessListener(orderResults -> {
-                        java.util.Map<String, String> orderStatusMap = new java.util.HashMap<>();
-                        for (Object orderResult : orderResults) {
-                            QuerySnapshot orderSnap = (QuerySnapshot) orderResult;
-                            for (DocumentSnapshot doc : orderSnap.getDocuments()) {
-                                String status = doc.getString("status");
-                                orderStatusMap.put(doc.getId(), status != null ? status.toLowerCase() : "pending");
-                            }
-                        }
-
-                        double totalRevenue = 0;
-                        long ticketCount = 0;
-                        for (com.example.vibetix.Models.OrderItem item : allItems) {
-                            String status = orderStatusMap.get(item.getOrderId());
-                            boolean isPaid = status != null &&
-                                    (status.equals("completed") || status.equals("confirmed") || status.equals("paid"));
-                            if (isPaid) {
-                                long q = item.getQuantity();
-                                ticketCount += q;
-                                totalRevenue += item.getPricePerTicket() * q;
-                            }
-                        }
-
-                        final long finalTicketCount = ticketCount;
-                        final long finalRevenue = (long) totalRevenue;
-                        if (tvStatRevenue != null) tvStatRevenue.setText(vndFmt.format(finalRevenue) + " ₫");
-                        if (tvStatTickets != null) tvStatTickets.setText(String.valueOf(finalTicketCount));
-                    });
-                });
+        com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(eventId, (totalTickets, totalRevenue) -> {
+            if (tvStatRevenue != null) tvStatRevenue.setText(getString(R.string.dash_price_vnd, vndFmt.format(totalRevenue)));
+            if (tvStatTickets != null) tvStatTickets.setText(String.valueOf(totalTickets));
+        });
 
         // Check-ins hôm nay
         String todayStart = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())

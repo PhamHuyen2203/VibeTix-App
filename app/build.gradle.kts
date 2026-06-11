@@ -36,14 +36,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(21))
-    }
-    buildFeatures {
-        viewBinding = true
     }
 }
 
@@ -64,4 +65,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     implementation(libs.mpandroidchart)
     implementation(libs.mlkit.barcode)
+    implementation(libs.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+    implementation(libs.zxing)
 }

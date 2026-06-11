@@ -32,8 +32,11 @@ public class FirestoreHelper {
     // Không hardcode UUID vì teammate thường xuyên tạo lại categories collection
     public static final Map<String, String> CAT_MAP      = new HashMap<>();
     public static final Map<String, String> CAT_KEY_TO_ID = new HashMap<>();
-    // Tên hiển thị: slug → Vietnamese name
     public static final Map<String, String> CAT_SLUG_TO_NAME = new HashMap<>();
+    public static final Map<String, String> CAT_NAME_MAP = new HashMap<>(); // Add missing
+    
+    public static final Map<String, String> VENUE_NAME_CACHE = new HashMap<>(); // Add missing
+    public static final Map<String, String> VENUE_ADDRESS_CACHE = new HashMap<>(); // Add missing
 
     /** Gọi 1 lần khi app khởi động để load category IDs thật từ Firestore */
     public static void loadCategoryCache(Runnable onDone) {
@@ -167,5 +170,82 @@ public class FirestoreHelper {
 
             return e;
         } catch (Exception ex) { return null; }
+    }
+
+    public interface OnEventStatsLoaded {
+        void onStatsLoaded(long totalTickets, double totalRevenue);
+    }
+
+    public static void calculateEventStats(String eventId, OnEventStatsLoaded callback) {
+        if (eventId == null || callback == null) return;
+        
+        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+        db.collection(FirebaseCollections.ORDER_ITEMS)
+            .whereEqualTo(com.example.vibetix.Utils.Constants.FIELD_EVENT_ID, eventId)
+            .get()
+            .addOnSuccessListener(snap -> {
+                if (snap == null || snap.isEmpty()) {
+                    callback.onStatsLoaded(0, 0);
+                    return;
+                }
+                
+                java.util.List<com.example.vibetix.Models.OrderItem> allItems = new java.util.ArrayList<>();
+                java.util.Set<String> orderIds = new java.util.HashSet<>();
+                for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
+                    com.example.vibetix.Models.OrderItem item = doc.toObject(com.example.vibetix.Models.OrderItem.class);
+                    if (item != null) {
+                        allItems.add(item);
+                        if (item.getOrderId() != null) orderIds.add(item.getOrderId());
+                    }
+                }
+
+                if (orderIds.isEmpty()) {
+                    callback.onStatsLoaded(0, 0);
+                    return;
+                }
+
+                java.util.List<String> orderIdList = new java.util.ArrayList<>(orderIds);
+                java.util.List<com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot>> orderTasks = new java.util.ArrayList<>();
+                
+                for (int i = 0; i < orderIdList.size(); i += 10) {
+                    java.util.List<String> chunk = orderIdList.subList(i, Math.min(i + 10, orderIdList.size()));
+                    orderTasks.add(db.collection(FirebaseCollections.ORDERS)
+                            .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
+                            .get());
+                }
+
+                com.google.android.gms.tasks.Tasks.whenAllSuccess(orderTasks).addOnSuccessListener(orderResults -> {
+                    java.util.Map<String, String> orderStatusMap = new java.util.HashMap<>();
+                    for (Object orderResult : orderResults) {
+                        com.google.firebase.firestore.QuerySnapshot orderSnap = (com.google.firebase.firestore.QuerySnapshot) orderResult;
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : orderSnap.getDocuments()) {
+                            String status = doc.getString(com.example.vibetix.Utils.Constants.FIELD_STATUS);
+                            orderStatusMap.put(doc.getId(), status != null ? status.toUpperCase() : com.example.vibetix.Utils.Constants.ORDER_STATUS_PENDING);
+                        }
+                    }
+
+                    long totalTickets = 0;
+                    double totalRevenue = 0;
+                    
+                    for (com.example.vibetix.Models.OrderItem item : allItems) {
+                        String status = orderStatusMap.get(item.getOrderId());
+                        boolean isPaid = status != null &&
+                                (status.equals(com.example.vibetix.Utils.Constants.ORDER_STATUS_COMPLETED) || 
+                                 status.equals(com.example.vibetix.Utils.Constants.ORDER_STATUS_CONFIRMED) || 
+                                 status.equals(com.example.vibetix.Utils.Constants.ORDER_STATUS_PAID));
+                        if (isPaid) {
+                            long q = item.getQuantity();
+                            totalTickets += q;
+                            totalRevenue += item.getPricePerTicket() * q;
+                        }
+                    }
+                    
+                    callback.onStatsLoaded(totalTickets, totalRevenue);
+                }).addOnFailureListener(e -> {
+                    callback.onStatsLoaded(0, 0);
+                });
+            }).addOnFailureListener(e -> {
+                callback.onStatsLoaded(0, 0);
+            });
     }
 }

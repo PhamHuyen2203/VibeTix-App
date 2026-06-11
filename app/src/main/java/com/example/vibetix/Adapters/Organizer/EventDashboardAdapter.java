@@ -135,9 +135,9 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         } else if (event.getStatus() != null) {
             // fallback: dùng enum
             holder.tvStatusBadge.setVisibility(View.VISIBLE);
-            switch (event.getStatus()) {
+            switch (event.getStatusEnum()) {
                 case APPROVED: case ONGOING:
-                    holder.tvStatusBadge.setText("● " + event.getStatus().name());
+                    holder.tvStatusBadge.setText("● " + event.getStatusEnum().name());
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
@@ -167,26 +167,11 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         // Fetch stats if OWNER or MANAGER
         String finalRoleStr = (event.getUserRole() != null) ? event.getUserRole().toUpperCase() : "";
         if (finalRoleStr.equals("OWNER") || finalRoleStr.equals("MANAGER")) {
-            com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                .collection(com.example.vibetix.Firebase.FirebaseCollections.ORDER_ITEMS)
-                .whereEqualTo("event_id", event.getId())
-                .get()
-                .addOnSuccessListener(snap -> {
-                    double totalRevenue = 0;
-                    int ticketCount = 0;
-                    if (snap != null) {
-                        for (com.google.firebase.firestore.DocumentSnapshot doc : snap.getDocuments()) {
-                            Double price = doc.getDouble("price_per_ticket");
-                            Long qty = doc.getLong("quantity");
-                            int itemQty = (qty != null) ? qty.intValue() : 1;
-                            ticketCount += itemQty;
-                            if (price != null) totalRevenue += price * itemQty;
-                        }
-                    }
-                    java.text.NumberFormat vndFmt = java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi", "VN"));
-                    holder.tvStatTickets.setText(String.valueOf(ticketCount));
-                    holder.tvStatRevenue.setText(vndFmt.format((long) totalRevenue) + " ₫");
-                });
+            com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(event.getId(), (totalTickets, totalRevenue) -> {
+                java.text.NumberFormat vndFmt = java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi", "VN"));
+                holder.tvStatTickets.setText(String.valueOf(totalTickets));
+                holder.tvStatRevenue.setText(holder.itemView.getContext().getString(R.string.dash_price_vnd, vndFmt.format((long) totalRevenue)));
+            });
         }
         // Sử dụng Glide để load ảnh poster
         Glide.with(holder.itemView.getContext())

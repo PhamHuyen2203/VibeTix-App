@@ -2,217 +2,202 @@
 <resources>
     <string name="app_name">VibeTix</string>
 
-    
-    <string name="str_nav_home">Trang chủ</string>
-    <string name="str_nav_events">Sự kiện</string>
-    <string name="str_nav_create">Tạo mới</string>
-    <string name="str_nav_my_tickets">Vé của tôi</string>
-    <string name="str_nav_profile">Cá nhân</string>
+    <string name="str_nav_home">Home</string>
+    <string name="str_nav_events">Events</string>
+    <string name="str_nav_create">Create</string>
+    <string name="str_nav_my_tickets">My Tickets</string>
+    <string name="str_nav_profile">Profile</string>
 
-    
-    <string name="str_search_hint">Tìm sự kiện, nghệ sĩ…</string>
-    <string name="str_notification">Thông báo</string>
+    <string name="str_search_hint">Search events, artists…</string>
+    <string name="str_notification">Notifications</string>
 
-    
-    <string name="str_featured_stars">⭐ Ngôi sao nổi bật</string>
-    <string name="str_featured_events">Sự kiện đặc biệt</string>
-    <string name="str_trending_events">🔥 Sự kiện xu hướng</string>
+    <string name="str_featured_stars">⭐ Featured Stars</string>
+    <string name="str_featured_events">Special Events</string>
+    <string name="str_trending_events">🔥 Trending Events</string>
     <string name="str_resale_ticket">Resale Ticket</string>
-    <string name="str_resale_ticket_subtitle">Tìm vé bán lại cho các sự kiện hết vé</string>
-    <string name="str_resale_label">VÉ BÁN LẠI</string>
-    <string name="str_resale_see_more">Xem thêm ›</string>
+    <string name="str_resale_ticket_subtitle">Find resale tickets for sold-out events</string>
+    <string name="str_resale_label">RESALE TICKET</string>
+    <string name="str_resale_see_more">See more ›</string>
     <string name="str_resale_badge">RE-SALE</string>
-    <string name="str_live_music">Nhạc sống</string>
-    <string name="str_stage_arts">Sân khấu &amp; Nghệ thuật</string>
-    <string name="str_workshop">Workshop &amp; Hội thảo</string>
-    <string name="str_tour_experience">Tour &amp; Trải nghiệm</string>
-    <string name="str_sports">Thể thao</string>
-    <string name="str_popular_destinations">Điểm đến nổi bật</string>
-    <string name="str_see_more">Xem thêm</string>
+    <string name="str_live_music">Live Music</string>
+    <string name="str_stage_arts">Stage &amp; Arts</string>
+    <string name="str_workshop">Workshops</string>
+    <string name="str_tour_experience">Tours &amp; Experiences</string>
+    <string name="str_sports">Sports</string>
+    <string name="str_popular_destinations">Popular Destinations</string>
+    <string name="str_see_more">See more</string>
 
-    
-    <string name="str_promo_discount">Giảm đến 30%</string>
-    <string name="str_promo_subtitle">Dành riêng cho bạn</string>
-    <string name="str_promo_buy_now">Mua ngay</string>
+    <string name="str_promo_discount">Up to 30% Off</string>
+    <string name="str_promo_subtitle">Exclusive for you</string>
+    <string name="str_promo_buy_now">Buy Now</string>
 
-    
-    <string name="str_from_price">Từ %s</string>
-    <string name="str_free">Miễn phí</string>
-    <string name="str_sold_out">Hết vé</string>
+    <string name="str_from_price">From %s</string>
+    <string name="str_free">Free</string>
+    <string name="str_sold_out">Sold Out</string>
 
-    
-    <string name="str_login">Đăng nhập</string>
-    <string name="str_register">Đăng ký</string>
+    <string name="str_login">Log In</string>
+    <string name="str_register">Sign Up</string>
     <string name="str_email">Email</string>
-    <string name="str_password">Mật khẩu</string>
-    <string name="str_confirm_password">Xác nhận mật khẩu</string>
-    <string name="str_full_name">Họ và tên</string>
-    <string name="str_phone">Số điện thoại</string>
-    <string name="str_forgot_password">Quên mật khẩu?</string>
-    <string name="str_no_account">Chưa có tài khoản? Đăng ký</string>
-    <string name="str_have_account">Đã có tài khoản? Đăng nhập</string>
+    <string name="str_password">Password</string>
+    <string name="str_confirm_password">Confirm Password</string>
+    <string name="str_full_name">Full Name</string>
+    <string name="str_phone">Phone Number</string>
+    <string name="str_forgot_password">Forgot Password?</string>
+    <string name="str_no_account">Don\'t have an account? Sign Up</string>
+    <string name="str_have_account">Already have an account? Log In</string>
     
-    <string name="str_auth_tagline">Khám phá &amp; đặt vé sự kiện dễ dàng</string>
-    <string name="str_login_subtitle">Chào mừng bạn trở lại!</string>
-    <string name="str_register_title">Tạo tài khoản</string>
-    <string name="str_register_subtitle">Đăng ký để khám phá ngàn sự kiện</string>
-    <string name="str_choose_role">Bạn là?</string>
-    <string name="str_role_customer">Người mua vé</string>
-    <string name="str_role_organizer">Ban tổ chức</string>
-    <string name="str_no_account_prefix">Chưa có tài khoản?</string>
-    <string name="str_have_account_prefix">Đã có tài khoản?</string>
-    <string name="str_or_divider">hoặc</string>
+    <string name="str_auth_tagline">Discover &amp; book events easily</string>
+    <string name="str_login_subtitle">Welcome back!</string>
+    <string name="str_register_title">Create Account</string>
+    <string name="str_register_subtitle">Sign up to discover thousands of events</string>
+    <string name="str_choose_role">Who are you?</string>
+    <string name="str_role_customer">Ticket Buyer</string>
+    <string name="str_role_organizer">Organizer</string>
+    <string name="str_no_account_prefix">Don\'t have an account?</string>
+    <string name="str_have_account_prefix">Already have an account?</string>
+    <string name="str_or_divider">or</string>
     
-    <string name="str_remember_me">Ghi nhớ trên thiết bị này</string>
-    <string name="str_or_continue_with">Hoặc tiếp tục với</string>
+    <string name="str_remember_me">Remember me</string>
+    <string name="str_or_continue_with">Or continue with</string>
     <string name="str_login_google">Google</string>
     <string name="str_login_apple">Apple</string>
     
-    <string name="str_terms_agree_prefix">Tôi đồng ý với </string>
-    <string name="str_terms_link">Điều khoản &amp; Điều kiện</string>
-    <string name="str_terms_of_suffix"> của VibeTix</string>
-    <string name="str_error_terms_required">Vui lòng đồng ý với điều khoản sử dụng</string>
+    <string name="str_terms_agree_prefix">I agree to the </string>
+    <string name="str_terms_link">Terms &amp; Conditions</string>
+    <string name="str_terms_of_suffix"> of VibeTix</string>
+    <string name="str_error_terms_required">Please agree to the terms of use</string>
     
-    <string name="str_org_name">Tên tổ chức</string>
-    <string name="str_hint_org_name">Nhập tên tổ chức</string>
+    <string name="str_org_name">Organization Name</string>
+    <string name="str_hint_org_name">Enter organization name</string>
     
-    <string name="str_hint_email">Nhập địa chỉ email</string>
-    <string name="str_hint_password">Nhập mật khẩu (tối thiểu 6 ký tự)</string>
-    <string name="str_hint_confirm_password">Nhập lại mật khẩu</string>
-    <string name="str_hint_full_name">Nhập họ và tên</string>
-    <string name="str_hint_phone">Nhập số điện thoại</string>
+    <string name="str_hint_email">Enter email address</string>
+    <string name="str_hint_password">Enter password (min 6 characters)</string>
+    <string name="str_hint_confirm_password">Re-enter password</string>
+    <string name="str_hint_full_name">Enter full name</string>
+    <string name="str_hint_phone">Enter phone number</string>
     
-    <string name="str_error_empty_field">Vui lòng điền đầy đủ thông tin</string>
-    <string name="str_error_invalid_email">Địa chỉ email không hợp lệ</string>
-    <string name="str_error_password_too_short">Mật khẩu phải có ít nhất 6 ký tự</string>
-    <string name="str_error_password_mismatch">Mật khẩu xác nhận không khớp</string>
+    <string name="str_error_empty_field">Please fill in all fields</string>
+    <string name="str_error_invalid_email">Invalid email address</string>
+    <string name="str_error_password_too_short">Password must be at least 6 characters</string>
+    <string name="str_error_password_mismatch">Passwords do not match</string>
 
-    
-    <string name="str_profile">Hồ sơ</string>
-    <string name="str_my_orders">Đơn hàng của tôi</string>
-    <string name="str_settings">Cài đặt</string>
-    <string name="str_logout">Đăng xuất</string>
+    <string name="str_profile">Profile</string>
+    <string name="str_my_orders">My Orders</string>
+    <string name="str_settings">Settings</string>
+    <string name="str_logout">Log Out</string>
 
-    
-    <string name="str_my_tickets">Vé của tôi</string>
-    <string name="str_ticket_active">Còn hiệu lực</string>
-    <string name="str_ticket_used">Đã sử dụng</string>
-    <string name="str_ticket_expired">Đã hết hạn</string>
-    <string name="str_show_qr">Hiển thị mã QR</string>
+    <string name="str_my_tickets">My Tickets</string>
+    <string name="str_ticket_active">Active</string>
+    <string name="str_ticket_used">Used</string>
+    <string name="str_ticket_expired">Expired</string>
+    <string name="str_show_qr">Show QR Code</string>
 
-    
-    <string name="str_loading">Đang tải…</string>
-    <string name="str_error_generic">Đã có lỗi xảy ra. Vui lòng thử lại.</string>
-    <string name="str_no_data">Không có dữ liệu</string>
-    <string name="str_cancel">Hủy</string>
-    <string name="str_confirm">Xác nhận</string>
+    <string name="str_loading">Loading…</string>
+    <string name="str_error_generic">Something went wrong. Please try again.</string>
+    <string name="str_no_data">No data available</string>
+    <string name="str_cancel">Cancel</string>
+    <string name="str_confirm">Confirm</string>
     <string name="str_ok">OK</string>
-    <string name="str_back">Quay lại</string>
+    <string name="str_back">Back</string>
 
-    
-    <string name="str_cat_festival">Lễ hội</string>
-    <string name="str_browse_categories">Xem danh mục</string>
+    <string name="str_cat_festival">Festival</string>
+    <string name="str_browse_categories">Browse Categories</string>
 
-    
-    <string name="str_interest_count">%d quan tâm</string>
-    <string name="str_status_ongoing">Đang diễn ra</string>
-    <string name="str_by_organizer">Bởi %s</string>
+    <string name="str_interest_count">%d interested</string>
+    <string name="str_status_ongoing">Ongoing</string>
+    <string name="str_by_organizer">By %s</string>
 
-    
-    <string name="str_search_title">Tìm kiếm sự kiện</string>
-    <string name="str_recent_searches">Tìm kiếm gần đây</string>
-    <string name="str_browse_by_category">Khám phá theo Thể loại</string>
-    <string name="str_browse_by_city">Khám phá theo Thành phố</string>
-    <string name="str_suggestions">Gợi ý dành cho bạn</string>
-    <string name="str_date_filter_all">Tất cả các ngày</string>
-    <string name="str_filter">Bộ lọc</string>
+    <string name="str_search_title">Search Events</string>
+    <string name="str_recent_searches">Recent Searches</string>
+    <string name="str_browse_by_category">Browse by Category</string>
+    <string name="str_browse_by_city">Browse by City</string>
+    <string name="str_suggestions">Suggestions for You</string>
+    <string name="str_date_filter_all">All Dates</string>
+    <string name="str_filter">Filter</string>
 
-    
     <string name="str_cd_app_logo">VibeTix logo</string>
     <string name="str_cd_search">Search</string>
     <string name="str_cd_notification">Notification bell</string>
     <string name="str_cd_event_image">Event image</string>
     <string name="str_cd_star_avatar">Artist avatar</string>
 
-    
-    <string name="ticket_select_title">Chọn vé</string>
-    <string name="payment_simulation_title">Thanh toán giả lập</string>
-    <string name="my_tickets_empty_message">Bạn chưa có vé nào cả!</string>
-    <string name="ticket_qr_title">Vé điện tử QR</string>
-    <string name="ticket_transfer_button">Bán lại vé</string>
+    <string name="ticket_select_title">Select Tickets</string>
+    <string name="payment_simulation_title">Payment</string>
+    <string name="my_tickets_empty_message">You don\'t have any tickets yet!</string>
+    <string name="ticket_qr_title">QR E-Ticket</string>
+    <string name="ticket_transfer_button">Resell Ticket</string>
 
-    <string name="str_step_select">Chọn vé</string>
-    <string name="str_step_info">Thông tin</string>
-    <string name="str_step_payment">Thanh toán</string>
-    <string name="str_step_done">Hoàn tất</string>
-    <string name="str_remaining_tickets">Còn %1$d vé</string>
-    <string name="str_benefits_title">Quyền lợi bao gồm</string>
-    <string name="str_benefits_cond">Xem điều kiện</string>
-    <string name="str_ticket_info_title">Thông tin vé ℹ</string>
-    <string name="str_total_price">Tổng cộng</string>
-    <string name="str_continue">Tiếp tục ›</string>
-    <string name="str_fill_attendee_info">Nhập thông tin người tham dự</string>
-    <string name="str_attendee_name">Người tham dự</string>
-    <string name="str_attendee_email">Email nhận vé</string>
-    <string name="str_attendee_phone">Số điện thoại</string>
-    <string name="str_attendee_company">Tên công ty (nếu có)</string>
-    <string name="str_attendee_role">Chức danh / Vai trò</string>
-    <string name="str_attendee_notes">Ghi chú thêm</string>
-    <string name="str_required_fields_warning">Vui lòng nhập đầy đủ các trường bắt buộc (*)</string>
-    <string name="str_invalid_email_warning">Địa chỉ email không hợp lệ</string>
-    <string name="str_referral_source">Bạn biết đến sự kiện qua đâu?</string>
-    <string name="str_payment_timer_prefix">Vui lòng hoàn tất đặt vé trong  </string>
-    <string name="str_payment_timer_expired">Đặt vé đã hết thời gian hiệu lực!</string>
-    <string name="str_payment_expired_toast">Giao dịch hết hạn đặt chỗ!</string>
-    <string name="str_agree_vibetix_rules">Vui lòng đồng ý với Quy chế hoạt động của VibeTix</string>
-    <string name="str_processing_payment">Đang xử lý giao dịch thanh toán...</string>
-    <string name="str_payment_error">Lỗi thanh toán: </string>
-    <string name="str_save_ticket_error">Lỗi lưu vé: </string>
+    <string name="str_step_select">Select Tickets</string>
+    <string name="str_step_info">Information</string>
+    <string name="str_step_payment">Payment</string>
+    <string name="str_step_done">Done</string>
+    <string name="str_remaining_tickets">%1$d tickets left</string>
+    <string name="str_benefits_title">Benefits Included</string>
+    <string name="str_benefits_cond">View conditions</string>
+    <string name="str_ticket_info_title">Ticket Info ℹ</string>
+    <string name="str_total_price">Total</string>
+    <string name="str_continue">Continue ›</string>
+    <string name="str_fill_attendee_info">Enter attendee information</string>
+    <string name="str_attendee_name">Attendee Name</string>
+    <string name="str_attendee_email">Ticket Email</string>
+    <string name="str_attendee_phone">Phone Number</string>
+    <string name="str_attendee_company">Company Name (optional)</string>
+    <string name="str_attendee_role">Title / Role</string>
+    <string name="str_attendee_notes">Additional Notes</string>
+    <string name="str_required_fields_warning">Please fill in all required fields (*)</string>
+    <string name="str_invalid_email_warning">Invalid email address</string>
+    <string name="str_referral_source">How did you hear about this event?</string>
+    <string name="str_payment_timer_prefix">Please complete payment in </string>
+    <string name="str_payment_timer_expired">Booking session expired!</string>
+    <string name="str_payment_expired_toast">Transaction expired!</string>
+    <string name="str_agree_vibetix_rules">Please agree to the VibeTix Rules</string>
+    <string name="str_processing_payment">Processing payment...</string>
+    <string name="str_payment_error">Payment error: </string>
+    <string name="str_save_ticket_error">Error saving ticket: </string>
     <string name="str_vietqr">VietQR</string>
     <string name="str_zalopay">ZaloPay</string>
     <string name="str_shopeepay">ShopeePay</string>
-    <string name="str_creditcard">Thẻ tín dụng / ghi nợ</string>
+    <string name="str_creditcard">Credit / Debit Card</string>
     <string name="str_mobilebanking">VNPay / Mobile Banking</string>
-    <string name="str_ticket_resale_earnings">Tổng thực nhận</string>
-    <string name="str_ticket_resale_success">Đăng bán vé thành công!</string>
-    <string name="str_ticket_resale_cancel_success">Đã hủy đăng bán vé!</string>
-    <string name="str_ticket_resale_cancel_fail">Hủy đăng bán thất bại: </string>
-    <string name="str_ticket_resale_input_empty">Vui lòng nhập giá bán lại</string>
-    <string name="str_ticket_resale_invalid_price">Giá bán không hợp lệ</string>
-    <string name="str_ticket_resale_price_min">Giá bán phải lớn hơn 0 đ</string>
-    <string name="str_ticket_resell_action">Bán lại vé</string>
-    <string name="str_ticket_cancel_resell_action">Hủy bán lại</string>
-    <string name="str_attendee_label">Người tham dự: %1$s</string>
-    <string name="str_ticket_type_label">Hạng vé: %1$s</string>
-    <string name="str_original_price_label">Giá mua gốc: %1$s đ</string>
-    <string name="str_resale_price_label">Nhập giá bán lại (đ)</string>
-    <string name="str_payment_success_title">Đặt vé thành công!</string>
-    <string name="str_payment_success_desc">Cảm ơn bạn! Vé điện tử đã được xuất và gửi đến email của bạn.</string>
-    <string name="str_order_id">Mã đơn hàng: %1$s</string>
-    <string name="str_order_time">Thời gian đặt: %1$s</string>
-    <string name="str_view_purchased_tickets">Xem vé đã mua</string>
-    <string name="str_back_to_home">Về trang chủ</string>
+    <string name="str_ticket_resale_earnings">Total Earnings</string>
+    <string name="str_ticket_resale_success">Ticket listed successfully!</string>
+    <string name="str_ticket_resale_cancel_success">Ticket listing cancelled!</string>
+    <string name="str_ticket_resale_cancel_fail">Cancellation failed: </string>
+    <string name="str_ticket_resale_input_empty">Please enter resale price</string>
+    <string name="str_ticket_resale_invalid_price">Invalid price</string>
+    <string name="str_ticket_resale_price_min">Price must be greater than 0</string>
+    <string name="str_ticket_resell_action">Resell Ticket</string>
+    <string name="str_ticket_cancel_resell_action">Cancel Resale</string>
+    <string name="str_attendee_label">Attendee: %1$s</string>
+    <string name="str_ticket_type_label">Ticket Class: %1$s</string>
+    <string name="str_original_price_label">Original Price: %1$s</string>
+    <string name="str_resale_price_label">Enter resale price</string>
+    <string name="str_payment_success_title">Booking Successful!</string>
+    <string name="str_payment_success_desc">Thank you! Your e-ticket has been issued and sent to your email.</string>
+    <string name="str_order_id">Order ID: %1$s</string>
+    <string name="str_order_time">Order Time: %1$s</string>
+    <string name="str_view_purchased_tickets">View Purchased Tickets</string>
+    <string name="str_back_to_home">Back to Home</string>
     
-    
-    <string name="str_ticket_resell_instruction">Chọn vé bạn đã mua ở tab \'Vé đã mua\' rồi bấm \'Bán lại vé\' để đăng bán!</string>
-    <string name="str_canceling_resale">Đang hủy đăng bán…</string>
-    <string name="str_ticket_load_error">Lỗi tải vé: </string>
-    <string name="str_empty_upcoming_subtitle">Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn.</string>
-    <string name="str_buy_ticket_action">🎟 Mua vé ngay</string>
-    <string name="str_empty_ended_title">Bạn chưa có vé nào đã kết thúc!</string>
-    <string name="str_empty_ended_subtitle">Lịch sử mua vé của bạn sẽ xuất hiện tại đây.</string>
-    <string name="str_empty_resell_title">Bạn chưa có vé nào được đăng bán!</string>
-    <string name="str_empty_resell_subtitle">Hãy bán lại vé để người khác có cơ hội tham gia sự kiện và bạn cũng thu về dễ dàng.</string>
-    <string name="str_resell_ticket_action">🎟 Bán lại vé</string>
-    <string name="str_empty_pending_title">Không có tin nào chờ thanh toán</string>
-    <string name="str_empty_pending_subtitle">Bạn chưa có vé nào đang chờ thanh toán.</string>
-    <string name="str_empty_paid_title">Không có tin nào đã thanh toán</string>
-    <string name="str_empty_paid_subtitle">Bạn chưa có vé nào đã được thanh toán thành công.</string>
-    <string name="str_empty_cancelled_title">Không có tin nào đã hủy</string>
-    <string name="str_empty_cancelled_subtitle">Bạn chưa có vé nào đã hủy đăng bán.</string>
-    <string name="str_empty_membership_title">Không có thẻ thành viên</string>
-    <string name="str_empty_membership_subtitle">Các chương trình thành viên VIP đang được chuẩn bị ra mắt!</string>
-<string name="str_nav_organizer">Tổ chức</string>
+    <string name="str_ticket_resell_instruction">Select a ticket you purchased in the \'Purchased Tickets\' tab and click \'Resell Ticket\' to list it!</string>
+    <string name="str_canceling_resale">Cancelling listing…</string>
+    <string name="str_ticket_load_error">Error loading tickets: </string>
+    <string name="str_empty_upcoming_subtitle">Discover events and book tickets for memorable experiences waiting for you.</string>
+    <string name="str_buy_ticket_action">🎟 Buy Tickets Now</string>
+    <string name="str_empty_ended_title">You have no ended tickets!</string>
+    <string name="str_empty_ended_subtitle">Your purchase history will appear here.</string>
+    <string name="str_empty_resell_title">You have no tickets listed for resale!</string>
+    <string name="str_empty_resell_subtitle">Resell your ticket to give others a chance to attend and easily get your money back.</string>
+    <string name="str_resell_ticket_action">🎟 Resell Ticket</string>
+    <string name="str_empty_pending_title">No pending payments</string>
+    <string name="str_empty_pending_subtitle">You have no tickets awaiting payment.</string>
+    <string name="str_empty_paid_title">No paid tickets</string>
+    <string name="str_empty_paid_subtitle">You have no successfully paid tickets.</string>
+    <string name="str_empty_cancelled_title">No cancelled tickets</string>
+    <string name="str_empty_cancelled_subtitle">You have no cancelled tickets.</string>
+    <string name="str_empty_membership_title">No membership cards</string>
+    <string name="str_empty_membership_subtitle">VIP membership programs are being prepared for launch!</string>
+    <string name="str_nav_organizer">Organizer</string>
     <string name="nav_dashboard">Overview</string>
     <string name="nav_organizers">Verify Organizers</string>
     <string name="nav_events">Event Moderation</string>
@@ -223,7 +208,6 @@
     <string name="admin_header_title">VibeTix Admin</string>
     <string name="admin_header_subtitle">admin@vibetix.com</string>
 
-    
     <string name="str_filter_title">Filter</string>
     <string name="str_reset">Reset</string>
     <string name="str_apply">Apply</string>
@@ -242,7 +226,6 @@
     <string name="str_this_weekend">This Weekend</string>
     <string name="str_this_month">This Month</string>
 
-    
     <string name="str_mon">Mon</string>
     <string name="str_tue">Tue</string>
     <string name="str_wed">Wed</string>
@@ -251,7 +234,6 @@
     <string name="str_sat">Sat</string>
     <string name="str_sun">Sun</string>
 
-    
     <string name="str_login_welcome_back">Welcome back!</string>
     <string name="str_login_desc">Login to discover hot events</string>
     <string name="str_register_now">Register now</string>
@@ -268,7 +250,6 @@
     <string name="str_empty_title">Nothing here yet!</string>
     <string name="str_empty_desc">We couldn\'t find any data to display.</string>
 
-    
     <string name="tab_pending">Pending</string>
     <string name="tab_verified">Verified</string>
     <string name="btn_approve">Approve</string>
@@ -280,7 +261,6 @@
     <string name="label_featured">Featured</string>
     <string name="msg_featured_updated">Featured status updated</string>
 
-    
     <string name="tab_categories">Categories</string>
     <string name="tab_venues">Venues</string>
     <string name="add_category_title">Add New Category</string>
@@ -305,7 +285,7 @@
     <string name="hint_discount_description">Description</string>
     <string name="label_discount_type">Discount Type</string>
     <string name="type_percentage">Percentage (%)</string>
-    <string name="type_fixed">Fixed Amount (VND)</string>
+    <string name="type_fixed">Fixed Amount</string>
     <string name="hint_discount_value">Discount Value</string>
     <string name="hint_max_discount">Max Discount Value</string>
     <string name="hint_min_order">Min Order Value</string>
@@ -313,7 +293,6 @@
     <string name="error_date_range">End date must be after start date</string>
     <string name="msg_discount_created">Global discount created successfully</string>
 
-    
     <string name="status_ongoing">ONGOING</string>
     <string name="status_upcoming">UPCOMING</string>
     <string name="status_finished">FINISHED</string>
@@ -328,22 +307,21 @@
     <string name="dash_btn_create">Create Event</string>
     <string name="dash_btn_scan">Scan QR</string>
     <string name="dash_recent_events">Recent Events</string>
-    <string name="dash_revenue_format">%s VND</string>
+    <string name="dash_revenue_format">%s</string>
+    <string name="dash_price_vnd">%s</string>
+    <string name="dash_total_revenue_vnd">Total Revenue: %s</string>
     <string name="dash_ticket_count_format">%1$d / %2$d tickets</string>
     <string name="dash_percentage_format">%d%%</string>
     <string name="dash_realtime">Real-time</string>
 
-    
     <string name="str_nav_org_dashboard">Dashboard</string>
     <string name="str_nav_org_events">Events</string>
 
-    
     <string name="dash_welcome_name">Welcome back, %s!</string>
     <string name="dash_stat_revenue">REVENUE</string>
     <string name="dash_stat_tickets">TICKETS SOLD</string>
     <string name="dash_stat_checkins">CHECK-INS</string>
 
-    
     <string name="org_profile_verified">✓ Verified</string>
     <string name="org_profile_pending">⏳ Pending Verification</string>
     <string name="org_profile_account_info">Account Information</string>
@@ -352,7 +330,6 @@
     <string name="org_profile_tickets_sold">Tickets Sold</string>
     <string name="org_profile_website">Website</string>
 
-    
     <string name="org_events_search_hint">Search your events…</string>
     <string name="org_events_empty_title">No events yet</string>
     <string name="org_events_empty_desc">Create your first event and start selling tickets!</string>

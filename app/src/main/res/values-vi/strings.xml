@@ -2,25 +2,15 @@
 <resources>
     <string name="app_name">VibeTix</string>
 
-    <!-- Bottom Navigation -->
     <string name="str_nav_home">Trang chủ</string>
+    <string name="str_nav_events">Sự kiện</string>
+    <string name="str_nav_create">Tạo mới</string>
     <string name="str_nav_my_tickets">Vé của tôi</string>
     <string name="str_nav_profile">Cá nhân</string>
 
-    <!-- Admin Navigation -->
-    <string name="nav_dashboard">Tổng quan</string>
-    <string name="nav_organizers">Duyệt Nhà tổ chức</string>
-    <string name="nav_events">Kiểm duyệt Sự kiện</string>
-    <string name="nav_master_data">Quản lý Danh mục</string>
-    <string name="nav_discounts">Mã giảm giá toàn sàn</string>
-    <string name="nav_open_drawer">Mở ngăn điều hướng</string>
-    <string name="nav_close_drawer">Đóng ngăn điều hướng</string>
-    <string name="admin_header_title">VibeTix Admin</string>
-    <string name="admin_header_subtitle">admin@vibetix.com</string>
-
-    <!-- Home Header & Sections -->
     <string name="str_search_hint">Tìm sự kiện, nghệ sĩ…</string>
     <string name="str_notification">Thông báo</string>
+
     <string name="str_featured_stars">⭐ Ngôi sao nổi bật</string>
     <string name="str_featured_events">Sự kiện đặc biệt</string>
     <string name="str_trending_events">🔥 Sự kiện xu hướng</string>
@@ -37,57 +27,14 @@
     <string name="str_popular_destinations">Điểm đến nổi bật</string>
     <string name="str_see_more">Xem thêm</string>
 
-    <!-- Promo Banner -->
     <string name="str_promo_discount">Giảm đến 30%</string>
     <string name="str_promo_subtitle">Dành riêng cho bạn</string>
     <string name="str_promo_buy_now">Mua ngay</string>
 
-    <!-- Event Card -->
     <string name="str_from_price">Từ %s</string>
     <string name="str_free">Miễn phí</string>
     <string name="str_sold_out">Hết vé</string>
-    <string name="str_interest_count">%d quan tâm</string>
-    <string name="str_status_ongoing">Đang diễn ra</string>
-    <string name="str_by_organizer">Bởi %s</string>
 
-    <!-- Search feature -->
-    <string name="str_search_title">Tìm kiếm sự kiện</string>
-    <string name="str_recent_searches">Tìm kiếm gần đây</string>
-    <string name="str_browse_by_category">Khám phá theo Thể loại</string>
-    <string name="str_browse_by_city">Khám phá theo Thành phố</string>
-    <string name="str_suggestions">Gợi ý dành cho bạn</string>
-    <string name="str_date_filter_all">Tất cả các ngày</string>
-    <string name="str_filter">Bộ lọc</string>
-
-    <!-- Filter & Dialogs -->
-    <string name="str_filter_title">Bộ lọc</string>
-    <string name="str_reset">Đặt lại</string>
-    <string name="str_apply">Áp dụng</string>
-    <string name="str_location">Địa điểm</string>
-    <string name="str_category">Thể loại</string>
-    <string name="str_price_range">Giá vé</string>
-    <string name="str_free_only">Chỉ sự kiện miễn phí</string>
-    <string name="str_all_nation">Toàn quốc</string>
-    <string name="str_hcmc">TP. Hồ Chí Minh</string>
-    <string name="str_hanoi">Hà Nội</string>
-    <string name="str_danang">Đà Nẵng</string>
-    <string name="str_dalat">Đà Lạt</string>
-    <string name="str_select_time">Chọn thời gian</string>
-    <string name="str_today">Hôm nay</string>
-    <string name="str_tomorrow">Ngày mai</string>
-    <string name="str_this_weekend">Cuối tuần</string>
-    <string name="str_this_month">Tháng này</string>
-
-    <!-- Weekdays -->
-    <string name="str_mon">T2</string>
-    <string name="str_tue">T3</string>
-    <string name="str_wed">T4</string>
-    <string name="str_thu">T5</string>
-    <string name="str_fri">T6</string>
-    <string name="str_sat">T7</string>
-    <string name="str_sun">CN</string>
-
-    <!-- Auth -->
     <string name="str_login">Đăng nhập</string>
     <string name="str_register">Đăng ký</string>
     <string name="str_email">Email</string>
@@ -98,50 +45,53 @@
     <string name="str_forgot_password">Quên mật khẩu?</string>
     <string name="str_no_account">Chưa có tài khoản? Đăng ký</string>
     <string name="str_have_account">Đã có tài khoản? Đăng nhập</string>
+    
     <string name="str_auth_tagline">Khám phá &amp; đặt vé sự kiện dễ dàng</string>
-    <string name="str_login_welcome_back">Chào mừng trở lại!</string>
-    <string name="str_login_desc">Đăng nhập để khám phá các sự kiện hot</string>
+    <string name="str_login_subtitle">Chào mừng bạn trở lại!</string>
     <string name="str_register_title">Tạo tài khoản</string>
     <string name="str_register_subtitle">Đăng ký để khám phá ngàn sự kiện</string>
     <string name="str_choose_role">Bạn là?</string>
     <string name="str_role_customer">Người mua vé</string>
     <string name="str_role_organizer">Ban tổ chức</string>
-    <string name="str_no_account_prefix">Chưa có tài khoản? </string>
-    <string name="str_register_now">Đăng ký ngay</string>
+    <string name="str_no_account_prefix">Chưa có tài khoản?</string>
+    <string name="str_have_account_prefix">Đã có tài khoản?</string>
     <string name="str_or_divider">hoặc</string>
+    
     <string name="str_remember_me">Ghi nhớ trên thiết bị này</string>
     <string name="str_or_continue_with">Hoặc tiếp tục với</string>
     <string name="str_login_google">Google</string>
     <string name="str_login_apple">Apple</string>
+    
     <string name="str_terms_agree_prefix">Tôi đồng ý với </string>
     <string name="str_terms_link">Điều khoản &amp; Điều kiện</string>
     <string name="str_terms_of_suffix"> của VibeTix</string>
     <string name="str_error_terms_required">Vui lòng đồng ý với điều khoản sử dụng</string>
+    
     <string name="str_org_name">Tên tổ chức</string>
     <string name="str_hint_org_name">Nhập tên tổ chức</string>
-
-    <!-- Input hints & Validation -->
+    
     <string name="str_hint_email">Nhập địa chỉ email</string>
     <string name="str_hint_password">Nhập mật khẩu (tối thiểu 6 ký tự)</string>
     <string name="str_hint_confirm_password">Nhập lại mật khẩu</string>
     <string name="str_hint_full_name">Nhập họ và tên</string>
     <string name="str_hint_phone">Nhập số điện thoại</string>
+    
     <string name="str_error_empty_field">Vui lòng điền đầy đủ thông tin</string>
     <string name="str_error_invalid_email">Địa chỉ email không hợp lệ</string>
     <string name="str_error_password_too_short">Mật khẩu phải có ít nhất 6 ký tự</string>
     <string name="str_error_password_mismatch">Mật khẩu xác nhận không khớp</string>
 
-    <!-- Profile & Tickets -->
     <string name="str_profile">Hồ sơ</string>
     <string name="str_my_orders">Đơn hàng của tôi</string>
     <string name="str_settings">Cài đặt</string>
     <string name="str_logout">Đăng xuất</string>
+
+    <string name="str_my_tickets">Vé của tôi</string>
     <string name="str_ticket_active">Còn hiệu lực</string>
     <string name="str_ticket_used">Đã sử dụng</string>
     <string name="str_ticket_expired">Đã hết hạn</string>
     <string name="str_show_qr">Hiển thị mã QR</string>
 
-    <!-- Common -->
     <string name="str_loading">Đang tải…</string>
     <string name="str_error_generic">Đã có lỗi xảy ra. Vui lòng thử lại.</string>
     <string name="str_no_data">Không có dữ liệu</string>
@@ -149,88 +99,30 @@
     <string name="str_confirm">Xác nhận</string>
     <string name="str_ok">OK</string>
     <string name="str_back">Quay lại</string>
-    <string name="btn_save">Lưu</string>
-    <string name="btn_cancel">Hủy</string>
 
-    <!-- Empty State -->
-    <string name="str_empty_title">Chưa có gì ở đây!</string>
-    <string name="str_empty_desc">Chúng tôi không tìm thấy dữ liệu nào để hiển thị.</string>
+    <string name="str_cat_festival">Lễ hội</string>
+    <string name="str_browse_categories">Xem danh mục</string>
 
-    <!-- Admin/Organizer Specific -->
-    <string name="tab_pending">Chờ xác minh</string>
-    <string name="tab_verified">Đã xác minh</string>
-    <string name="btn_approve">Phê duyệt</string>
-    <string name="btn_reject">Từ chối</string>
-    <string name="status_all">Tất cả trạng thái</string>
-    <string name="status_pending">Chờ duyệt</string>
-    <string name="status_approved">Đã duyệt</string>
-    <string name="status_cancelled">Đã hủy</string>
-    <string name="label_featured">Nổi bật</string>
-    <string name="msg_featured_updated">Đã cập nhật trạng thái nổi bật</string>
+    <string name="str_interest_count">%d quan tâm</string>
+    <string name="str_status_ongoing">Đang diễn ra</string>
+    <string name="str_by_organizer">Bởi %s</string>
 
-    <!-- Master Data & Discounts -->
-    <string name="tab_categories">Danh mục</string>
-    <string name="tab_venues">Địa điểm</string>
-    <string name="add_category_title">Thêm danh mục mới</string>
-    <string name="add_venue_title">Thêm địa điểm mới</string>
-    <string name="hint_name">Tên</string>
-    <string name="hint_slug">Slug</string>
-    <string name="hint_address">Địa chỉ</string>
-    <string name="hint_city">Thành phố</string>
-    <string name="hint_capacity">Sức chứa</string>
-    <string name="hint_latitude">Vĩ độ (Latitude)</string>
-    <string name="hint_longitude">Kinh độ (Longitude)</string>
-    <string name="error_empty_fields">Vui lòng điền đầy đủ thông tin</string>
-    <string name="error_invalid_number">Định dạng số không hợp lệ</string>
-    <string name="add_discount_title">Thêm mã giảm giá mới</string>
-    <string name="hint_discount_code">Mã giảm giá</string>
-    <string name="hint_discount_percentage">Phần trăm (%)</string>
-    <string name="hint_expiry_date">Ngày hết hạn (YYYY-MM-DD)</string>
-    <string name="label_active">Đang hoạt động</string>
-    <string name="error_invalid_percentage">Phần trăm phải từ 1 đến 100</string>
-    <string name="create_discount_title">Tạo mã giảm giá toàn sàn</string>
-    <string name="hint_discount_title">Tiêu đề chương trình</string>
-    <string name="hint_discount_description">Mô tả</string>
-    <string name="label_discount_type">Loại giảm giá</string>
-    <string name="type_percentage">Phần trăm (%)</string>
-    <string name="type_fixed">Số tiền cố định (VND)</string>
-    <string name="hint_discount_value">Giá trị giảm</string>
-    <string name="hint_max_discount">Giá trị giảm tối đa</string>
-    <string name="hint_min_order">Giá trị đơn hàng tối thiểu</string>
-    <string name="hint_start_date">Ngày &amp; Giờ bắt đầu</string>
-    <string name="error_date_range">Ngày kết thúc phải sau ngày bắt đầu</string>
-    <string name="msg_discount_created">Đã tạo mã giảm giá toàn sàn thành công</string>
+    <string name="str_search_title">Tìm kiếm sự kiện</string>
+    <string name="str_recent_searches">Tìm kiếm gần đây</string>
+    <string name="str_browse_by_category">Khám phá theo Thể loại</string>
+    <string name="str_browse_by_city">Khám phá theo Thành phố</string>
+    <string name="str_suggestions">Gợi ý dành cho bạn</string>
+    <string name="str_date_filter_all">Tất cả các ngày</string>
+    <string name="str_filter">Bộ lọc</string>
 
-    <!-- Dashboard Statuses -->
-    <string name="status_ongoing">ĐANG DIỄN RA</string>
-    <string name="status_upcoming">SẮP DIỄN RA</string>
-    <string name="status_finished">ĐÃ KẾT THÚC</string>
-    <string name="status_live">TRỰC TIẾP</string>
-    <string name="dash_title">Dashboard</string>
-    <string name="dash_welcome">Chào mừng quay trở lại, Mascot!</string>
-    <string name="dash_total_revenue">TỔNG DOANH THU</string>
-    <string name="dash_revenue_compare">↑ 12% so với tháng trước</string>
-    <string name="dash_ticket_progress">TIẾN ĐỘ BÁN VÉ</string>
-    <string name="dash_checkin_status">TRẠNG THÁI CHECK-IN</string>
-    <string name="dash_people_count">%1$d / %2$d người</string>
-    <string name="dash_btn_create">Tạo sự kiện</string>
-    <string name="dash_btn_scan">Quét QR</string>
-    <string name="dash_recent_events">Sự kiện gần đây</string>
-    <string name="dash_revenue_format">%s đ</string>
-    <string name="dash_ticket_count_format">%1$d / %2$d vé</string>
-    <string name="dash_percentage_format">%d%%</string>
-    <string name="dash_realtime">Thời gian thực</string>
-
-    <!-- Accessibility -->
     <string name="str_cd_app_logo">VibeTix logo</string>
     <string name="str_cd_search">Tìm kiếm</string>
     <string name="str_cd_notification">Chuông thông báo</string>
     <string name="str_cd_event_image">Hình ảnh sự kiện</string>
     <string name="str_cd_star_avatar">Ảnh đại diện nghệ sĩ</string>
 
-    <!-- Ticket Flow Strings -->
     <string name="ticket_select_title">Chọn vé</string>
-    <string name="payment_simulation_title">Thanh toán</string>
+    <string name="payment_simulation_title">Thanh toán giả lập</string>
     <string name="my_tickets_empty_message">Bạn chưa có vé nào cả!</string>
     <string name="ticket_qr_title">Vé điện tử QR</string>
     <string name="ticket_transfer_button">Bán lại vé</string>
@@ -287,7 +179,6 @@
     <string name="str_view_purchased_tickets">Xem vé đã mua</string>
     <string name="str_back_to_home">Về trang chủ</string>
     
-    <!-- My Tickets Empty State Strings -->
     <string name="str_ticket_resell_instruction">Chọn vé bạn đã mua ở tab \'Vé đã mua\' rồi bấm \'Bán lại vé\' để đăng bán!</string>
     <string name="str_canceling_resale">Đang hủy đăng bán…</string>
     <string name="str_ticket_load_error">Lỗi tải vé: </string>
@@ -306,4 +197,140 @@
     <string name="str_empty_cancelled_subtitle">Bạn chưa có vé nào đã hủy đăng bán.</string>
     <string name="str_empty_membership_title">Không có thẻ thành viên</string>
     <string name="str_empty_membership_subtitle">Các chương trình thành viên VIP đang được chuẩn bị ra mắt!</string>
+    <string name="str_nav_organizer">Tổ chức</string>
+    <string name="nav_dashboard">Tổng quan</string>
+    <string name="nav_organizers">Duyệt Nhà tổ chức</string>
+    <string name="nav_events">Kiểm duyệt Sự kiện</string>
+    <string name="nav_master_data">Dữ liệu Master</string>
+    <string name="nav_discounts">Mã giảm giá</string>
+    <string name="nav_open_drawer">Mở ngăn điều hướng</string>
+    <string name="nav_close_drawer">Đóng ngăn điều hướng</string>
+    <string name="admin_header_title">VibeTix Admin</string>
+    <string name="admin_header_subtitle">admin@vibetix.com</string>
+
+    <string name="str_filter_title">Bộ lọc</string>
+    <string name="str_reset">Đặt lại</string>
+    <string name="str_apply">Áp dụng</string>
+    <string name="str_location">Địa điểm</string>
+    <string name="str_category">Thể loại</string>
+    <string name="str_price_range">Mức giá</string>
+    <string name="str_free_only">Chỉ sự kiện miễn phí</string>
+    <string name="str_all_nation">Toàn quốc</string>
+    <string name="str_hcmc">Hồ Chí Minh</string>
+    <string name="str_hanoi">Hà Nội</string>
+    <string name="str_danang">Đà Nẵng</string>
+    <string name="str_dalat">Đà Lạt</string>
+    <string name="str_select_time">Chọn thời gian</string>
+    <string name="str_today">Hôm nay</string>
+    <string name="str_tomorrow">Ngày mai</string>
+    <string name="str_this_weekend">Cuối tuần này</string>
+    <string name="str_this_month">Tháng này</string>
+
+    <string name="str_mon">Thứ 2</string>
+    <string name="str_tue">Thứ 3</string>
+    <string name="str_wed">Thứ 4</string>
+    <string name="str_thu">Thứ 5</string>
+    <string name="str_fri">Thứ 6</string>
+    <string name="str_sat">Thứ 7</string>
+    <string name="str_sun">CN</string>
+
+    <string name="str_login_welcome_back">Chào mừng quay lại!</string>
+    <string name="str_login_desc">Đăng nhập để khám phá sự kiện hot</string>
+    <string name="str_register_now">Đăng ký ngay</string>
+    <string name="btn_save">Lưu</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="qr_valid_ticket">Vé hợp lệ</string>
+    <string name="qr_invalid_ticket">Vé không hợp lệ</string>
+    <string name="qr_title">Quét mã QR</string>
+    <string name="qr_scan_instruction">Hướng mã QR vào khung hình để quét</string>
+    <string name="qr_scan_hint">Hướng mã QR vào khung hình</string>
+    <string name="qr_ticket_code_label">Mã vé</string>
+    <string name="search_hint">Tìm kiếm sự kiện, nghệ sĩ…</string>
+    <string name="str_no_account_yet">Chưa có tài khoản? </string>
+    <string name="str_empty_title">Chưa có gì ở đây!</string>
+    <string name="str_empty_desc">Chúng tôi không tìm thấy dữ liệu nào để hiển thị.</string>
+
+    <string name="tab_pending">Chờ xử lý</string>
+    <string name="tab_verified">Đã xác minh</string>
+    <string name="btn_approve">Duyệt</string>
+    <string name="btn_reject">Từ chối</string>
+    <string name="status_all">Tất cả</string>
+    <string name="status_pending">Chờ xử lý</string>
+    <string name="status_approved">Đã duyệt</string>
+    <string name="status_cancelled">Đã hủy</string>
+    <string name="label_featured">Nổi bật</string>
+    <string name="msg_featured_updated">Đã cập nhật trạng thái nổi bật</string>
+
+    <string name="tab_categories">Thể loại</string>
+    <string name="tab_venues">Địa điểm</string>
+    <string name="add_category_title">Thêm Thể loại mới</string>
+    <string name="add_venue_title">Thêm Địa điểm mới</string>
+    <string name="hint_name">Tên</string>
+    <string name="hint_slug">Slug</string>
+    <string name="hint_address">Địa chỉ</string>
+    <string name="hint_city">Thành phố</string>
+    <string name="hint_capacity">Sức chứa</string>
+    <string name="hint_latitude">Vĩ độ</string>
+    <string name="hint_longitude">Kinh độ</string>
+    <string name="error_empty_fields">Vui lòng điền đủ các trường</string>
+    <string name="error_invalid_number">Sai định dạng số</string>
+    <string name="add_discount_title">Thêm Mã giảm giá mới</string>
+    <string name="hint_discount_code">Mã giảm giá</string>
+    <string name="hint_discount_percentage">Phần trăm (%)</string>
+    <string name="hint_expiry_date">Ngày hết hạn (YYYY-MM-DD)</string>
+    <string name="label_active">Hoạt động</string>
+    <string name="error_invalid_percentage">Phần trăm phải từ 1 đến 100</string>
+    <string name="create_discount_title">Tạo Mã giảm giá</string>
+    <string name="hint_discount_title">Tiêu đề khuyến mãi</string>
+    <string name="hint_discount_description">Mô tả</string>
+    <string name="label_discount_type">Loại giảm giá</string>
+    <string name="type_percentage">Phần trăm (%)</string>
+    <string name="type_fixed">Số tiền cố định (đ)</string>
+    <string name="hint_discount_value">Giá trị giảm</string>
+    <string name="hint_max_discount">Giảm tối đa</string>
+    <string name="hint_min_order">Giá trị đơn tối thiểu</string>
+    <string name="hint_start_date">Ngày bắt đầu</string>
+    <string name="error_date_range">Ngày kết thúc phải sau ngày bắt đầu</string>
+    <string name="msg_discount_created">Tạo mã giảm giá thành công</string>
+
+    <string name="status_ongoing">ĐANG DIỄN RA</string>
+    <string name="status_upcoming">SẮP DIỄN RA</string>
+    <string name="status_finished">ĐÃ KẾT THÚC</string>
+    <string name="status_live">TRỰC TIẾP</string>
+    <string name="dash_title">Bảng điều khiển</string>
+    <string name="dash_welcome">Chào mừng trở lại, Mascot!</string>
+    <string name="dash_total_revenue">TỔNG DOANH THU</string>
+    <string name="dash_revenue_compare">↑ 12% so với tháng trước</string>
+    <string name="dash_ticket_progress">TIẾN ĐỘ BÁN VÉ</string>
+    <string name="dash_checkin_status">TRẠNG THÁI CHECK-IN</string>
+    <string name="dash_people_count">%1$d / %2$d người</string>
+    <string name="dash_btn_create">Tạo sự kiện</string>
+    <string name="dash_btn_scan">Quét QR</string>
+    <string name="dash_recent_events">Sự kiện gần đây</string>
+    <string name="dash_revenue_format">%s đ</string>
+    <string name="dash_price_vnd">%s ₫</string>
+    <string name="dash_total_revenue_vnd">Tổng doanh thu: %s ₫</string>
+    <string name="dash_ticket_count_format">%1$d / %2$d vé</string>
+    <string name="dash_percentage_format">%d%%</string>
+    <string name="dash_realtime">Thời gian thực</string>
+
+    <string name="str_nav_org_dashboard">Tổng quan</string>
+    <string name="str_nav_org_events">Sự kiện</string>
+
+    <string name="dash_welcome_name">Chào mừng trở lại, %s!</string>
+    <string name="dash_stat_revenue">DOANH THU</string>
+    <string name="dash_stat_tickets">VÉ ĐÃ BÁN</string>
+    <string name="dash_stat_checkins">CHECK-IN</string>
+
+    <string name="org_profile_verified">✓ Đã xác minh</string>
+    <string name="org_profile_pending">⏳ Đang chờ xác minh</string>
+    <string name="org_profile_account_info">Thông tin tài khoản</string>
+    <string name="org_profile_total_events">Tổng sự kiện</string>
+    <string name="org_profile_monthly_revenue">Doanh thu tháng</string>
+    <string name="org_profile_tickets_sold">Vé đã bán</string>
+    <string name="org_profile_website">Trang web</string>
+
+    <string name="org_events_search_hint">Tìm kiếm sự kiện của bạn…</string>
+    <string name="org_events_empty_title">Chưa có sự kiện nào</string>
+    <string name="org_events_empty_desc">Tạo sự kiện đầu tiên của bạn và bắt đầu bán vé!</string>
 </resources>

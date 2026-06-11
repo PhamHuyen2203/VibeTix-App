@@ -40,7 +40,7 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
         }
         holder.tvTicketCode.setText("Mã vé: #" + id);
 
-        if (t.isUsed()) {
+        if (UserTicket.Status.USED.equals(t.getStatus())) {
             holder.tvTicketStatus.setText("Đã check-in");
             holder.tvTicketStatus.setTextColor(holder.itemView.getContext().getColor(R.color.clr_success));
             holder.tvTicketStatus.setBackgroundResource(R.drawable.bg_ticket_type_active);

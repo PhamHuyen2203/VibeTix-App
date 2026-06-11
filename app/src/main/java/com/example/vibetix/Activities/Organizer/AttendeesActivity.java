@@ -175,7 +175,7 @@ public class AttendeesActivity extends AppCompatActivity {
         int total = allTickets.size();
         int checkedIn = 0;
         for (UserTicket t : allTickets) {
-            if (t.isUsed()) checkedIn++;
+            if (UserTicket.Status.USED.equals(t.getStatus())) checkedIn++;
         }
         int notCheckedIn = total - checkedIn;
 
@@ -194,9 +194,9 @@ public class AttendeesActivity extends AppCompatActivity {
             boolean matchId    = t.getUserTicketId() != null && t.getUserTicketId().toLowerCase().contains(q);
 
             boolean matchStatus = true;
-            if ("checked_in".equals(currentFilterStatus) && !t.isUsed()) {
+            if ("checked_in".equals(currentFilterStatus) && !UserTicket.Status.USED.equals(t.getStatus())) {
                 matchStatus = false;
-            } else if ("not_checked_in".equals(currentFilterStatus) && t.isUsed()) {
+            } else if ("not_checked_in".equals(currentFilterStatus) && UserTicket.Status.USED.equals(t.getStatus())) {
                 matchStatus = false;
             }
 

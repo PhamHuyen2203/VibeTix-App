@@ -51,6 +51,11 @@ public class Constants {
     public static final String ORDER_STATUS_PENDING = "PENDING";
     public static final String ORDER_STATUS_PAID = "PAID";
     public static final String ORDER_STATUS_CANCELLED = "CANCELLED";
+    public static final String ORDER_STATUS_COMPLETED = "COMPLETED";
+    public static final String ORDER_STATUS_CONFIRMED = "CONFIRMED";
+
+    public static final String FIELD_STATUS = "status";
+    public static final String FIELD_EVENT_ID = "event_id";
 
     public static final String PAYMENT_STATUS_PENDING = "PENDING";
     public static final String PAYMENT_STATUS_SUCCESS = "SUCCESS";
