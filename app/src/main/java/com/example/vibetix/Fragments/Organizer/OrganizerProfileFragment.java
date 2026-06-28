@@ -54,7 +54,7 @@ public class OrganizerProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_organizer_profile, container, false);
+        return inflater.inflate(R.layout.fragment_organizer_profile_list, container, false);
     }
 
     @Override
