@@ -220,7 +220,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
         binding.pbLoading.setVisibility(View.GONE);
         binding.btnSendBlast.setEnabled(true);
 
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("⚠️ Xác nhận gửi")
                 .setMessage("Bạn chuẩn bị gửi thông báo này tới " + userIds.size() + " khách hàng.\n\nHành động này không thể hoàn tác. Bạn đã kiểm tra kỹ nội dung chưa?")
                 .setPositiveButton("Xác nhận Gửi", (dialog, which) -> {
@@ -233,6 +233,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
     }
 
     private void executeBatchInsert(Set<String> userIds, String title, String body) {
+        List<Task<Void>> batchTasks = new ArrayList<>();
         WriteBatch batch = db.batch();
         int count = 0;
         int total = userIds.size();
@@ -256,38 +257,31 @@ public class OrganizerBlastActivity extends AppCompatActivity {
             count++;
 
             if (count >= 490) {
-                batch.commit();
+                batchTasks.add(batch.commit());
                 batch = db.batch();
                 count = 0;
             }
         }
 
         if (count > 0) {
-            batch.commit().addOnSuccessListener(unused -> {
-                binding.pbLoading.setVisibility(View.GONE);
-                new AlertDialog.Builder(this)
-                        .setTitle("Thành công")
-                        .setMessage("Đã đưa " + total + " thông báo vào hàng đợi. Thời gian gửi dự kiến: ~2 phút.")
-                        .setPositiveButton("Đóng", (dialog, which) -> finish())
-                        .setCancelable(false)
-                        .show();
-            }).addOnFailureListener(this::showFailureAlert);
-        } else {
-            // Already committed all 500 batches perfectly without remainder
+            batchTasks.add(batch.commit());
+        }
+
+        Tasks.whenAll(batchTasks).addOnSuccessListener(unused -> {
             binding.pbLoading.setVisibility(View.GONE);
-            new AlertDialog.Builder(this)
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                     .setTitle("Thành công")
                     .setMessage("Đã đưa " + total + " thông báo vào hàng đợi. Thời gian gửi dự kiến: ~2 phút.")
                     .setPositiveButton("Đóng", (dialog, which) -> finish())
                     .setCancelable(false)
                     .show();
-        }
+        }).addOnFailureListener(this::showFailureAlert);
     }
 
     private void showNoTargetAlert() {
         binding.pbLoading.setVisibility(View.GONE);
         binding.btnSendBlast.setEnabled(true);
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Không có đối tượng")
                 .setMessage("Không tìm thấy người dùng nào phù hợp với điều kiện để gửi thông báo.")
                 .setPositiveButton("Đóng", null)

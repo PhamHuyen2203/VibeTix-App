@@ -53,7 +53,12 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
             b.tvRoleBadge.setTextColor(b.getRoot().getContext().getColor(R.color.clr_warning));
         }
 
-        b.btnStaffOptions.setVisibility(View.GONE); // Ẩn nút 3 chấm vì chỉ dùng switch bật/tắt
+        b.btnStaffOptions.setVisibility(View.VISIBLE);
+        b.btnStaffOptions.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onOptionsClick(staff, b.btnStaffOptions);
+            }
+        });
         
         // Remove listener temporarily to avoid triggering when setting state programmatically
         b.swStaffActive.setOnCheckedChangeListener(null);

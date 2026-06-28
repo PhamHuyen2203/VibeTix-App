@@ -78,7 +78,7 @@ public class MasterDataFragment extends Fragment {
         EditText etName = dialogView.findViewById(R.id.et_category_name);
         EditText etSlug = dialogView.findViewById(R.id.et_category_slug);
 
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.add_category_title)
                 .setView(dialogView)
                 .setPositiveButton(R.string.btn_save, null)
@@ -114,7 +114,7 @@ public class MasterDataFragment extends Fragment {
         EditText etCity = dialogView.findViewById(R.id.et_venue_city);
         EditText etCapacity = dialogView.findViewById(R.id.et_venue_capacity);
 
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.add_venue_title)
                 .setView(dialogView)
                 .setPositiveButton(R.string.btn_save, null)

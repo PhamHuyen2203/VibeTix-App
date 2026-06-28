@@ -88,6 +88,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private String existingEventId = null;
     private Event editingEvent = null;
     private Uri selectedPosterUri = null;
+    private boolean isReadOnly = false;
     private List<Organizer> myOrganizers = new ArrayList<>();
     private Organizer selectedOrganizer = null;
     private List<com.example.vibetix.Models.Category> categoryList = new ArrayList<>();
@@ -113,6 +114,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
         // Check xem đang tạo mới hay sửa — phải đọc TRƯỚC setupToolbar()
         existingEventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
+        isReadOnly = getIntent().getBooleanExtra("IS_READ_ONLY", false);
 
         bindViews();
         setupToolbar();
@@ -128,6 +130,35 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
         setupButtons();
         setupStepper();
+        
+        if (isReadOnly) {
+            disableAllFields();
+        }
+    }
+
+    private void disableAllFields() {
+        if (etTitle != null) etTitle.setEnabled(false);
+        if (etDescription != null) etDescription.setEnabled(false);
+        if (etStartTime != null) etStartTime.setEnabled(false);
+        if (etEndTime != null) etEndTime.setEnabled(false);
+        if (etVenueName != null) etVenueName.setEnabled(false);
+        if (etVenueAddress != null) etVenueAddress.setEnabled(false);
+        if (etVenueCity != null) etVenueCity.setEnabled(false);
+        if (ddCategory != null) ddCategory.setEnabled(false);
+        if (ddOrganizer != null) ddOrganizer.setEnabled(false);
+        if (ivEventPoster != null) ivEventPoster.setEnabled(false);
+        if (rgOrganizerMode != null) rgOrganizerMode.setEnabled(false);
+        if (etNewOrgName != null) etNewOrgName.setEnabled(false);
+        if (etNewOrgEmail != null) etNewOrgEmail.setEnabled(false);
+        if (etNewOrgPhone != null) etNewOrgPhone.setEnabled(false);
+        if (etNewOrgWebsite != null) etNewOrgWebsite.setEnabled(false);
+        
+        if (btnSaveDraft != null) btnSaveDraft.setVisibility(android.view.View.GONE);
+        if (btnSubmitForApproval != null) {
+            btnSubmitForApproval.setText(getString(R.string.event_pending_approval_btn));
+            btnSubmitForApproval.setEnabled(false);
+            btnSubmitForApproval.setBackgroundColor(getResources().getColor(R.color.clr_grey_2, null));
+        }
     }
 
     private void bindViews() {
@@ -194,7 +225,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
         updateStepperUI();
         btnNextStep.setOnClickListener(v -> {
             if (currentStep < 2) {
-                if (!validateCurrentStep()) return;
+                if (!isReadOnly && !validateCurrentStep()) return;
                 currentStep++;
                 viewFlipper.setDisplayedChild(currentStep);
                 updateStepperUI();
@@ -493,9 +524,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
     }
 
     private void saveEvent(String status) {
-        if (!validateForm()) return;
+        if (!validateForm(status)) return;
 
         String title       = etTitle.getText() != null ? etTitle.getText().toString().trim() : "";
+        if (title.isEmpty() && "draft".equals(status)) title = getString(R.string.default_event_title_draft);
+        
         String description = etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
         String venueName   = etVenueName.getText() != null ? etVenueName.getText().toString().trim() : "";
         String venueAddr   = etVenueAddress.getText() != null ? etVenueAddress.getText().toString().trim() : "";
@@ -510,15 +543,20 @@ public class CreateEditEventActivity extends AppCompatActivity {
             String newOrgPhone = etNewOrgPhone.getText() != null ? etNewOrgPhone.getText().toString().trim() : "";
             String newOrgWebsite = etNewOrgWebsite.getText() != null ? etNewOrgWebsite.getText().toString().trim() : "";
 
-            if (newOrgName.isEmpty() || newOrgEmail.isEmpty() || newOrgPhone.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập Tên, Email và Số điện thoại Ban tổ chức", Toast.LENGTH_SHORT).show();
+            if (!"draft".equals(status) && (newOrgName.isEmpty() || newOrgEmail.isEmpty() || newOrgPhone.isEmpty())) {
+                Toast.makeText(this, getString(R.string.err_empty_new_org_info), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if ("draft".equals(status) && newOrgName.isEmpty()) {
+                // If draft and org is empty, skip creating new org
+                continueSaveFlow(title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
                 return;
             }
             createNewOrganizerAndSaveFull(newOrgName, newOrgEmail, newOrgPhone, newOrgWebsite, title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
             return;
         } else {
-            if (selectedOrganizer == null) {
-                Toast.makeText(this, "Vui lòng chọn Ban tổ chức đã lưu", Toast.LENGTH_SHORT).show();
+            if (!"draft".equals(status) && selectedOrganizer == null) {
+                Toast.makeText(this, getString(R.string.err_empty_saved_org), Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -724,9 +762,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean validateForm() {
+    private boolean validateForm(String status) {
+        if ("draft".equals(status)) return true;
+        
         if (etTitle == null || etTitle.getText() == null || etTitle.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tiêu đề sự kiện", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.err_empty_event_title), Toast.LENGTH_SHORT).show();
             return false;
         }
         
@@ -734,16 +774,43 @@ public class CreateEditEventActivity extends AppCompatActivity {
         boolean hasTypedOrganizer = etNewOrgName != null && etNewOrgName.getText() != null && !etNewOrgName.getText().toString().trim().isEmpty();
         
         if (!hasSelectedOrganizer && !hasTypedOrganizer) {
-            Toast.makeText(this, "Vui lòng chọn hoặc nhập Ban tổ chức", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.err_empty_organizer), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
 
     @Override
+    public void onBackPressed() {
+        handleBackPress();
+    }
+
+    private void handleBackPress() {
+        if (isReadOnly || (existingEventId != null && editingEvent != null && !"draft".equals(editingEvent.getStatusStr()))) {
+            finish();
+            return;
+        }
+
+        String currentTitle = etTitle.getText() != null ? etTitle.getText().toString().trim() : "";
+        
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.dialog_save_draft_title))
+                .setMessage(getString(R.string.dialog_save_draft_msg))
+                .setPositiveButton(getString(R.string.btn_save_draft), (dialog, which) -> {
+                    if (currentTitle.isEmpty()) {
+                        etTitle.setText(getString(R.string.default_event_title_draft));
+                    }
+                    saveEvent("draft");
+                })
+                .setNegativeButton(getString(R.string.btn_skip), (dialog, which) -> finish())
+                .setNeutralButton(getString(R.string.btn_cancel), null)
+                .show();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
+            handleBackPress();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -44,7 +44,7 @@ public class GlobalDiscountFragment extends Fragment {
         EditText etExpiry = dialogView.findViewById(R.id.et_expiry_date);
         SwitchCompat switchActive = dialogView.findViewById(R.id.switch_discount_active);
 
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
                 .setPositiveButton(R.string.btn_save, null)
                 .setNegativeButton(R.string.btn_cancel, (d, w) -> d.dismiss())

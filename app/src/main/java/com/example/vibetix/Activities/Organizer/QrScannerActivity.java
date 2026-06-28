@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
@@ -37,8 +38,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.OfflineSyncManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -48,6 +51,9 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 public class QrScannerActivity extends AppCompatActivity {
 
@@ -77,6 +83,12 @@ public class QrScannerActivity extends AppCompatActivity {
     private String eventId;
     private FirebaseFirestore db;
 
+    private SwitchCompat switchOffline;
+    private LinearLayout panelOfflineActions;
+    private Button btnDownloadData, btnSyncData;
+    private OfflineSyncManager offlineSyncManager;
+    private boolean isOfflineMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +101,7 @@ public class QrScannerActivity extends AppCompatActivity {
             return;
         }
         db = FirebaseFirestore.getInstance();
+        offlineSyncManager = new OfflineSyncManager(this, eventId);
 
         initViews();
         setupMLKit();
@@ -119,13 +132,86 @@ public class QrScannerActivity extends AppCompatActivity {
         btnManualEntry = findViewById(R.id.btnManualEntry);
         ivFlashlightIcon = findViewById(R.id.ivFlashlightIcon);
 
+        switchOffline = findViewById(R.id.switchOffline);
+        panelOfflineActions = findViewById(R.id.panelOfflineActions);
+        btnDownloadData = findViewById(R.id.btnDownloadData);
+        btnSyncData = findViewById(R.id.btnSyncData);
+
         btnBack.setOnClickListener(v -> finish());
         btnScanNext.setOnClickListener(v -> resumeScanning());
         
         btnFlashlight.setOnClickListener(v -> toggleFlashlight());
         btnManualEntry.setOnClickListener(v -> showManualEntryDialog());
+
+        switchOffline.setOnCheckedChangeListener((btn, isChecked) -> {
+            isOfflineMode = isChecked;
+            panelOfflineActions.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            updateSyncButtonText();
+        });
+
+        btnDownloadData.setOnClickListener(v -> downloadOfflineData());
+        btnSyncData.setOnClickListener(v -> syncOfflineData());
     }
     
+    private void updateSyncButtonText() {
+        int pendingCount = offlineSyncManager.getPendingSyncTickets().size();
+        btnSyncData.setText("Đồng bộ (" + pendingCount + ")");
+    }
+
+    private void downloadOfflineData() {
+        tvInstruction.setText("Đang tải dữ liệu...");
+        btnDownloadData.setEnabled(false);
+        db.collection("user_tickets").whereEqualTo("event_id", eventId).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    Map<String, com.example.vibetix.Models.UserTicket> ticketsMap = new HashMap<>();
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : queryDocumentSnapshots) {
+                        com.example.vibetix.Models.UserTicket ticket = doc.toObject(com.example.vibetix.Models.UserTicket.class);
+                        if (ticket != null) {
+                            String key = doc.getId();
+                            ticketsMap.put(key, ticket);
+                        }
+                    }
+                    offlineSyncManager.saveOfflineTickets(ticketsMap);
+                    Toast.makeText(this, "Tải thành công " + ticketsMap.size() + " vé", Toast.LENGTH_SHORT).show();
+                    tvInstruction.setText("Tải hoàn tất. Đặt mã QR vào khung để quét");
+                    btnDownloadData.setEnabled(true);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    tvInstruction.setText("Lỗi tải dữ liệu");
+                    btnDownloadData.setEnabled(true);
+                });
+    }
+
+    private void syncOfflineData() {
+        List<String> pendingIds = offlineSyncManager.getPendingSyncTickets();
+        if (pendingIds.isEmpty()) {
+            Toast.makeText(this, "Không có dữ liệu cần đồng bộ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        tvInstruction.setText("Đang đồng bộ...");
+        btnSyncData.setEnabled(false);
+        
+        WriteBatch batch = db.batch();
+        for (String id : pendingIds) {
+            batch.update(db.collection("user_tickets").document(id),
+                    "status", "used",
+                    "checked_in_at", new java.util.Date());
+        }
+        
+        batch.commit().addOnSuccessListener(aVoid -> {
+            offlineSyncManager.savePendingSyncTickets(new java.util.ArrayList<>());
+            updateSyncButtonText();
+            Toast.makeText(this, "Đồng bộ thành công!", Toast.LENGTH_SHORT).show();
+            tvInstruction.setText("Đồng bộ thành công");
+            btnSyncData.setEnabled(true);
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Lỗi đồng bộ", Toast.LENGTH_SHORT).show();
+            tvInstruction.setText("Lỗi đồng bộ");
+            btnSyncData.setEnabled(true);
+        });
+    }
+
     private void toggleFlashlight() {
         if (camera != null) {
             CameraControl cameraControl = camera.getCameraControl();
@@ -141,7 +227,7 @@ public class QrScannerActivity extends AppCompatActivity {
     
     private void showManualEntryDialog() {
         isScanning = false;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
         builder.setTitle("Nhập mã vé thủ công");
         
         final EditText input = new EditText(this);
@@ -250,6 +336,11 @@ public class QrScannerActivity extends AppCompatActivity {
     }
 
     private void handleScanResult(String code) {
+        if (isOfflineMode) {
+            handleScanOffline(code);
+            return;
+        }
+
         tvInstruction.setText("Đang kiểm tra...");
         
         db.collection("user_tickets").document(code).get()
@@ -284,6 +375,33 @@ public class QrScannerActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> showScanError("Lỗi kết nối kiểm tra vé!"));
+    }
+    
+    private void handleScanOffline(String code) {
+        tvInstruction.setText("Đang kiểm tra offline...");
+        Map<String, com.example.vibetix.Models.UserTicket> offlineTickets = offlineSyncManager.getOfflineTickets();
+        
+        if (offlineTickets.containsKey(code)) {
+            com.example.vibetix.Models.UserTicket ticket = offlineTickets.get(code);
+            if (ticket != null) {
+                tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
+                tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
+                
+                if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
+                    showScanError("Vé đã được sử dụng (Check-in rồi)!");
+                } else {
+                    boolean success = offlineSyncManager.markTicketUsedOffline(code);
+                    if (success) {
+                        showScanSuccess("Check-in Offline thành công!");
+                        updateSyncButtonText();
+                    } else {
+                        showScanError("Lỗi cập nhật vé offline!");
+                    }
+                }
+            }
+        } else {
+            showScanError("Không tìm thấy vé trong dữ liệu offline!");
+        }
     }
     
     private void showScanSuccess(String msg) {
@@ -330,6 +448,7 @@ public class QrScannerActivity extends AppCompatActivity {
             } else {
                 toneG.startTone(ToneGenerator.TONE_SUP_ERROR, 400); 
             }
+            new Handler(Looper.getMainLooper()).postDelayed(toneG::release, 450);
         } catch (Exception e) {
             e.printStackTrace();
         }

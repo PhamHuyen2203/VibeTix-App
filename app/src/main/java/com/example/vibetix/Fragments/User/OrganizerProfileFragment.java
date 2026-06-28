@@ -507,7 +507,7 @@ public class OrganizerProfileFragment extends Fragment {
             if (edtWeb   != null) edtWeb.setText(existing.getWebsiteUrl());
         }
 
-        new AlertDialog.Builder(requireContext())
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(isEdit ? "Chỉnh sửa Ban tổ chức" : "Thêm Ban tổ chức mới")
                 .setView(dialogView)
                 .setPositiveButton(isEdit ? "Lưu thay đổi" : "Gửi đăng ký", (dialog, which) -> {
@@ -542,7 +542,7 @@ public class OrganizerProfileFragment extends Fragment {
     }
 
     private void confirmDelete(OrganizerProfile org) {
-        new AlertDialog.Builder(requireContext())
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Xóa Ban tổ chức")
                 .setMessage("Bạn có chắc muốn xóa \"" + org.getBrandName() + "\" không?\nThao tác này không thể hoàn tác.")
                 .setPositiveButton("Xóa", (d, w) -> {

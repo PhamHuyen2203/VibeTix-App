@@ -247,6 +247,27 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 sheetBinding.etTotalQty.setError("Vui lòng nhập số lượng vé");
                 return;
             }
+            if (TextUtils.isEmpty(saleStart)) {
+                sheetBinding.etSaleStart.setError("Vui lòng chọn ngày bắt đầu bán");
+                return;
+            }
+            if (TextUtils.isEmpty(saleEnd)) {
+                sheetBinding.etSaleEnd.setError("Vui lòng chọn ngày kết thúc bán");
+                return;
+            }
+            
+            try {
+                SimpleDateFormat dispFmt = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                java.util.Date startDate = dispFmt.parse(saleStart);
+                java.util.Date endDate = dispFmt.parse(saleEnd);
+                if (endDate != null && startDate != null && endDate.before(startDate)) {
+                    sheetBinding.etSaleEnd.setError("Lỗi thời gian");
+                    Toast.makeText(this, "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
 
             long price;
             long qty;
@@ -368,7 +389,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 .addOnSuccessListener(snap -> {
                     if (snap != null && !snap.isEmpty()) {
                         // Has orders — cannot delete
-                        new AlertDialog.Builder(this)
+                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                                 .setTitle("Không thể xóa")
                                 .setMessage("Loại vé \"" + tt.getName() + "\" đã có đơn hàng. " +
                                         "Hãy tắt kích hoạt thay vì xóa.")
@@ -384,7 +405,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
     }
 
     private void confirmDelete(TicketType tt) {
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Xóa loại vé?")
                 .setMessage("Bạn có chắc muốn xóa loại vé \"" + tt.getName() + "\"?\nHành động này không thể hoàn tác.")
                 .setPositiveButton("Xóa", (d, w) -> {

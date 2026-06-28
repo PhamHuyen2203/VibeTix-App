@@ -14,11 +14,12 @@ import com.google.firebase.firestore.PropertyName;
  */
 public class EventStaff {
     public enum Role {
-        MANAGER, CHECK_IN_STAFF;
+        MANAGER, CHECK_IN_STAFF, OWNER;
 
         public String toValue() {
             switch (this) {
                 case MANAGER: return "manager";
+                case OWNER: return "owner";
                 case CHECK_IN_STAFF: return "check_in_staff";
                 default: return "check_in_staff";
             }
@@ -26,6 +27,7 @@ public class EventStaff {
 
         public static Role fromValue(String value) {
             if ("manager".equalsIgnoreCase(value)) return MANAGER;
+            if ("owner".equalsIgnoreCase(value)) return OWNER;
             return CHECK_IN_STAFF;
         }
     }

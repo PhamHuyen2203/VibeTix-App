@@ -247,6 +247,7 @@ public class SimulatedPaymentFragment extends Fragment {
         order.setUserId(loggedInEmail); // Note: using email for now
         order.setOrderDate(new com.google.firebase.Timestamp(new Date(now)));
         order.setTotalAmount(finalTotal);
+        order.setPaymentMethod(paymentMethod);
         order.setStatusStr(Constants.ORDER_STATUS_PAID);
 
         orderRepository.saveOrder(order, new OrderRepository.OnOrderActionListener() {

@@ -80,7 +80,21 @@ public class StaffManagementActivity extends AppCompatActivity {
         staffAdapter = new StaffAdapter(staffList, new StaffAdapter.OnStaffInteractionListener() {
             @Override
             public void onOptionsClick(EventStaff staff, View anchor) {
-                // Not strictly needed since we toggle active state, but kept for future expansion
+                PopupMenu popup = new PopupMenu(StaffManagementActivity.this, anchor);
+                popup.getMenu().add(0, 1, 0, "Đổi vai trò (Role)");
+                popup.getMenu().add(0, 2, 0, "Xóa nhân sự");
+                
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == 1) {
+                        showRoleChangeDialog(staff);
+                        return true;
+                    } else if (item.getItemId() == 2) {
+                        confirmDeleteStaff(staff);
+                        return true;
+                    }
+                    return false;
+                });
+                popup.show();
             }
 
             @Override
@@ -110,11 +124,24 @@ public class StaffManagementActivity extends AppCompatActivity {
                 .addOnSuccessListener(query -> {
                     staffList.clear();
                     if (query != null && !query.isEmpty()) {
+                        List<EventStaff> tempStaffList = new ArrayList<>();
+                        List<String> userIds = new ArrayList<>();
+                        
                         for (DocumentSnapshot doc : query.getDocuments()) {
                             EventStaff staff = doc.toObject(EventStaff.class);
                             if (staff != null) {
-                                loadStaffUserInfo(staff);
+                                tempStaffList.add(staff);
+                                if (staff.getUserId() != null && !userIds.contains(staff.getUserId())) {
+                                    userIds.add(staff.getUserId());
+                                }
                             }
+                        }
+                        
+                        if (userIds.isEmpty()) {
+                            staffList.addAll(tempStaffList);
+                            updateUI();
+                        } else {
+                            fetchUsersAndEnrichStaff(tempStaffList, userIds);
                         }
                     } else {
                         updateUI();
@@ -126,21 +153,39 @@ public class StaffManagementActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadStaffUserInfo(EventStaff staff) {
-        if (staff.getUserId() == null) return;
-        db.collection("users").document(staff.getUserId()).get()
-                .addOnSuccessListener(userDoc -> {
-                    if (userDoc.exists()) {
-                        User user = userDoc.toObject(User.class);
-                        if (user != null) {
-                            staff.setStaffName(user.getFullName());
-                            staff.setStaffEmail(user.getEmail());
-                            staff.setStaffAvatarUrl(user.getAvatarUrl());
-                        }
+    private void fetchUsersAndEnrichStaff(List<EventStaff> tempStaffList, List<String> userIds) {
+        List<com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot>> tasks = new ArrayList<>();
+        for (int i = 0; i < userIds.size(); i += 10) {
+            List<String> chunk = userIds.subList(i, Math.min(userIds.size(), i + 10));
+            tasks.add(db.collection("users").whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk).get());
+        }
+        
+        com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+            Map<String, User> userMap = new HashMap<>();
+            for (Object res : results) {
+                com.google.firebase.firestore.QuerySnapshot snap = (com.google.firebase.firestore.QuerySnapshot) res;
+                for (DocumentSnapshot doc : snap.getDocuments()) {
+                    User u = doc.toObject(User.class);
+                    if (u != null) {
+                        userMap.put(doc.getId(), u);
                     }
-                    staffList.add(staff);
-                    updateUI();
-                });
+                }
+            }
+            
+            for (EventStaff staff : tempStaffList) {
+                if (staff.getUserId() != null && userMap.containsKey(staff.getUserId())) {
+                    User u = userMap.get(staff.getUserId());
+                    staff.setStaffName(u.getFullName());
+                    staff.setStaffEmail(u.getEmail());
+                    staff.setStaffAvatarUrl(u.getAvatarUrl());
+                }
+                staffList.add(staff);
+            }
+            updateUI();
+        }).addOnFailureListener(e -> {
+            binding.pbLoading.setVisibility(View.GONE);
+            Toast.makeText(this, "Lỗi tải thông tin user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void updateUI() {
@@ -234,5 +279,51 @@ public class StaffManagementActivity extends AppCompatActivity {
                     staff.setActive(!isActive);
                     staffAdapter.notifyDataSetChanged();
                 });
+    }
+
+    private void showRoleChangeDialog(EventStaff staff) {
+        String[] roles = {"Quản lý (Manager)", "Soát vé (Check-in Staff)"};
+        int checkedItem = staff.getRole() == EventStaff.Role.MANAGER ? 0 : 1;
+        
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Đổi vai trò")
+            .setSingleChoiceItems(roles, checkedItem, (dialog, which) -> {
+                EventStaff.Role newRole = which == 0 ? EventStaff.Role.MANAGER : EventStaff.Role.CHECK_IN_STAFF;
+                if (newRole != staff.getRole()) {
+                    updateStaffRole(staff, newRole);
+                }
+                dialog.dismiss();
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
+    }
+
+    private void updateStaffRole(EventStaff staff, EventStaff.Role newRole) {
+        db.collection("event_staff").document(staff.getStaffId())
+            .update("role", newRole)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(this, "Đã cập nhật vai trò", Toast.LENGTH_SHORT).show();
+                staff.setRole(newRole);
+                staffAdapter.notifyDataSetChanged();
+            })
+            .addOnFailureListener(e -> Toast.makeText(this, "Lỗi cập nhật vai trò", Toast.LENGTH_SHORT).show());
+    }
+
+    private void confirmDeleteStaff(EventStaff staff) {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Xóa nhân sự")
+            .setMessage("Bạn có chắc chắn muốn xóa nhân sự này khỏi sự kiện?")
+            .setPositiveButton("Xóa", (dialog, which) -> {
+                db.collection("event_staff").document(staff.getStaffId())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Đã xóa nhân sự", Toast.LENGTH_SHORT).show();
+                        staffList.remove(staff);
+                        updateUI();
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi khi xóa", Toast.LENGTH_SHORT).show());
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
     }
 }

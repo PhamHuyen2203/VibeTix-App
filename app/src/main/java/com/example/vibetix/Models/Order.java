@@ -15,6 +15,7 @@ public class Order {
     private com.google.firebase.Timestamp orderDate;
     private long totalAmount;
     private String statusStr = "pending";
+    private String paymentMethod;
     private com.google.firebase.Timestamp expiresAt;
 
     public Order() {}
@@ -43,6 +44,11 @@ public class Order {
     public String getStatusStr() { return statusStr; }
     @PropertyName("status")
     public void setStatusStr(String statusStr) { this.statusStr = statusStr; }
+
+    @PropertyName("payment_method")
+    public String getPaymentMethod() { return paymentMethod; }
+    @PropertyName("payment_method")
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
     @Exclude
     public Status getStatus() {

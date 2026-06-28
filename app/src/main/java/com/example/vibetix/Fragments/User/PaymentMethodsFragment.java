@@ -138,7 +138,7 @@ public class PaymentMethodsFragment extends Fragment {
             public void onDelete(int position) {
                 if (!isAdded()) return;
                 String name = methods.get(position).getDisplayName();
-                new AlertDialog.Builder(requireContext())
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Xóa phương thức thanh toán")
                         .setMessage("Bạn có chắc muốn xóa \"" + name + "\" không?")
                         .setPositiveButton("Xóa", (d, w) -> {

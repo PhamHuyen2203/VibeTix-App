@@ -93,6 +93,14 @@ public class EventHubActivity extends AppCompatActivity {
         loadEventDetails();
         loadStats();
     }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (eventId != null && db != null) {
+            loadStats();
+        }
+    }
 
     // ── View Binding ──────────────────────────────────────────────────────────
 
@@ -157,7 +165,7 @@ public class EventHubActivity extends AppCompatActivity {
     }
 
     private void confirmCancelEvent() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Huỷ sự kiện")
             .setMessage("Bạn có chắc chắn muốn huỷ sự kiện này? Hành động này không thể hoàn tác và sẽ gửi thông báo đến tất cả khách hàng đã mua vé.")
             .setPositiveButton("Huỷ sự kiện", (dialog, which) -> {
@@ -286,6 +294,14 @@ public class EventHubActivity extends AppCompatActivity {
                     startActivity(i);
                 }));
 
+        list.add(new FeatureAdapter.FeatureItem(
+                R.drawable.ic_trending_up, "Báo cáo", isOwner || isManager, false,
+                () -> {
+                    Intent i = new Intent(this, EventAnalyticsActivity.class);
+                    i.putExtra(EventAnalyticsActivity.EXTRA_EVENT_ID, eventId);
+                    startActivity(i);
+                }));
+
         return list;
     }
 
@@ -393,8 +409,13 @@ public class EventHubActivity extends AppCompatActivity {
         });
 
         // Check-ins hôm nay
-        String todayStart = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                .format(new java.util.Date()) + "T00:00:00";
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        cal.set(java.util.Calendar.MILLISECOND, 0);
+        com.google.firebase.Timestamp todayStart = new com.google.firebase.Timestamp(cal.getTime());
+
         db.collection(FirebaseCollections.USER_TICKETS)
                 .whereEqualTo("event_id", eventId)
                 .whereGreaterThanOrEqualTo("checked_in_at", todayStart)

@@ -333,4 +333,39 @@
     <string name="org_events_search_hint">Search your events…</string>
     <string name="org_events_empty_title">No events yet</string>
     <string name="org_events_empty_desc">Create your first event and start selling tickets!</string>
+
+    <string name="event_pending_approval_btn">Event is pending approval</string>
+    <string name="btn_continue_readonly">Continue (Read-only)</string>
+    <string name="dialog_save_draft_title">Save event draft?</string>
+    <string name="dialog_save_draft_msg">Do you want to save the entered information as a draft?</string>
+    <string name="btn_save_draft">Save Draft</string>
+    <string name="btn_skip">Skip</string>
+    <string name="default_event_title_draft">Untitled Event</string>
+    <string name="err_empty_event_title">Please enter event title</string>
+    <string name="err_empty_organizer">Please select or enter an Organizer</string>
+    <string name="err_empty_new_org_info">Please enter Organizer Name, Email and Phone</string>
+    <string name="err_empty_saved_org">Please select a saved Organizer</string>
+
+    <string name="status_draft_caps">DRAFT</string>
+    <string name="status_pending_caps">PENDING</string>
+    <string name="status_approved_caps">APPROVED</string>
+    <string name="status_ongoing_caps">ONGOING</string>
+    <string name="status_cancelled_caps">CANCELLED</string>
+    <string name="status_completed_caps">COMPLETED</string>
+
+    <string name="role_owner">👑 OWNER</string>
+    <string name="role_manager">👔 MANAGER</string>
+    <string name="role_staff">🎫 STAFF</string>
+
+    <string name="msg_no_tickets_to_export">No ticket data to export</string>
+    <string name="err_export_csv">Error creating export file</string>
+    <string name="err_load_orders">Error loading orders</string>
+    <string name="err_load_analytics">Error loading analytics data</string>
+    <string name="csv_header">Ticket_Code,Ticket_Type,Price,Purchase_Date,Status,Owner_ID,Email,Full_Name,Event_ID\n</string>
+    <string name="share_report">Share Report</string>
+
+    <string name="err_load_data">Error loading data</string>
+    <string name="err_load_event_details">Error loading event details</string>
+    <string name="status_dot_prefix">● %s</string>
+    <string name="txt_coming_soon">Coming soon</string>
 </resources>

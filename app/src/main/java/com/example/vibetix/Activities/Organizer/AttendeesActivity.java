@@ -15,6 +15,7 @@ import com.example.vibetix.Models.UserTicket;
 import com.example.vibetix.databinding.ActivityAttendeesBinding;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class AttendeesActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String eventId;
     private String currentFilterStatus = "all"; // all, checked_in, not_checked_in
+    private ListenerRegistration ticketsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +95,7 @@ public class AttendeesActivity extends AppCompatActivity {
         binding.rvAttendees.setVisibility(View.GONE);
         binding.layoutEmpty.setVisibility(View.GONE);
 
-        db.collection("user_tickets")
+        ticketsListener = db.collection("user_tickets")
                 .whereEqualTo("event_id", eventId)
                 .addSnapshotListener((value, error) -> {
                     binding.pbLoading.setVisibility(View.GONE);
@@ -217,6 +219,14 @@ public class AttendeesActivity extends AppCompatActivity {
     private void showEmptyState() {
         binding.rvAttendees.setVisibility(View.GONE);
         binding.layoutEmpty.setVisibility(View.VISIBLE);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (ticketsListener != null) {
+            ticketsListener.remove();
+        }
     }
 }
 

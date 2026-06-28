@@ -199,7 +199,7 @@ public class MyEventsListFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     if (isAdded()) {
                         pbLoading.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.err_load_data), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -253,7 +253,7 @@ public class MyEventsListFragment extends Fragment {
         }).addOnFailureListener(e -> {
             if (isAdded()) {
                 pbLoading.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Lỗi khi lấy chi tiết sự kiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.err_load_event_details), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -273,10 +273,21 @@ public class MyEventsListFragment extends Fragment {
         // Lưu context sự kiện vào session
         sessionManager.setActiveEvent(event.getEventId(), role);
 
-        // Tất cả role đều navigate vào EventHubActivity — role sẽ quyết định chức năng nào enabled
-        Intent intent = new Intent(getActivity(), EventHubActivity.class);
-        intent.putExtra(EventHubActivity.EXTRA_EVENT_ID, event.getEventId());
-        intent.putExtra(EventHubActivity.EXTRA_ROLE, role);
-        startActivity(intent);
+        String status = event.getStatusStr();
+        boolean isDraftOrPending = "draft".equals(status) || "pending".equals(status);
+        
+        if (isDraftOrPending) {
+            Intent intent = new Intent(getActivity(), CreateEditEventActivity.class);
+            intent.putExtra(CreateEditEventActivity.EXTRA_EVENT_ID, event.getEventId());
+            if ("pending".equals(status)) {
+                intent.putExtra("IS_READ_ONLY", true);
+            }
+            createEventLauncher.launch(intent);
+        } else {
+            Intent intent = new Intent(getActivity(), EventHubActivity.class);
+            intent.putExtra(EventHubActivity.EXTRA_EVENT_ID, event.getEventId());
+            intent.putExtra(EventHubActivity.EXTRA_ROLE, role);
+            startActivity(intent);
+        }
     }
 }

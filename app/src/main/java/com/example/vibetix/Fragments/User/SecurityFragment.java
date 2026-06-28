@@ -249,7 +249,7 @@ public class SecurityFragment extends Fragment {
             });
         }
 
-        androidx.appcompat.app.AlertDialog dialog = new AlertDialog.Builder(requireContext())
+        androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setView(dialogView)
                 .setPositiveButton("Lưu PIN", null) // null để override
                 .setNegativeButton("Hủy", null)

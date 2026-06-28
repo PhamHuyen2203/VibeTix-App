@@ -1,6 +1,6 @@
 package com.example.vibetix.Fragments.User;
 
-import android.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -234,7 +234,7 @@ public class EventFilterDialog extends BottomSheetDialogFragment {
         int pad = (int)(16 * getResources().getDisplayMetrics().density);
         input.setPadding(pad, pad, pad, pad);
 
-        new AlertDialog.Builder(requireContext())
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(isMin ? "Nhập giá tối thiểu" : "Nhập giá tối đa")
                 .setView(input)
                 .setPositiveButton("Xác nhận", (dialog, which) -> {

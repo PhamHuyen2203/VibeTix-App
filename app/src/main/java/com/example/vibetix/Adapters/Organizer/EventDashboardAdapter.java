@@ -46,7 +46,7 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
 
         // Date
         String dateStr = event.getStartTime();
-        holder.tvDate.setText(dateStr != null ? "📅 " + dateStr : "Sắp diễn ra");
+        holder.tvDate.setText(dateStr != null ? "📅 " + dateStr : holder.itemView.getContext().getString(R.string.txt_coming_soon));
 
         // Venue
         if (holder.tvVenue != null) {
@@ -69,17 +69,17 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
             String roleStr = event.getUserRole().toUpperCase();
             switch (roleStr) {
                 case "OWNER":
-                    holder.tvRoleBadge.setText("👑 OWNER");
+                    holder.tvRoleBadge.setText(holder.itemView.getContext().getString(R.string.role_owner));
                     holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_owner);
                     holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 case "MANAGER":
-                    holder.tvRoleBadge.setText("👔 MANAGER");
+                    holder.tvRoleBadge.setText(holder.itemView.getContext().getString(R.string.role_manager));
                     holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_manager);
                     holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 default:
-                    holder.tvRoleBadge.setText("🎫 STAFF");
+                    holder.tvRoleBadge.setText(holder.itemView.getContext().getString(R.string.role_staff));
                     holder.tvRoleBadge.setBackgroundResource(R.drawable.bg_role_staff);
                     holder.tvRoleBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_black));
                     
@@ -107,27 +107,27 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
             switch (s) {
                 case "approved":
                 case "ongoing":
-                    holder.tvStatusBadge.setText("● " + s.toUpperCase());
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), s.equals("approved") ? holder.itemView.getContext().getString(R.string.status_approved_caps) : holder.itemView.getContext().getString(R.string.status_ongoing_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active); // xanh
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 case "pending":
-                    holder.tvStatusBadge.setText("● PENDING");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_pending_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
                     break;
                 case "cancelled":
-                    holder.tvStatusBadge.setText("● CANCELLED");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_cancelled_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
                     break;
                 case "completed":
-                    holder.tvStatusBadge.setText("● COMPLETED");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_completed_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 default: // draft
-                    holder.tvStatusBadge.setText("● DRAFT");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_draft_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
                     break;
@@ -137,22 +137,22 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
             holder.tvStatusBadge.setVisibility(View.VISIBLE);
             switch (event.getStatusEnum()) {
                 case APPROVED: case ONGOING:
-                    holder.tvStatusBadge.setText("● " + event.getStatusEnum().name());
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), event.getStatusEnum() == Event.Status.APPROVED ? holder.itemView.getContext().getString(R.string.status_approved_caps) : holder.itemView.getContext().getString(R.string.status_ongoing_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
                 case PENDING:
-                    holder.tvStatusBadge.setText("● PENDING");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_pending_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
                     break;
                 case CANCELLED:
-                    holder.tvStatusBadge.setText("● CANCELLED");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_cancelled_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
                     break;
                 default:
-                    holder.tvStatusBadge.setText("● DRAFT");
+                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_draft_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
                     break;
@@ -164,9 +164,20 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         holder.tvStatTickets.setText("...");
         holder.tvStatRevenue.setText("...");
 
-        // Fetch stats if OWNER or MANAGER
         String finalRoleStr = (event.getUserRole() != null) ? event.getUserRole().toUpperCase() : "";
-        if (finalRoleStr.equals("OWNER") || finalRoleStr.equals("MANAGER")) {
+        boolean isDraftOrPending = false;
+        if (event.getStatusStr() != null) {
+            String s = event.getStatusStr().toLowerCase();
+            isDraftOrPending = s.equals("draft") || s.equals("pending");
+        } else if (event.getStatusEnum() != null) {
+            isDraftOrPending = (event.getStatusEnum() == Event.Status.DRAFT || event.getStatusEnum() == Event.Status.PENDING);
+        }
+
+        // Hide stats if draft or pending
+        if (isDraftOrPending) {
+            if (holder.layoutStats != null) holder.layoutStats.setVisibility(View.GONE);
+        } else if (finalRoleStr.equals("OWNER") || finalRoleStr.equals("MANAGER")) {
+            if (holder.layoutStats != null) holder.layoutStats.setVisibility(View.VISIBLE);
             com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(event.getId(), (totalTickets, totalRevenue) -> {
                 java.text.NumberFormat vndFmt = java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi", "VN"));
                 holder.tvStatTickets.setText(String.valueOf(totalTickets));

@@ -9,6 +9,7 @@
         <item name="colorSurface">@color/clr_bg_white</item>
         <item name="colorOnSurface">@color/clr_text_black</item>
         <item name="bottomNavigationStyle">@style/Style.VibeTix.BottomNav</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.VibeTix.MaterialAlertDialog</item>
     </style>
 
     <style name="Theme.VibeTix" parent="Base.Theme.VibeTix" />
@@ -141,5 +142,17 @@
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Dialog Style -->
+    <style name="ThemeOverlay.VibeTix.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearance">@style/ShapeAppearance.VibeTix.Dialog</item>
+        <item name="colorPrimary">@color/clr_primary_blue</item>
+        <item name="colorSecondary">@color/clr_primary_pest</item>
+    </style>
+
+    <style name="ShapeAppearance.VibeTix.Dialog" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
     </style>
 </resources>

@@ -160,6 +160,52 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+    <!-- Offline Controls at top right -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        android:gravity="end">
+        
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchOffline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Offline Mode "
+            android:textColor="@color/clr_text_white"
+            android:textSize="12sp"
+            android:theme="@style/Theme.AppCompat.DayNight" />
+            
+        <LinearLayout
+            android:id="@+id/panelOfflineActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+            
+            <Button
+                android:id="@+id/btnDownloadData"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Tải DB"
+                android:textSize="10sp"
+                android:backgroundTint="@color/clr_primary"
+                android:layout_marginEnd="4dp"/>
+                
+            <Button
+                android:id="@+id/btnSyncData"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Đồng bộ (0)"
+                android:textSize="10sp"
+                android:backgroundTint="@color/clr_warning"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Result panel — slides up from bottom -->
     <LinearLayout
         android:id="@+id/panelResult"

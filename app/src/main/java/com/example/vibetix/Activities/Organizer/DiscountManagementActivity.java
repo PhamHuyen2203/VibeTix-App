@@ -228,6 +228,12 @@ public class DiscountManagementActivity extends AppCompatActivity {
             }
             
             String discountType = typeStr.contains("%") ? "percentage" : "fixed";
+            
+            if ("percentage".equals(discountType) && value > 100) {
+                Toast.makeText(this, "Phần trăm giảm không được vượt quá 100", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             com.google.firebase.Timestamp tsStart = displayToTimestamp(saleStart);
             com.google.firebase.Timestamp tsEnd   = displayToTimestamp(saleEnd);
             if (tsStart == null || tsEnd == null) {
@@ -256,6 +262,8 @@ public class DiscountManagementActivity extends AppCompatActivity {
     private void createDiscount(String code, String title, String type, long value, long limit,
                                 com.google.firebase.Timestamp tsStart, com.google.firebase.Timestamp tsEnd, boolean isActive, BottomSheetDialog dialog) {
         Discount discount = new Discount();
+        String id = UUID.randomUUID().toString();
+        discount.setId(id);
         discount.setCode(code);
         discount.setTitle(title);
         discount.setType(type);
@@ -348,7 +356,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
     private String generateRandomCode() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder sb = new StringBuilder();
-        Random rnd = new Random();
+        java.security.SecureRandom rnd = new java.security.SecureRandom();
         for (int i = 0; i < 8; i++) {
             sb.append(chars.charAt(rnd.nextInt(chars.length())));
         }

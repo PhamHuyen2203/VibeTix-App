@@ -333,4 +333,39 @@
     <string name="org_events_search_hint">Tìm kiếm sự kiện của bạn…</string>
     <string name="org_events_empty_title">Chưa có sự kiện nào</string>
     <string name="org_events_empty_desc">Tạo sự kiện đầu tiên của bạn và bắt đầu bán vé!</string>
+
+    <string name="event_pending_approval_btn">Sự kiện đang chờ duyệt</string>
+    <string name="btn_continue_readonly">Tiếp tục (Chỉ xem)</string>
+    <string name="dialog_save_draft_title">Lưu nháp sự kiện?</string>
+    <string name="dialog_save_draft_msg">Bạn có muốn lưu các thông tin đã nhập vào bản nháp không?</string>
+    <string name="btn_save_draft">Lưu nháp</string>
+    <string name="btn_skip">Bỏ qua</string>
+    <string name="default_event_title_draft">Sự kiện chưa đặt tên</string>
+    <string name="err_empty_event_title">Vui lòng nhập tiêu đề sự kiện</string>
+    <string name="err_empty_organizer">Vui lòng chọn hoặc nhập Ban tổ chức</string>
+    <string name="err_empty_new_org_info">Vui lòng nhập Tên, Email và Số điện thoại Ban tổ chức</string>
+    <string name="err_empty_saved_org">Vui lòng chọn Ban tổ chức đã lưu</string>
+
+    <string name="status_draft_caps">BẢN NHÁP</string>
+    <string name="status_pending_caps">CHỜ DUYỆT</string>
+    <string name="status_approved_caps">ĐÃ DUYỆT</string>
+    <string name="status_ongoing_caps">ĐANG DIỄN RA</string>
+    <string name="status_cancelled_caps">ĐÃ HỦY</string>
+    <string name="status_completed_caps">ĐÃ KẾT THÚC</string>
+
+    <string name="role_owner">👑 CHỦ SỞ HỮU</string>
+    <string name="role_manager">👔 QUẢN LÝ</string>
+    <string name="role_staff">🎫 NHÂN VIÊN</string>
+
+    <string name="msg_no_tickets_to_export">Chưa có dữ liệu vé để xuất</string>
+    <string name="err_export_csv">Lỗi khi tạo file xuất</string>
+    <string name="err_load_orders">Lỗi khi tải đơn hàng</string>
+    <string name="err_load_analytics">Lỗi khi tải dữ liệu phân tích</string>
+    <string name="csv_header">Ma_Ve,Ten_Loai_Ve,Gia_Tien,Ngay_Mua,Trang_Thai,Nguoi_So_Huu,Email,Ten_Nguoi_Dung,Event_ID\n</string>
+    <string name="share_report">Chia sẻ báo cáo</string>
+
+    <string name="err_load_data">Lỗi tải dữ liệu</string>
+    <string name="err_load_event_details">Lỗi khi lấy chi tiết sự kiện</string>
+    <string name="status_dot_prefix">● %s</string>
+    <string name="txt_coming_soon">Sắp diễn ra</string>
 </resources>

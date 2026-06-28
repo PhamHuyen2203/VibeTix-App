@@ -359,7 +359,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
     }
 
     private void showEditDialog(OrganizerEventStarAdapter.EventStarWrapper wrapper) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
         builder.setTitle("Chỉnh sửa: " + (wrapper.star != null ? wrapper.star.getStageName() : ""));
 
         LinearLayout layout = new LinearLayout(this);
@@ -399,7 +399,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
     }
 
     private void showDeleteDialog(OrganizerEventStarAdapter.EventStarWrapper wrapper) {
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Xoá Nghệ sĩ")
                 .setMessage("Bạn có chắc chắn muốn xoá " + (wrapper.star != null ? wrapper.star.getStageName() : "nghệ sĩ này") + " khỏi sự kiện?")
                 .setPositiveButton("Xoá", (dialog, which) -> {

@@ -106,6 +106,10 @@ public class OrderManagementActivity extends AppCompatActivity {
             filterOrders();
         });
 
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            loadOrders();
+        });
+
         adapter.setOnItemClickListener(this::showOrderDetails);
 
         loadOrders();
@@ -130,6 +134,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                     allOrderItems.clear();
                     if (orderItemsSnap == null || orderItemsSnap.isEmpty()) {
                         binding.pbLoading.setVisibility(View.GONE);
+                        binding.swipeRefresh.setRefreshing(false);
                         updateStatsHeader();
                         showEmptyState();
                         return;
@@ -150,6 +155,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                     List<String> orderIds = new ArrayList<>(orderIdSet);
                     if (orderIds.isEmpty()) {
                         binding.pbLoading.setVisibility(View.GONE);
+                        binding.swipeRefresh.setRefreshing(false);
                         updateStatsHeader();
                         showEmptyState();
                         return;
@@ -202,6 +208,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                                     });
 
                                     binding.pbLoading.setVisibility(View.GONE);
+                                    binding.swipeRefresh.setRefreshing(false);
                                     updateStatsHeader();
 
                                     if (allOrderItems.isEmpty()) {
@@ -219,6 +226,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
+                    binding.swipeRefresh.setRefreshing(false);
                     Toast.makeText(this, "Lỗi khi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     showEmptyState();
                 });
@@ -324,6 +332,10 @@ public class OrderManagementActivity extends AppCompatActivity {
         }
 
         String status = (o != null && o.getStatusStr() != null) ? o.getStatusStr() : "pending";
+        String paymentMethod = (o != null && o.getPaymentMethod() != null) ? o.getPaymentMethod() : "unknown";
+        
+        sheetBinding.btnConfirmOrder.setVisibility(View.GONE);
+
         switch (status.toLowerCase()) {
             case "completed": case "confirmed": case "paid":
                 sheetBinding.tvOrderStatusDetails.setText("Thành công");
@@ -344,7 +356,9 @@ public class OrderManagementActivity extends AppCompatActivity {
                 sheetBinding.tvOrderStatusDetails.setText("Chờ xử lý");
                 sheetBinding.tvOrderStatusDetails.setTextColor(0xFF226CEB);
                 sheetBinding.tvOrderStatusDetails.setBackgroundResource(R.drawable.bg_ticket_type_active);
-                sheetBinding.btnConfirmOrder.setVisibility(View.VISIBLE);
+                if ("transfer".equalsIgnoreCase(paymentMethod)) {
+                    sheetBinding.btnConfirmOrder.setVisibility(View.VISIBLE);
+                }
                 break;
         }
 
