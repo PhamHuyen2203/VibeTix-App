@@ -128,6 +128,15 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <activity
+            android:name=".Activities.Organizer.OrganizerRevenueActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.EventRevenueDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.TicketDetailActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

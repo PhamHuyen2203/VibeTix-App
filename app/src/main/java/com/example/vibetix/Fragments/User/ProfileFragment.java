@@ -24,6 +24,7 @@ import com.example.vibetix.Activities.User.UserMainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.vibetix.Fragments.Organizer.OrganizerProfileFragment;
 import com.example.vibetix.Models.OrganizerProfile;
 import com.example.vibetix.Models.PaymentMethod;
 import com.example.vibetix.R;

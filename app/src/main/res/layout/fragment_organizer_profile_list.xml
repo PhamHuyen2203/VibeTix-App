@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/clr_bg_light"
+    android:orientation="vertical">
+
+    <!-- ── HEADER ─────────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_auth_header"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="28dp">
+
+        <!-- Row: greeting + add button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xin chào,"
+                    android:textColor="#AAFFFFFF"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvUserDisplayName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/clr_text_white"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="Nguyễn Văn A" />
+
+                <TextView
+                    android:id="@+id/tvOrgCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="#AAFFFFFF"
+                    android:textSize="12sp"
+                    tools:text="2 hồ sơ ban tổ chức" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddOrgProfile"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="+ Thêm mới"
+                android:textAllCaps="false"
+                android:textColor="@color/clr_text_white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:cornerRadius="20dp"
+                app:strokeColor="@color/clr_text_white"
+                app:strokeWidth="1.5dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ── BODY ───────────────────────────────────────── -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="32dp">
+
+            <!-- User identity card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                app:cardBackgroundColor="@color/clr_bg_white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivUserAvatar"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_avatar_circle"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_auth_person" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvUserInfoName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/clr_text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            tools:text="Nguyễn Văn A" />
+
+                        <TextView
+                            android:id="@+id/tvUserInfoEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="12sp"
+                            tools:text="user@email.com" />
+
+                        <TextView
+                            android:id="@+id/tvUserInfoPhone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            tools:text="0901 234 567" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_approved"
+                        android:paddingHorizontal="9dp"
+                        android:paddingVertical="4dp"
+                        android:text="Organizer"
+                        android:textColor="@color/clr_success"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Section header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Hồ sơ ban tổ chức"
+                    android:textColor="@color/clr_text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/pbProfileLoading"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Organizer list -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvOrganizerProfiles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_organizer_profile_card" />
+
+            <!-- Empty state -->
+            <LinearLayout
+                android:id="@+id/layoutOrgEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="48dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏢"
+                    android:textSize="52sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Chưa có hồ sơ ban tổ chức"
+                    android:textColor="@color/clr_text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="Tạo hồ sơ đầu tiên để bắt đầu\nquản lý sự kiện của bạn"
+                    android:textColor="@color/clr_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Error -->
+            <TextView
+                android:id="@+id/tvProfileError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/clr_error"
+                android:textSize="13sp"
+                android:visibility="gone"
+                tools:text="Không thể tải thông tin. Thử lại." />
+
+            <!-- Settings card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="@color/clr_bg_white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp"
+                        android:letterSpacing="0.06"
+                        android:text="CÀI ĐẶT TÀI KHOẢN"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <TextView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:gravity="center"
+                            android:text="🔔"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Cài đặt thông báo"
+                            android:textColor="@color/clr_text_primary"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="#C8CBD0" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="60dp"
+                        android:background="@color/clr_divider" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <TextView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:gravity="center"
+                            android:text="🏦"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Thông tin thanh toán"
+                            android:textColor="@color/clr_text_primary"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="#C8CBD0" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="60dp"
+                        android:background="@color/clr_divider" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <TextView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:gravity="center"
+                            android:text="🔒"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Đổi mật khẩu"
+                            android:textColor="@color/clr_text_primary"
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right"
+                            android:tint="#C8CBD0" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Logout -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrgLogout"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Đăng xuất"
+                android:textAllCaps="false"
+                android:textColor="@color/clr_error"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/clr_bg_white"
+                app:cornerRadius="16dp"
+                app:elevation="2dp"
+                app:strokeColor="@color/clr_divider"
+                app:strokeWidth="0dp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

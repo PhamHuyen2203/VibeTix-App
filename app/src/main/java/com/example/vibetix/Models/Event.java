@@ -73,11 +73,11 @@ public class Event {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    @PropertyName("banner_url") public String getImageUrl() { return posterUrl; }
-    @PropertyName("banner_url") public void setImageUrl(String imageUrl) { this.posterUrl = imageUrl; }
-    
-    @Exclude public String getPosterUrl() { return posterUrl; }
-    @Exclude public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+    @Exclude public String getImageUrl() { return posterUrl; }
+    @Exclude public void setImageUrl(String imageUrl) { this.posterUrl = imageUrl; }
+
+    @PropertyName("poster_url") public String getPosterUrl() { return posterUrl; }
+    @PropertyName("poster_url") public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
     public String getDate() { return date != null ? date : getStartTime(); }
     public void setDate(String date) { this.date = date; }
@@ -125,8 +125,8 @@ public class Event {
     public int getLocalPortraitImageResId() { return localPortraitImageResId; }
     public void setLocalPortraitImageResId(int localPortraitImageResId) { this.localPortraitImageResId = localPortraitImageResId; }
 
-    @PropertyName("poster_url") public String getPortraitImageUrl() { return portraitImageUrl; }
-    @PropertyName("poster_url") public void setPortraitImageUrl(String v) { this.portraitImageUrl = v; }
+    @Exclude public String getPortraitImageUrl() { return posterUrl != null ? posterUrl : portraitImageUrl; }
+    @Exclude public void setPortraitImageUrl(String v) { this.portraitImageUrl = v; }
 
     public String getOrganizerName() { return organizerName != null ? organizerName : organizerId; }
     public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
