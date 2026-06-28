@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -113,6 +113,17 @@
             android:name=".Activities.User.EventDetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+
+        <activity
+            android:name=".Activities.Organizer.OrganizerRevenueActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.EventRevenueDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Organizer.TicketDetailActivity"
+            android:exported="false" />
 
     </application>
 

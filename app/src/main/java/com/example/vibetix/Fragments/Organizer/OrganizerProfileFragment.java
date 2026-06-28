@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,443 +17,342 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.vibetix.Activities.Auth.AuthActivity;
-import com.example.vibetix.Activities.User.CreateOrganizerActivity;
+import com.example.vibetix.Activities.Organizer.OrganizerRevenueActivity;
 import com.example.vibetix.Models.Organizer;
-import com.example.vibetix.Models.User;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.gms.tasks.Tasks;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * OrganizerProfileFragment — Redesigned with:
- * - Gradient blue header, avatar, brand name, verified badge, edit profile button
- * - 3-column stats (events, tickets, revenue) from real Firestore data
- * - Info card (email, phone, website)
- * - Multi-org RecyclerView with "+ Thêm hồ sơ" button
- * - Settings section (notification, payment, password)
- * - Logout button
- */
 public class OrganizerProfileFragment extends Fragment {
 
-    // Header
-    private ImageView ivOrgAvatar;
-    private TextView tvOrgBrandName;
-    private LinearLayout layoutVerifiedBadge;
-    private TextView tvVerifiedBadge;
-    private MaterialButton btnEditProfile;
-
-    // Stats
-    private TextView tvTotalEvents;
-    private TextView tvMonthlyRevenue;
-    private TextView tvTotalTicketsSold;
-
-    // Info card
-    private TextView tvOrgEmail;
-    private TextView tvOrgPhone;
-    private TextView tvOrgWebsite;
-
-    // Multi-org section
-    private RecyclerView rvOrganizerProfiles;
-    private MaterialButton btnAddOrgProfile;
-
-    // State
-    private ProgressBar pbProfileLoading;
-    private TextView tvProfileError;
-
-    // Logout
-    private MaterialButton btnOrgLogout;
-
-    // Firebase & session
     private FirebaseFirestore db;
+    private FirebaseAuth auth;
     private SessionManager sessionManager;
 
-    // Adapter data
-    private final List<Organizer> organizerList = new ArrayList<>();
-    private OrgProfileMiniAdapter orgAdapter;
+    private TextView tvUserDisplayName, tvOrgCount, tvProfileError;
+    private TextView tvUserInfoName, tvUserInfoEmail, tvUserInfoPhone;
+    private android.widget.ImageView ivUserAvatar;
+    private ProgressBar pbProfileLoading;
+    private RecyclerView rvOrganizerProfiles;
+    private LinearLayout layoutOrgEmpty;
+    private MaterialButton btnAddOrgProfile, btnOrgLogout;
+
+    private OrgProfileAdapter adapter;
+    private final List<OrgCardData> orgList = new ArrayList<>();
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_organizer_profile, container, false);
+        return inflater.inflate(R.layout.fragment_organizer_profile, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
         sessionManager = new SessionManager(requireContext());
 
-        bindViews(view);
-        setupRecyclerView();
-        setupClickListeners();
-        loadData();
-
-        return view;
-    }
-
-    private void bindViews(View view) {
-        ivOrgAvatar         = view.findViewById(R.id.ivOrgAvatar);
-        tvOrgBrandName      = view.findViewById(R.id.tvOrgBrandName);
-        layoutVerifiedBadge = view.findViewById(R.id.layoutVerifiedBadge);
-        tvVerifiedBadge     = view.findViewById(R.id.tvVerifiedBadge);
-        btnEditProfile      = view.findViewById(R.id.btnEditProfile);
-
-        tvTotalEvents       = view.findViewById(R.id.tvTotalEvents);
-        tvMonthlyRevenue    = view.findViewById(R.id.tvMonthlyRevenue);
-        tvTotalTicketsSold  = view.findViewById(R.id.tvTotalTicketsSold);
-
-        tvOrgEmail          = view.findViewById(R.id.tvOrgEmail);
-        tvOrgPhone          = view.findViewById(R.id.tvOrgPhone);
-        tvOrgWebsite        = view.findViewById(R.id.tvOrgWebsite);
-
+        tvUserDisplayName = view.findViewById(R.id.tvUserDisplayName);
+        tvOrgCount = view.findViewById(R.id.tvOrgCount);
+        tvProfileError = view.findViewById(R.id.tvProfileError);
+        pbProfileLoading = view.findViewById(R.id.pbProfileLoading);
+        tvUserInfoName = view.findViewById(R.id.tvUserInfoName);
+        tvUserInfoEmail = view.findViewById(R.id.tvUserInfoEmail);
+        tvUserInfoPhone = view.findViewById(R.id.tvUserInfoPhone);
+        ivUserAvatar = view.findViewById(R.id.ivUserAvatar);
         rvOrganizerProfiles = view.findViewById(R.id.rvOrganizerProfiles);
-        btnAddOrgProfile    = view.findViewById(R.id.btnAddOrgProfile);
+        layoutOrgEmpty = view.findViewById(R.id.layoutOrgEmpty);
+        btnAddOrgProfile = view.findViewById(R.id.btnAddOrgProfile);
+        btnOrgLogout = view.findViewById(R.id.btnOrgLogout);
 
-        pbProfileLoading    = view.findViewById(R.id.pbProfileLoading);
-        tvProfileError      = view.findViewById(R.id.tvProfileError);
-        btnOrgLogout        = view.findViewById(R.id.btnOrgLogout);
-    }
-
-    private void setupRecyclerView() {
-        orgAdapter = new OrgProfileMiniAdapter(organizerList, organizer -> {
-            // Switch active organizer on tap
-            sessionManager.setActiveOrganizer(
-                    organizer.getOrganizerId(),
-                    organizer.getBrandName(),
-                    organizer.getLogoUrl()
-            );
-            // Reload header display
-            displayProfile(organizer, sessionManager.getUserDetails());
-        });
+        adapter = new OrgProfileAdapter(orgList, this::openOrgDetail);
         rvOrganizerProfiles.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvOrganizerProfiles.setAdapter(adapter);
         rvOrganizerProfiles.setNestedScrollingEnabled(false);
-        rvOrganizerProfiles.setAdapter(orgAdapter);
-    }
-
-    private void setupClickListeners() {
-        btnEditProfile.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), CreateOrganizerActivity.class));
-        });
-
-        btnAddOrgProfile.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), CreateOrganizerActivity.class));
-        });
 
         btnOrgLogout.setOnClickListener(v -> logout());
+        btnAddOrgProfile.setOnClickListener(v -> {
+            // Navigate to CreateOrganizerActivity if available
+            try {
+                Intent intent = new Intent(requireContext(),
+                        Class.forName("com.example.vibetix.Activities.User.CreateOrganizerActivity"));
+                startActivity(intent);
+            } catch (ClassNotFoundException ignored) { }
+        });
+
+        loadData();
     }
 
     private void loadData() {
-        User currentUser = sessionManager.getUserDetails();
-        if (currentUser == null) {
-            showError("Không tìm thấy thông tin người dùng.");
-            return;
-        }
-        showLoading(true);
+        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+        if (userId == null) { logout(); return; }
 
-        // Load ALL organizer profiles for this user
-        db.collection("organizers")
-                .whereEqualTo("user_id", currentUser.getUserId())
-                .get()
-                .addOnSuccessListener(query -> {
-                    showLoading(false);
-                    organizerList.clear();
+        // Load user info from Firestore
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(userDoc -> {
+                    if (!isAdded() || userDoc == null) return;
+                    String name = userDoc.getString("full_name");
+                    String email = userDoc.getString("email");
+                    String phone = userDoc.getString("phone");
+                    String avatarUrl = userDoc.getString("avatar_url");
 
-                    if (query != null && !query.isEmpty()) {
-                        for (DocumentSnapshot doc : query.getDocuments()) {
-                            Organizer org = doc.toObject(Organizer.class);
-                            if (org != null) {
-                                // Ensure ID populated from doc ID as fallback
-                                if (org.getOrganizerId() == null) {
-                                    org.setOrganizerId(doc.getId());
-                                }
-                                organizerList.add(org);
-                            }
-                        }
-                        orgAdapter.notifyDataSetChanged();
-
-                        // Show active organizer in header
-                        String activeId = sessionManager.getActiveOrganizerId();
-                        Organizer activeOrg = null;
-                        for (Organizer o : organizerList) {
-                            if (o.getOrganizerId().equals(activeId)) {
-                                activeOrg = o;
-                                break;
-                            }
-                        }
-                        if (activeOrg == null) activeOrg = organizerList.get(0);
-
-                        displayProfile(activeOrg, currentUser);
-                        final String orgId = activeOrg.getOrganizerId();
-                        loadEventStats(orgId);  // also loads revenue inside
-
-                    } else {
-                        displayFallbackProfile(currentUser);
-                        displayMockStats();
+                    String displayName = name != null && !name.isEmpty() ? name : "Ban tổ chức";
+                    tvUserDisplayName.setText(displayName);
+                    if (tvUserInfoName != null) tvUserInfoName.setText(displayName);
+                    if (tvUserInfoEmail != null && email != null) tvUserInfoEmail.setText(email);
+                    if (tvUserInfoPhone != null && phone != null && !phone.isEmpty()) {
+                        tvUserInfoPhone.setText(phone);
+                        tvUserInfoPhone.setVisibility(View.VISIBLE);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    showLoading(false);
-                    displayFallbackProfile(currentUser);
-                    displayMockStats();
+                    if (ivUserAvatar != null && avatarUrl != null && !avatarUrl.isEmpty()) {
+                        Glide.with(this).load(avatarUrl).circleCrop()
+                                .placeholder(R.drawable.bg_avatar_circle).into(ivUserAvatar);
+                    }
                 });
-    }
 
-    private void displayProfile(Organizer org, User fallbackUser) {
-        // Brand name
-        String brandName = org.getBrandName();
-        if (brandName == null || brandName.isEmpty()) {
-            brandName = fallbackUser != null && fallbackUser.getFullName() != null
-                    ? fallbackUser.getFullName() : "Organizer";
-        }
-        tvOrgBrandName.setText(brandName);
-
-        // Avatar via Glide
-        String logoUrl = org.getLogoUrl();
-        if (logoUrl != null && !logoUrl.isEmpty() && isAdded()) {
-            Glide.with(this)
-                    .load(logoUrl)
-                    .circleCrop()
-                    .placeholder(R.drawable.ic_role_building)
-                    .into(ivOrgAvatar);
-        } else {
-            ivOrgAvatar.setImageResource(R.drawable.ic_role_building);
-        }
-
-        // Email
-        String email = org.getContactEmail();
-        if (email == null || email.isEmpty()) {
-            email = fallbackUser != null ? fallbackUser.getEmail() : null;
-        }
-        tvOrgEmail.setText(email != null ? email : "—");
-
-        // Phone
-        String phone = org.getContactPhone();
-        if (phone == null || phone.isEmpty()) {
-            phone = fallbackUser != null ? fallbackUser.getPhone() : null;
-        }
-        tvOrgPhone.setText(phone != null ? phone : "—");
-
-        // Website
-        String website = org.getWebsiteUrl();
-        tvOrgWebsite.setText(website != null && !website.isEmpty() ? website : "—");
-
-        // Verified badge
-        updateVerifiedBadge(org.isVerified());
-    }
-
-    private void displayFallbackProfile(User user) {
-        String name = user.getFullName() != null ? user.getFullName() : user.getEmail();
-        tvOrgBrandName.setText(name != null ? name : "Organizer");
-        tvOrgEmail.setText(user.getEmail() != null ? user.getEmail() : "—");
-        tvOrgPhone.setText(user.getPhone() != null ? user.getPhone() : "—");
-        tvOrgWebsite.setText("—");
-        updateVerifiedBadge(false);
-    }
-
-    private void loadEventStats(String organizerId) {
-        // Query events where user created them (via event_staff as owner)
-        // Use organizer_id if available, fallback to user_id from session
-        String userId = sessionManager.getUserDetails() != null
-                ? sessionManager.getUserDetails().getUserId() : null;
-
-        com.google.firebase.firestore.Query eventsQuery = userId != null
-                ? db.collection("events").whereEqualTo("user_id", userId)
-                : db.collection("events").whereEqualTo("organizer_id", organizerId);
-
-        eventsQuery.get()
-                .addOnSuccessListener(snapshot -> {
-                    if (!isAdded()) return;
-                    int totalEvents = snapshot != null ? snapshot.size() : 0;
-                    tvTotalEvents.setText(String.valueOf(totalEvents));
-
-                    if (snapshot == null || snapshot.isEmpty()) {
-                        tvTotalTicketsSold.setText("0");
-                        tvMonthlyRevenue.setText("0đ");
+        showLoading(true);
+        db.collection("organizers")
+                .whereEqualTo("user_id", userId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    showLoading(false);
+                    if (snap == null || snap.isEmpty()) {
+                        showEmpty(true);
                         return;
                     }
 
-                    // Collect all event IDs
-                    List<String> eventIds = new ArrayList<>();
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        eventIds.add(doc.getId());
+                    List<Organizer> organizers = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snap) {
+                        Organizer org = doc.toObject(Organizer.class);
+                        org.setOrganizerId(doc.getId());
+                        organizers.add(org);
                     }
 
-                    loadRevenueFromOrderItems(eventIds);
+                    tvOrgCount.setText(organizers.size() + " hồ sơ ban tổ chức");
+                    showEmpty(false);
+
+                    // Load events+tickets stats for each organizer in parallel
+                    loadStatsForOrgs(organizers);
                 })
                 .addOnFailureListener(e -> {
-                    if (!isAdded()) return;
-                    tvTotalEvents.setText("—");
-                    tvTotalTicketsSold.setText("—");
+                    showLoading(false);
+                    tvProfileError.setText("Không thể tải thông tin. Thử lại.");
+                    tvProfileError.setVisibility(View.VISIBLE);
                 });
     }
 
-    /**
-     * Tính doanh thu tổng bằng cách:
-     * 1. Query order_items WHERE event_id IN (eventIds) — chunk mỗi 10
-     * 2. Tính tổng price_per_ticket * quantity
-     */
-    private void loadRevenueFromOrderItems(List<String> eventIds) {
-        if (eventIds == null || eventIds.isEmpty()) {
-            if (isAdded()) {
-                tvMonthlyRevenue.setText("0đ");
-                tvTotalTicketsSold.setText("0");
-            }
-            return;
-        }
+    private void loadStatsForOrgs(List<Organizer> organizers) {
+        orgList.clear();
 
-        List<com.google.android.gms.tasks.Task<QuerySnapshot>> tasks = new ArrayList<>();
-        for (int i = 0; i < eventIds.size(); i += 10) {
-            List<String> chunk = eventIds.subList(i, Math.min(i + 10, eventIds.size()));
-            tasks.add(db.collection(com.example.vibetix.Firebase.FirebaseCollections.ORDER_ITEMS)
-                    .whereIn("event_id", chunk)
-                    .get());
+        // Add cards with placeholder stats first so UI appears immediately
+        for (Organizer org : organizers) {
+            OrgCardData card = new OrgCardData(org);
+            orgList.add(card);
         }
+        adapter.notifyDataSetChanged();
 
-        Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
-            if (!isAdded()) return;
-            
-            List<com.example.vibetix.Models.OrderItem> allItems = new ArrayList<>();
-            java.util.Set<String> orderIds = new java.util.HashSet<>();
-            for (Object result : results) {
-                QuerySnapshot snap = (QuerySnapshot) result;
-                for (DocumentSnapshot doc : snap.getDocuments()) {
-                    com.example.vibetix.Models.OrderItem item = doc.toObject(com.example.vibetix.Models.OrderItem.class);
-                    if (item != null) {
-                        allItems.add(item);
-                        if (item.getOrderId() != null) {
-                            orderIds.add(item.getOrderId());
+        // Then load stats per organizer
+        for (int i = 0; i < organizers.size(); i++) {
+            Organizer org = organizers.get(i);
+            String orgId = org.getOrganizerId();
+            final int idx = i;
+
+            db.collection("events")
+                    .whereEqualTo("organizer_id", orgId)
+                    .get()
+                    .addOnSuccessListener(eventSnap -> {
+                        if (eventSnap == null || idx >= orgList.size()) return;
+
+                        List<String> eventIds = new ArrayList<>();
+                        for (DocumentSnapshot d : eventSnap.getDocuments()) {
+                            eventIds.add(d.getId());
                         }
-                    }
-                }
-            }
 
-            if (orderIds.isEmpty()) {
-                tvMonthlyRevenue.setText("0đ");
-                tvTotalTicketsSold.setText("0");
+                        orgList.get(idx).eventCount = eventSnap.size();
+
+                        if (eventIds.isEmpty()) {
+                            adapter.notifyItemChanged(idx);
+                            return;
+                        }
+
+                        loadTicketStats(eventIds, idx);
+                    });
+        }
+    }
+
+    private void loadTicketStats(List<String> eventIds, int idx) {
+        List<List<String>> chunks = new ArrayList<>();
+        for (int i = 0; i < eventIds.size(); i += 10) {
+            chunks.add(eventIds.subList(i, Math.min(i + 10, eventIds.size())));
+        }
+
+        // Step 1: query order_items for revenue + ticket count
+        List<com.google.android.gms.tasks.Task<?>> tasks = new ArrayList<>();
+        final long[] totalTickets = {0};
+        final java.util.Set<String> orderIdSet = new java.util.HashSet<>();
+        final java.util.Map<String, long[]> orderTotals = new java.util.HashMap<>();
+
+        for (List<String> chunk : chunks) {
+            var task = db.collection("order_items")
+                    .whereIn("event_id", chunk)
+                    .get()
+                    .addOnSuccessListener(snap -> {
+                        if (snap == null) return;
+                        for (DocumentSnapshot d : snap.getDocuments()) {
+                            Long qty = d.getLong("quantity");
+                            Long unitPrice = d.getLong("price_per_ticket");
+                            String orderId = d.getString("order_id");
+                            if (orderId != null) {
+                                orderIdSet.add(orderId);
+                                long q = qty != null ? qty : 0;
+                                long p = unitPrice != null ? unitPrice : 0;
+                                orderTotals.merge(orderId, new long[]{q, q * p},
+                                        (a, b) -> new long[]{a[0] + b[0], a[1] + b[1]});
+                            }
+                        }
+                    });
+            tasks.add(task);
+        }
+
+        // Step 2: after all order_items loaded, filter by order status
+        Tasks.whenAllSuccess(tasks).addOnSuccessListener(r -> {
+            if (orderIdSet.isEmpty()) {
+                // No orders → use user_tickets count only
+                countTicketsOnly(eventIds, idx);
                 return;
             }
 
-            List<String> orderIdList = new ArrayList<>(orderIds);
-            List<com.google.android.gms.tasks.Task<QuerySnapshot>> orderTasks = new ArrayList<>();
-            for (int i = 0; i < orderIdList.size(); i += 10) {
-                List<String> chunk = orderIdList.subList(i, Math.min(i + 10, orderIdList.size()));
-                orderTasks.add(db.collection(com.example.vibetix.Firebase.FirebaseCollections.ORDERS)
-                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
-                        .get());
+            List<String> orderIds = new ArrayList<>(orderIdSet);
+            List<com.google.android.gms.tasks.Task<?>> orderTasks = new ArrayList<>();
+            final long[] revenue = {0};
+            final long[] tickets = {0};
+
+            List<List<String>> orderChunks = new ArrayList<>();
+            for (int i = 0; i < orderIds.size(); i += 10) {
+                orderChunks.add(orderIds.subList(i, Math.min(i + 10, orderIds.size())));
             }
 
-            Tasks.whenAllSuccess(orderTasks).addOnSuccessListener(orderResults -> {
-                if (!isAdded()) return;
-                
-                java.util.Map<String, String> orderStatusMap = new java.util.HashMap<>();
-                for (Object orderResult : orderResults) {
-                    QuerySnapshot orderSnap = (QuerySnapshot) orderResult;
-                    for (DocumentSnapshot doc : orderSnap.getDocuments()) {
-                        String status = doc.getString("status");
-                        orderStatusMap.put(doc.getId(), status != null ? status.toLowerCase() : "pending");
-                    }
-                }
+            for (List<String> chunk : orderChunks) {
+                var t = db.collection("orders")
+                        .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
+                        .get()
+                        .addOnSuccessListener(snap -> {
+                            if (snap == null) return;
+                            for (DocumentSnapshot d : snap.getDocuments()) {
+                                String status = d.getString("status");
+                                boolean cancelled = status != null &&
+                                        (status.equalsIgnoreCase("cancelled") || status.equalsIgnoreCase("refunded"));
+                                if (!cancelled) {
+                                    long[] totals = orderTotals.get(d.getId());
+                                    if (totals != null) {
+                                        tickets[0] += totals[0];
+                                        revenue[0] += totals[1];
+                                    }
+                                }
+                            }
+                        });
+                orderTasks.add(t);
+            }
 
-                double totalRevenue = 0;
-                long totalTickets = 0;
-                for (com.example.vibetix.Models.OrderItem item : allItems) {
-                    String status = orderStatusMap.get(item.getOrderId());
-                    boolean isPaid = status != null && (status.equals("completed") || status.equals("confirmed") || status.equals("paid"));
-                    
-                    if (isPaid) {
-                        long q = item.getQuantity();
-                        totalTickets += q;
-                        totalRevenue += item.getPricePerTicket() * q;
-                    }
+            Tasks.whenAllSuccess(orderTasks).addOnCompleteListener(done -> {
+                if (idx < orgList.size()) {
+                    orgList.get(idx).totalTickets = tickets[0];
+                    orgList.get(idx).totalRevenue = revenue[0];
+                    if (adapter != null) adapter.notifyItemChanged(idx);
                 }
-
-                tvMonthlyRevenue.setText(formatRevenue(totalRevenue));
-                tvTotalTicketsSold.setText(formatCompact(totalTickets));
             });
-        }).addOnFailureListener(e -> {
-            if (!isAdded()) return;
-            tvMonthlyRevenue.setText("—");
-            tvTotalTicketsSold.setText("—");
         });
     }
 
-    private void displayMockStats() {
-        tvTotalEvents.setText("—");
-        tvMonthlyRevenue.setText("—");
-        tvTotalTicketsSold.setText("—");
-    }
-
-    private void updateVerifiedBadge(boolean isVerified) {
-        if (!isAdded()) return;
-        if (isVerified) {
-            tvVerifiedBadge.setText("✓ Đã xác minh");
-            tvVerifiedBadge.setTextColor(requireContext().getColor(R.color.clr_success));
-        } else {
-            tvVerifiedBadge.setText("⏳ Chờ xác minh");
-            tvVerifiedBadge.setTextColor(requireContext().getColor(R.color.clr_warning));
+    private void countTicketsOnly(List<String> eventIds, int idx) {
+        List<List<String>> chunks = new ArrayList<>();
+        for (int i = 0; i < eventIds.size(); i += 10) {
+            chunks.add(eventIds.subList(i, Math.min(i + 10, eventIds.size())));
         }
+        List<com.google.android.gms.tasks.Task<?>> tasks = new ArrayList<>();
+        final long[] count = {0};
+        for (List<String> chunk : chunks) {
+            tasks.add(db.collection("user_tickets").whereIn("event_id", chunk).get()
+                    .addOnSuccessListener(s -> { if (s != null) count[0] += s.size(); }));
+        }
+        Tasks.whenAllSuccess(tasks).addOnCompleteListener(done -> {
+            if (idx < orgList.size()) {
+                orgList.get(idx).totalTickets = count[0];
+                if (adapter != null) adapter.notifyItemChanged(idx);
+            }
+        });
     }
 
-    private String formatCompact(long number) {
-        if (number >= 1_000_000) return String.format(Locale.getDefault(), "%.1fM", number / 1_000_000.0);
-        if (number >= 1_000) return String.format(Locale.getDefault(), "%.1fK", number / 1_000.0);
-        return String.valueOf(number);
-    }
+    private void openOrgDetail(OrgCardData card) {
+        Organizer org = card.organizer;
+        sessionManager.setActiveOrganizer(
+                org.getOrganizerId(),
+                org.getBrandName(),
+                org.getLogoUrl()
+        );
 
-    private String formatRevenue(double amount) {
-        if (amount == 0) return "0đ";
-        if (amount >= 1_000_000_000) return String.format(Locale.getDefault(), "%.1fB", amount / 1_000_000_000.0);
-        if (amount >= 1_000_000) return String.format(Locale.getDefault(), "%.1fM", amount / 1_000_000.0);
-        if (amount >= 1_000) return String.format(Locale.getDefault(), "%.0fK", amount / 1_000.0);
-        return new DecimalFormat("#,###").format(amount) + "đ";
+        Intent intent = new Intent(requireContext(), OrganizerRevenueActivity.class);
+        intent.putExtra(OrganizerRevenueActivity.EXTRA_ORGANIZER_ID, org.getOrganizerId());
+        intent.putExtra(OrganizerRevenueActivity.EXTRA_ORGANIZER_NAME, org.getBrandName());
+        intent.putExtra("extra_is_verified", org.isVerified());
+        startActivity(intent);
     }
 
     private void showLoading(boolean show) {
-        if (pbProfileLoading != null)
-            pbProfileLoading.setVisibility(show ? View.VISIBLE : View.GONE);
-        hideError();
+        pbProfileLoading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void showError(String message) {
-        if (tvProfileError != null) {
-            tvProfileError.setText(message);
-            tvProfileError.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void hideError() {
-        if (tvProfileError != null) tvProfileError.setVisibility(View.GONE);
+    private void showEmpty(boolean show) {
+        layoutOrgEmpty.setVisibility(show ? View.VISIBLE : View.GONE);
+        rvOrganizerProfiles.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
     private void logout() {
-        FirebaseAuth.getInstance().signOut();
+        auth.signOut();
         sessionManager.logoutUser();
         Intent intent = new Intent(requireContext(), AuthActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Inline mini-adapter for organizer profiles list
-    // ─────────────────────────────────────────────────────────────────────────
+    // ── Data holder ─────────────────────────────────────────────────────────
 
-    interface OnOrgClickListener {
-        void onOrgClick(Organizer organizer);
+    static class OrgCardData {
+        Organizer organizer;
+        long eventCount = 0;
+        long totalTickets = 0;
+        long totalRevenue = 0;
+
+        OrgCardData(Organizer organizer) {
+            this.organizer = organizer;
+        }
     }
 
-    static class OrgProfileMiniAdapter extends RecyclerView.Adapter<OrgProfileMiniAdapter.VH> {
+    // ── Adapter ─────────────────────────────────────────────────────────────
 
-        private final List<Organizer> items;
+    interface OnOrgClickListener {
+        void onOrgClick(OrgCardData card);
+    }
+
+    static class OrgProfileAdapter extends RecyclerView.Adapter<OrgProfileAdapter.VH> {
+
+        private final List<OrgCardData> items;
         private final OnOrgClickListener listener;
 
-        OrgProfileMiniAdapter(List<Organizer> items, OnOrgClickListener listener) {
+        OrgProfileAdapter(List<OrgCardData> items, OnOrgClickListener listener) {
             this.items = items;
             this.listener = listener;
         }
@@ -463,43 +361,97 @@ public class OrganizerProfileFragment extends Fragment {
         @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_organizer_switcher, parent, false);
+                    .inflate(R.layout.item_organizer_profile_card, parent, false);
             return new VH(v);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull VH holder, int position) {
-            Organizer org = items.get(position);
-            holder.tvName.setText(org.getBrandName() != null ? org.getBrandName() : "—");
-            String email = org.getContactEmail();
-            holder.tvSub.setText(email != null && !email.isEmpty() ? email :
-                    (org.isVerified() ? "✓ Đã xác minh" : "⏳ Chờ xác minh"));
+        public void onBindViewHolder(@NonNull VH h, int position) {
+            OrgCardData card = items.get(position);
+            Organizer org = card.organizer;
 
+            h.tvBrandName.setText(org.getBrandName() != null ? org.getBrandName() : "Ban tổ chức");
+
+            // Description line: website or description fallback
+            String desc = org.getWebsite();
+            if (desc == null || desc.isEmpty()) desc = org.getDescription();
+            if (desc == null || desc.isEmpty()) desc = "Đơn vị tổ chức sự kiện";
+            h.tvDescription.setText(desc);
+
+            // Verified badge — solid pill
+            boolean verified = org.isVerified();
+            android.graphics.drawable.GradientDrawable pill = new android.graphics.drawable.GradientDrawable();
+            pill.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            pill.setCornerRadius(100f);
+            if (verified) {
+                pill.setColor(0x1A27AE60); // light green bg
+                h.tvVerifiedChip.setText("● Đã xác thực");
+                h.tvVerifiedChip.setTextColor(0xFF27AE60);
+            } else {
+                pill.setColor(0x1AE6A817); // light amber bg
+                h.tvVerifiedChip.setText("● Chờ xác thực");
+                h.tvVerifiedChip.setTextColor(0xFFB8860B);
+            }
+            h.tvVerifiedChip.setBackground(pill);
+
+            // Accent bar
+            h.viewAccentBar.setBackgroundColor(
+                    verified ? 0xFF2563EB : 0xFFE6A817);
+
+            // Stats
+            h.tvStatEvents.setText(String.valueOf(card.eventCount));
+            h.tvStatTickets.setText(formatCompact(card.totalTickets));
+            h.tvStatRevenue.setText(formatRevenue(card.totalRevenue));
+
+            // Logo
             if (org.getLogoUrl() != null && !org.getLogoUrl().isEmpty()) {
-                Glide.with(holder.ivLogo.getContext())
+                Glide.with(h.ivOrgLogo.getContext())
                         .load(org.getLogoUrl())
                         .circleCrop()
-                        .placeholder(R.drawable.ic_organizer_placeholder)
-                        .into(holder.ivLogo);
+                        .placeholder(R.drawable.bg_avatar_circle)
+                        .into(h.ivOrgLogo);
             } else {
-                holder.ivLogo.setImageResource(R.drawable.ic_organizer_placeholder);
+                h.ivOrgLogo.setImageResource(R.drawable.ic_role_building);
             }
 
-            holder.itemView.setOnClickListener(v -> listener.onOrgClick(org));
+            h.itemView.setOnClickListener(v -> {
+                if (listener != null) listener.onOrgClick(card);
+            });
         }
 
         @Override
         public int getItemCount() { return items.size(); }
 
+        private String formatCompact(long n) {
+            if (n >= 1_000_000) return String.format(Locale.getDefault(), "%.1fM", n / 1_000_000.0);
+            if (n >= 1_000) return String.format(Locale.getDefault(), "%.1fK", n / 1_000.0);
+            return String.valueOf(n);
+        }
+
+        private String formatRevenue(long amount) {
+            if (amount == 0) return "0đ";
+            if (amount >= 1_000_000_000) return String.format(Locale.getDefault(), "%.1fBđ", amount / 1_000_000_000.0);
+            if (amount >= 1_000_000) return String.format(Locale.getDefault(), "%.1fMđ", amount / 1_000_000.0);
+            if (amount >= 1_000) return String.format(Locale.getDefault(), "%.0fKđ", amount / 1_000.0);
+            return new DecimalFormat("#,###").format(amount) + "đ";
+        }
+
         static class VH extends RecyclerView.ViewHolder {
-            ImageView ivLogo;
-            TextView tvName, tvSub;
+            android.widget.ImageView ivOrgLogo;
+            TextView tvBrandName, tvVerifiedChip, tvDescription;
+            TextView tvStatEvents, tvStatTickets, tvStatRevenue;
+            View viewAccentBar;
 
             VH(@NonNull View v) {
                 super(v);
-                ivLogo = v.findViewById(R.id.ivOrgSwitchLogo);
-                tvName = v.findViewById(R.id.tvOrgSwitchName);
-                tvSub  = v.findViewById(R.id.tvOrgSwitchSub);
+                ivOrgLogo = v.findViewById(R.id.ivOrgLogo);
+                tvBrandName = v.findViewById(R.id.tvOrgBrandName);
+                tvVerifiedChip = v.findViewById(R.id.tvVerifiedChip);
+                tvDescription = v.findViewById(R.id.tvOrgDescription);
+                tvStatEvents = v.findViewById(R.id.tvStatEvents);
+                tvStatTickets = v.findViewById(R.id.tvStatTickets);
+                tvStatRevenue = v.findViewById(R.id.tvStatRevenue);
+                viewAccentBar = v.findViewById(R.id.viewAccentBar);
             }
         }
     }

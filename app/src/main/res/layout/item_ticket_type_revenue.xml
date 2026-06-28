@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTicketTypeName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/clr_text_primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="VIP" />
+
+        <TextView
+            android:id="@+id/tvTicketTypePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/clr_text_secondary"
+            android:textSize="12sp"
+            tools:text="500,000 ₫ / vé" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvTicketTypeSold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:textColor="@color/clr_primary_blue"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="150 vé" />
+
+        <TextView
+            android:id="@+id/tvTicketTypeRevenue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/clr_success"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="75M ₫" />
+    </LinearLayout>
+</LinearLayout>

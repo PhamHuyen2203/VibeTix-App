@@ -82,14 +82,6 @@ public class OrganizerProfileFragment extends Fragment {
 
     // ── Insets ─────────────────────────────────────────────────────────────────
     private void applyInsets(View root) {
-        View header = root.findViewById(R.id.layoutOrgHeader);
-        if (header != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
-                int top = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-                v.setPadding(0, top, 0, 0);
-                return insets;
-            });
-        }
     }
 
     // ── Data ───────────────────────────────────────────────────────────────────
