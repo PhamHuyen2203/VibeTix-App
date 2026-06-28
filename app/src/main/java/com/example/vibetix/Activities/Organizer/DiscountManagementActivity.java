@@ -176,6 +176,8 @@ public class DiscountManagementActivity extends AppCompatActivity {
             sheetBinding.etDiscountTitle.setText(existing.getTitle());
             sheetBinding.etDiscountValue.setText(String.valueOf((long) existing.getValue()));
             sheetBinding.etUsageLimit.setText(String.valueOf(existing.getUsageLimit()));
+            sheetBinding.etMinOrderValue.setText(String.valueOf((long) existing.getMinOrderValue()));
+            sheetBinding.etMaxDiscount.setText(String.valueOf((long) existing.getMaxDiscount()));
 
             sheetBinding.etSaleStart.setText(timestampToDisplay(existing.getStartDate()));
             sheetBinding.etSaleEnd.setText(timestampToDisplay(existing.getExpiryDate()));
@@ -200,6 +202,8 @@ public class DiscountManagementActivity extends AppCompatActivity {
             String title       = getText(sheetBinding.etDiscountTitle);
             String valueStr    = getText(sheetBinding.etDiscountValue);
             String limitStr    = getText(sheetBinding.etUsageLimit);
+            String minOrderStr = getText(sheetBinding.etMinOrderValue);
+            String maxDiscStr  = getText(sheetBinding.etMaxDiscount);
             String saleStart   = getText(sheetBinding.etSaleStart);
             String saleEnd     = getText(sheetBinding.etSaleEnd);
             String typeStr     = sheetBinding.actvDiscountType.getText().toString();
@@ -220,9 +224,13 @@ public class DiscountManagementActivity extends AppCompatActivity {
 
             long value;
             long limit = 0;
+            long minOrder = 0;
+            long maxDisc = 0;
             try {
                 value = Long.parseLong(valueStr);
                 if (!TextUtils.isEmpty(limitStr)) limit = Long.parseLong(limitStr);
+                if (!TextUtils.isEmpty(minOrderStr)) minOrder = Long.parseLong(minOrderStr);
+                if (!TextUtils.isEmpty(maxDiscStr)) maxDisc = Long.parseLong(maxDiscStr);
             } catch (Exception e) {
                 Toast.makeText(this, "Giá trị không hợp lệ", Toast.LENGTH_SHORT).show(); return;
             }
@@ -250,9 +258,9 @@ public class DiscountManagementActivity extends AppCompatActivity {
             sheetBinding.btnSaveDiscount.setText("Đang lưu…");
 
             if (isEdit) {
-                updateDiscount(existing, title, discountType, value, limit, tsStart, tsEnd, isActive, dialog);
+                updateDiscount(existing, title, discountType, value, limit, minOrder, maxDisc, tsStart, tsEnd, isActive, dialog);
             } else {
-                createDiscount(code, title, discountType, value, limit, tsStart, tsEnd, isActive, dialog);
+                createDiscount(code, title, discountType, value, limit, minOrder, maxDisc, tsStart, tsEnd, isActive, dialog);
             }
         });
 
@@ -260,6 +268,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
     }
     
     private void createDiscount(String code, String title, String type, long value, long limit,
+                                long minOrder, long maxDisc,
                                 com.google.firebase.Timestamp tsStart, com.google.firebase.Timestamp tsEnd, boolean isActive, BottomSheetDialog dialog) {
         Discount discount = new Discount();
         String id = UUID.randomUUID().toString();
@@ -269,6 +278,8 @@ public class DiscountManagementActivity extends AppCompatActivity {
         discount.setType(type);
         discount.setValue(value);
         discount.setUsageLimit(limit);
+        discount.setMinOrderValue(minOrder);
+        discount.setMaxDiscount(maxDisc);
         discount.setStartDate(tsStart);
         discount.setExpiryDate(tsEnd);
         discount.setCreatorType("organizer");
@@ -293,12 +304,15 @@ public class DiscountManagementActivity extends AppCompatActivity {
     }
 
     private void updateDiscount(Discount existing, String title, String type, long value, long limit,
+                                long minOrder, long maxDisc,
                                 com.google.firebase.Timestamp tsStart, com.google.firebase.Timestamp tsEnd, boolean isActive, BottomSheetDialog dialog) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("title", title);
         updates.put("type", type);
         updates.put("value", value);
         updates.put("usage_limit", limit);
+        updates.put("min_order_value", minOrder);
+        updates.put("max_discount", maxDisc);
         updates.put("start_date", tsStart);
         updates.put("expiry_date", tsEnd);
         updates.put("is_active", isActive);

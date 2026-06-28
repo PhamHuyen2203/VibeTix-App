@@ -32,15 +32,15 @@
     ═══════════════════════════════════════════════════════════════ -->
     <color name="clr_text_primary">#1C1B1B</color>        <!-- Tên chính, heading -->
     <color name="clr_text_on_primary">#FFFFFF</color>     <!-- Chữ trên nền primary -->
-    <color name="clr_text_secondary">#808E92</color>      <!-- Phụ đề, hint -->
-    <color name="clr_text_placeholder">#A2A2A6</color>    <!-- Placeholder input -->
+    <color name="clr_text_secondary">#4A5568</color>      <!-- Phụ đề, hint -->
+    <color name="clr_text_placeholder">#718096</color>    <!-- Placeholder input -->
     <color name="clr_text_link">#226CEB</color>           <!-- Link, xem thêm -->
 
     <!-- Aliases cho compatibility với code cũ — sẽ migrate dần -->
     <color name="clr_text_black">#1C1B1B</color>
     <color name="clr_text_white">#FFFFFF</color>
-    <color name="clr_grey_1">#808E92</color>
-    <color name="clr_grey_2">#A2A2A6</color>
+    <color name="clr_grey_1">#4A5568</color>
+    <color name="clr_grey_2">#718096</color>
 
     <!-- ═══════════════════════════════════════════════════════════════
          BACKGROUND & SURFACE COLORS
@@ -67,7 +67,7 @@
          NAV & INTERACTIVE
     ═══════════════════════════════════════════════════════════════ -->
     <color name="clr_nav_active">#226CEB</color>
-    <color name="clr_nav_inactive">#808E92</color>
+    <color name="clr_nav_inactive">#4A5568</color>
     <color name="clr_dot_active">#0059B8</color>
     <color name="clr_dot_inactive">#C1C6D6</color>
     <color name="clr_resale_bg">#0957DE</color>
@@ -101,7 +101,7 @@
     <color name="primary_blue">#226CEB</color>
     <color name="text_black">#1C1B1B</color>
     <color name="text_white">#FFFFFF</color>
-    <color name="grey_1">#808E92</color>
+    <color name="grey_1">#4A5568</color>
     <color name="state_info">#2F80ED</color>
     <color name="brand_red">#FF4848</color>
     <color name="brand_green">#5FD788</color>

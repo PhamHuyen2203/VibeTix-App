@@ -155,6 +155,8 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                     // Sort locally to avoid Firestore composite index requirement
                     java.util.Collections.sort(ticketTypes, (t1, t2) -> Long.compare(t1.getSortOrder(), t2.getSortOrder()));
                     
+                    syncEventPriceRange();
+                    
                     adapter.notifyDataSetChanged();
 
                     // Update header stats
@@ -181,6 +183,39 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
     private void showEmptyState() {
         binding.layoutEmpty.setVisibility(View.VISIBLE);
         binding.rvTicketTypes.setVisibility(View.GONE);
+        if (ticketTypes.isEmpty()) {
+            syncEventPriceRange();
+        }
+    }
+
+    private void syncEventPriceRange() {
+        if (eventId == null || eventId.isEmpty()) return;
+        
+        long min = Long.MAX_VALUE;
+        long max = 0;
+        boolean hasActive = false;
+        
+        for (TicketType tt : ticketTypes) {
+            if (tt.isActive()) {
+                hasActive = true;
+                long p = (long) tt.getPrice();
+                if (p < min) min = p;
+                if (p > max) max = p;
+            }
+        }
+        
+        if (!hasActive) {
+            min = 0;
+            max = 0;
+        }
+        
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("min_price", min);
+        updates.put("max_price", max);
+        
+        db.collection(FirebaseCollections.EVENTS).document(eventId)
+                .update(updates)
+                .addOnFailureListener(e -> android.util.Log.e("TicketType", "Failed to sync price: " + e.getMessage()));
     }
 
     // ─────────────────────────────────────────────────────────────────────────
