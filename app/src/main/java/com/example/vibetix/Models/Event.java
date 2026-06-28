@@ -73,11 +73,11 @@ public class Event {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public String getImageUrl() { return posterUrl; }
-    public void setImageUrl(String imageUrl) { this.posterUrl = imageUrl; }
-    
-    public String getPosterUrl() { return posterUrl; }
-    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+    @Exclude public String getImageUrl() { return posterUrl; }
+    @Exclude public void setImageUrl(String imageUrl) { this.posterUrl = imageUrl; }
+
+    @PropertyName("poster_url") public String getPosterUrl() { return posterUrl; }
+    @PropertyName("poster_url") public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
     public String getDate() { return date != null ? date : getStartTime(); }
     public void setDate(String date) { this.date = date; }
@@ -125,8 +125,8 @@ public class Event {
     public int getLocalPortraitImageResId() { return localPortraitImageResId; }
     public void setLocalPortraitImageResId(int localPortraitImageResId) { this.localPortraitImageResId = localPortraitImageResId; }
 
-    public String getPortraitImageUrl() { return portraitImageUrl; }
-    public void setPortraitImageUrl(String v) { this.portraitImageUrl = v; }
+    @Exclude public String getPortraitImageUrl() { return posterUrl != null ? posterUrl : portraitImageUrl; }
+    @Exclude public void setPortraitImageUrl(String v) { this.portraitImageUrl = v; }
 
     public String getOrganizerName() { return organizerName != null ? organizerName : organizerId; }
     public void setOrganizerName(String organizerName) { this.organizerName = organizerName; }
@@ -178,8 +178,8 @@ public class Event {
         status = statusStr;
     }
     
-    public String getStatus() { return statusStr != null ? statusStr : status; }
-    public void setStatus(String s) { status = s; statusStr = s; }
+    @Exclude public String getStatus() { return statusStr != null ? statusStr : status; }
+    @Exclude public void setStatus(String s) { status = s; statusStr = s; }
 
     @PropertyName("max_price") public Double getMaxPrice() { return maxPrice; }
     @PropertyName("max_price") public void setMaxPrice(Double v) { maxPrice = v; }
