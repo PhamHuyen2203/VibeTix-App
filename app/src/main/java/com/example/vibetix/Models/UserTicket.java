@@ -72,6 +72,21 @@ public class UserTicket {
         this.statusStr = status != null ? status.name().toLowerCase() : Status.VALID.name().toLowerCase();
     }
 
+    @Exclude
+    public boolean isUsed() {
+        return getStatus() == Status.USED;
+    }
+
+    @Exclude
+    public boolean isExpired() {
+        return getStatus() == Status.EXPIRED;
+    }
+
+    @Exclude
+    public boolean isCancelled() {
+        return getStatus() == Status.CANCELLED;
+    }
+
     @PropertyName("checked_in_at")
     public Object getCheckedInAt() { return checkedInAt; }
     @PropertyName("checked_in_at")

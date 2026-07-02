@@ -53,8 +53,8 @@ public class TicketSaleAdapter extends RecyclerView.Adapter<TicketSaleAdapter.VH
         h.tvType.setText(typeName + " · #" + code);
 
         boolean isUsed = t.isUsed();
-        boolean expired = false;
-        boolean cancelled = false;
+        boolean expired = t.isExpired();
+        boolean cancelled = t.isCancelled();
         if (isUsed) {
             h.tvStatus.setText("Đã check-in");
             h.tvStatus.setTextColor(h.itemView.getContext().getColor(R.color.clr_success));
