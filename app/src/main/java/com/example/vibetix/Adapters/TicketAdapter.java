@@ -30,6 +30,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
     public interface OnTicketClickListener {
         void onQrClick(Ticket ticket);
         void onResellClick(Ticket ticket);
+        default void onItemClick(Ticket ticket) {}
     }
 
     public TicketAdapter(Context context, List<Ticket> ticketsList, OnTicketClickListener listener) {
@@ -53,20 +54,22 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
         holder.txtTicketEventTitle.setText(ticket.getEventTitle());
         holder.txtTicketEventDate.setText(ticket.getEventDate());
         holder.txtTicketEventLocation.setText(ticket.getEventLocation());
-        holder.txtTicketTypeName.setText(ticket.getTicketTypeName());
+        // Hiện loại vé sổ dọc: "1x Vé VIP, 1x Vé Early bird" → mỗi loại 1 dòng
+        String typeDisplay = ticket.getTicketTypeName();
+        if (typeDisplay != null && typeDisplay.contains(", ")) {
+            typeDisplay = typeDisplay.replace(", ", "\n");
+        }
+        holder.txtTicketTypeName.setText(typeDisplay);
 
-        // Display correct image based on event ID or imageUrl
+        // Load event image from URL stored in ticket
         if (ticket.getEventImageUrl() != null && !ticket.getEventImageUrl().isEmpty()) {
             Glide.with(context)
                     .load(ticket.getEventImageUrl())
                     .placeholder(R.drawable.event_live_non_song)
+                    .error(R.drawable.event_live_non_song)
                     .into(holder.imvTicketThumb);
         } else {
-            int coverResId = R.drawable.event_live_non_song;
-            if (!"b1".equals(ticket.getEventId()) && !"e1".equals(ticket.getEventId()) && !"rs1".equals(ticket.getEventId())) {
-                coverResId = R.drawable.event_arts_private_fantasy;
-            }
-            holder.imvTicketThumb.setImageResource(coverResId);
+            holder.imvTicketThumb.setImageResource(R.drawable.event_live_non_song);
         }
 
         // Bind status and pricing details
@@ -80,10 +83,18 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getPurchasePrice()) + " đ");
 
-            holder.btnTicketResellAction.setText("Bán lại vé");
-            holder.btnTicketResellAction.setEnabled(true);
+            // Cho bán lại nếu sự kiện còn approved hoặc ongoing (chưa completed/cancelled)
+            String evStatus = ticket.getEventStatus() != null ? ticket.getEventStatus().toLowerCase() : "";
+            boolean canResell = evStatus.isEmpty() || "approved".equals(evStatus) || "ongoing".equals(evStatus);
+            if (canResell) {
+                holder.btnTicketResellAction.setText("Bán lại vé");
+                holder.btnTicketResellAction.setEnabled(true);
+                holder.btnTicketResellAction.setVisibility(View.VISIBLE);
+            } else {
+                holder.btnTicketResellAction.setVisibility(View.GONE);
+            }
         } else if ("RESELLING".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Đang bán lại");
+            holder.txtTicketStatusBadge.setText("Đang rao bán");
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_primary_blue));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
@@ -106,6 +117,24 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
 
             holder.btnTicketResellAction.setVisibility(View.GONE);
             holder.btnTicketQrAction.setVisibility(View.GONE);
+        } else if ("RESOLD".equalsIgnoreCase(status)) {
+            holder.txtTicketStatusBadge.setText("Đã bán");
+            holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_success));
+            holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
+            holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
+
+            holder.btnTicketResellAction.setVisibility(View.GONE);
+            holder.btnTicketQrAction.setVisibility(View.GONE);
+        } else if ("RESALE_CANCELLED".equalsIgnoreCase(status)) {
+            holder.txtTicketStatusBadge.setText("Đã huỷ bán");
+            holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_grey_1));
+            holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_divider)));
+            holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
+
+            holder.btnTicketResellAction.setText("Đăng bán lại");
+            holder.btnTicketResellAction.setEnabled(true);
+            holder.btnTicketResellAction.setVisibility(View.VISIBLE);
+            holder.btnTicketQrAction.setVisibility(View.GONE);
         }
 
         // Set action triggers
@@ -114,6 +143,9 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
         });
         holder.btnTicketResellAction.setOnClickListener(v -> {
             if (listener != null) listener.onResellClick(ticket);
+        });
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(ticket);
         });
     }
 

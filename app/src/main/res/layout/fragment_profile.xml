@@ -78,41 +78,15 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/layoutStatFavorites"
                     android:layout_width="0dp"
                     android:layout_height="64dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/txtTicketsBought"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/clr_primary_blue"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vé đã mua"
-                        android:textColor="#808E92"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="#EEF0F5" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <TextView
                         android:id="@+id/txtEventsInterested"
@@ -126,7 +100,41 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sự kiện quan tâm"
+                        android:text="Yêu thích"
+                        android:textColor="#808E92"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="#EEF0F5" />
+
+                <LinearLayout
+                    android:id="@+id/layoutStatFollowing"
+                    android:layout_width="0dp"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/txtFollowingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đang theo dõi"
                         android:textColor="#808E92"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -234,43 +242,6 @@
                         android:textSize="11sp"
                         android:textStyle="bold"
                         android:visibility="gone" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_chevron_right"
-                        android:tint="#808E92"
-                        android:contentDescription="@null" />
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp"
-                    android:layout_marginStart="44dp" android:background="#F0F0F0" />
-
-                <!-- Row: Phương thức thanh toán -->
-                <LinearLayout
-                    android:id="@+id/rowPaymentMethods"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_auth_phone"
-                        android:tint="#808E92"
-                        android:contentDescription="@null" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:text="Phương thức thanh toán"
-                        android:textColor="#1C1B1B"
-                        android:textSize="14sp" />
 
                     <ImageView
                         android:layout_width="18dp"

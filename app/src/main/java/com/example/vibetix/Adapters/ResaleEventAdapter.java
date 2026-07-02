@@ -57,14 +57,31 @@ public class ResaleEventAdapter extends RecyclerView.Adapter<ResaleEventAdapter.
         // Date
         holder.txtResaleDate.setText(event.getDate());
 
-        // Event image (local drawable preferred over URL)
-        Object imageSource = event.getLocalImageResId() != 0
-                ? event.getLocalImageResId()
-                : R.drawable.ic_launcher_background;
+        // Giá bán lại
+        if (holder.txtResalePrice != null) {
+            long price = event.getMinPrice();
+            if (price > 0) {
+                holder.txtResalePrice.setText(new java.text.DecimalFormat("#,###").format(price) + " đ");
+                holder.txtResalePrice.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtResalePrice.setText("Thương lượng");
+                holder.txtResalePrice.setVisibility(View.VISIBLE);
+            }
+        }
+
+        Object imageSource;
+        if (event.getLocalImageResId() != 0) {
+            imageSource = event.getLocalImageResId();
+        } else if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
+            imageSource = event.getImageUrl();
+        } else {
+            imageSource = R.drawable.ic_launcher_background;
+        }
 
         Glide.with(context)
                 .load(imageSource)
                 .centerCrop()
+                .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.imvResaleImage);
 
         // Click
@@ -88,12 +105,14 @@ public class ResaleEventAdapter extends RecyclerView.Adapter<ResaleEventAdapter.
         ImageView imvResaleImage;
         TextView txtResaleTitle;
         TextView txtResaleDate;
+        TextView txtResalePrice;
 
         ResaleViewHolder(@NonNull View itemView) {
             super(itemView);
             imvResaleImage = itemView.findViewById(R.id.imvResaleImage);
             txtResaleTitle = itemView.findViewById(R.id.txtResaleTitle);
             txtResaleDate = itemView.findViewById(R.id.txtResaleDate);
+            txtResalePrice = itemView.findViewById(R.id.txtResalePrice);
         }
     }
 }

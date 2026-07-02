@@ -16,26 +16,31 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.vibetix.Models.Ticket;
+import com.example.vibetix.Models.TicketTransfer;
 import com.example.vibetix.R;
-import com.example.vibetix.Repositories.TicketRepository;
+import com.example.vibetix.Repositories.TicketTransferRepository;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 public class PassTicketDialogFragment extends DialogFragment {
 
     private Ticket ticket;
     private OnTicketPassedListener listener;
 
-    private final TicketRepository ticketRepository = new TicketRepository();
+    private final TicketTransferRepository ticketTransferRepository = new TicketTransferRepository();
 
     // Views
     private TextView txtPassDialogEventTitle;
     private TextView txtPassDialogOriginalPrice;
     private EditText etPassResalePrice;
+    private EditText etPassMessage;
     private Button btnPassCancel;
     private Button btnPassConfirm;
-
-    private final DecimalFormat formatter = new DecimalFormat("#,###");
 
     public interface OnTicketPassedListener {
         void onTicketPassed();
@@ -75,26 +80,41 @@ public class PassTicketDialogFragment extends DialogFragment {
         txtPassDialogEventTitle = view.findViewById(R.id.txtPassDialogEventTitle);
         txtPassDialogOriginalPrice = view.findViewById(R.id.txtPassDialogOriginalPrice);
         etPassResalePrice = view.findViewById(R.id.etPassResalePrice);
+        etPassMessage = view.findViewById(R.id.etPassMessage);
         btnPassCancel = view.findViewById(R.id.btnPassCancel);
         btnPassConfirm = view.findViewById(R.id.btnPassConfirm);
     }
 
+    private final java.text.DecimalFormat priceFormatter = new java.text.DecimalFormat("#,###");
+
     private void populateViews() {
         if (ticket == null) return;
         txtPassDialogEventTitle.setText(ticket.getEventTitle());
-        txtPassDialogOriginalPrice.setText("Giá mua gốc: " + formatter.format(ticket.getPurchasePrice()) + " đ");
+        long original = ticket.getPurchasePrice();
+        if (original > 0) {
+            txtPassDialogOriginalPrice.setText("Giá mua gốc: " + priceFormatter.format(original) + " đ");
+            txtPassDialogOriginalPrice.setVisibility(View.VISIBLE);
+        } else {
+            txtPassDialogOriginalPrice.setVisibility(View.GONE);
+        }
     }
 
     private void setupClickListeners() {
         btnPassCancel.setOnClickListener(v -> dismiss());
 
         btnPassConfirm.setOnClickListener(v -> {
-            String priceStr = etPassResalePrice.getText().toString().trim();
-            if (priceStr.isEmpty()) {
-                Toast.makeText(requireContext(), "Vui lòng nhập giá muốn bán", Toast.LENGTH_SHORT).show();
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser == null) {
+                Toast.makeText(requireContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Validate giá bán
+            String priceStr = etPassResalePrice.getText().toString().trim().replaceAll("[^0-9]", "");
+            if (priceStr.isEmpty()) {
+                Toast.makeText(requireContext(), "Vui lòng nhập giá bạn muốn bán", Toast.LENGTH_SHORT).show();
+                return;
+            }
             long resalePrice;
             try {
                 resalePrice = Long.parseLong(priceStr);
@@ -102,7 +122,6 @@ public class PassTicketDialogFragment extends DialogFragment {
                 Toast.makeText(requireContext(), "Giá bán không hợp lệ", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (resalePrice <= 0) {
                 Toast.makeText(requireContext(), "Giá bán phải lớn hơn 0", Toast.LENGTH_SHORT).show();
                 return;
@@ -111,7 +130,37 @@ public class PassTicketDialogFragment extends DialogFragment {
             btnPassConfirm.setEnabled(false);
             Toast.makeText(requireContext(), "Đang xử lý...", Toast.LENGTH_SHORT).show();
 
-            ticketRepository.resellTicket(ticket.getId(), resalePrice, new TicketRepository.OnTicketActionListener() {
+            // Build TicketTransfer
+            String transferId = UUID.randomUUID().toString();
+            TicketTransfer transfer = new TicketTransfer();
+            transfer.setTransferId(transferId);
+            transfer.setSenderId(currentUser.getUid());
+            transfer.setReceiverId("");
+            transfer.setReceiverEmail(null);
+            transfer.setUserTicketId(ticket.getId()); // maps Ticket.id → user_ticket_id
+            String message = etPassMessage != null ? etPassMessage.getText().toString().trim() : "";
+            if (message.isEmpty()) message = "Đăng bán lại vé";
+
+            transfer.setStatus("pending");
+            transfer.setPrice(resalePrice);
+            transfer.setOriginalPrice(ticket.getPurchasePrice());
+            transfer.setMessage(message);
+            // Denormalize event display data từ vé → không cần join khi hiển thị
+            transfer.setEventId(ticket.getEventId());
+            transfer.setEventTitle(ticket.getEventTitle());
+            transfer.setEventDate(ticket.getEventDate());
+            transfer.setEventLocation(ticket.getEventLocation());
+            transfer.setEventImageUrl(ticket.getEventImageUrl());
+            transfer.setTransferToken(UUID.randomUUID().toString());
+            transfer.setCreatedAt(Timestamp.now());
+            transfer.setCompletedAt(null);
+
+            // expires_at = now + 30 days
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_YEAR, 30);
+            transfer.setExpiresAt(new Timestamp(cal.getTime()));
+
+            ticketTransferRepository.createTransfer(transfer, new TicketTransferRepository.OnTransferActionListener() {
                 @Override
                 public void onSuccess() {
                     if (isAdded()) {

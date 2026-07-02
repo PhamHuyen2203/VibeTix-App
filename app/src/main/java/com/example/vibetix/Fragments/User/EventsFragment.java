@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,10 +48,20 @@ public class EventsFragment extends Fragment {
     private TextView     txtFilterCity;
     private RecyclerView rvEvents;
 
+    private ProgressBar  pbEventsLoading;
+    private LinearLayout layoutErrorEmptyState;
+    private TextView     txtErrorEmptyTitle;
+    private TextView     txtErrorEmptySub;
+    private TextView     btnRetryEvents;
+
     // ── Data ───────────────────────────────────────────────────────────────────
-    private final ArrayList<Event> allEvents    = new ArrayList<>();
-    private final ArrayList<Event> displayList  = new ArrayList<>();
+    private final ArrayList<Event> allEvents        = new ArrayList<>();
+    private final ArrayList<Event> filteredFullList = new ArrayList<>();
+    private final ArrayList<Event> displayList      = new ArrayList<>();
     private EventAdapter adapter;
+
+    private int currentPage = 1;
+    private static final int PAGE_SIZE = 10;
 
     private String activeCategory  = "all";
     private String activeSort      = "newest";
@@ -64,6 +76,15 @@ public class EventsFragment extends Fragment {
     // CITY_LABELS: tên hiển thị | CITY_KEYWORDS: keyword filter (khớp Firestore venue_city)
     private static final String[] CITY_LABELS   = {"Tất cả tỉnh thành", "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Đà Lạt", "Hội An"};
     private static final String[] CITY_KEYWORDS = {"",                  "Hồ Chí Minh",     "Hà Nội", "Đà Nẵng", "Đà Lạt", "Hội An"};
+
+    public static EventsFragment newInstance(String categoryKey, String cityKeyword) {
+        EventsFragment fragment = new EventsFragment();
+        Bundle args = new Bundle();
+        if (categoryKey != null) args.putString("preset_category", categoryKey);
+        if (cityKeyword != null) args.putString("preset_city", cityKeyword);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
     @Nullable
@@ -81,9 +102,33 @@ public class EventsFragment extends Fragment {
         applyInsets(view);
         setupRecyclerView();
         setupListeners();
+
+        if (getArguments() != null) {
+            String cat = getArguments().getString("preset_category");
+            if (cat != null && !cat.isEmpty()) {
+                // Resolve app-key (music, arts, ...) to UUID if needed
+                String uuid = FirestoreHelper.CAT_KEY_TO_ID.get(cat);
+                activeCategory = (uuid != null && !uuid.isEmpty()) ? uuid : cat;
+            }
+            String city = getArguments().getString("preset_city");
+            if (city != null && !city.isEmpty()) {
+                activeCity = city;
+                activeCityLabel = city;
+                if (txtFilterCity != null) txtFilterCity.setText(city);
+            }
+        }
+
         // Load category cache trước → rebuild chips → rồi load events
         FirestoreHelper.loadCategoryCache(() -> {
             if (!isAdded()) return;
+            // Re-resolve app-key → UUID now that cache is populated
+            if (getArguments() != null) {
+                String cat = getArguments().getString("preset_category");
+                if (cat != null && !cat.isEmpty() && !"all".equals(cat)) {
+                    String uuid = FirestoreHelper.CAT_KEY_TO_ID.get(cat);
+                    if (uuid != null && !uuid.isEmpty()) activeCategory = uuid;
+                }
+            }
             buildCategoryChipsDefault(); // Build chips với UUIDs mới từ cache
             loadCategoriesFromFirestore(); // Rebuild với tên thật
             loadEventsFromFirestore();     // Load events
@@ -101,6 +146,19 @@ public class EventsFragment extends Fragment {
         btnFilterCity         = v.findViewById(R.id.btnFilterCity);
         txtFilterCity         = v.findViewById(R.id.txtFilterCity);
         rvEvents              = v.findViewById(R.id.rvEvents);
+
+        pbEventsLoading       = v.findViewById(R.id.pbEventsLoading);
+        layoutErrorEmptyState = v.findViewById(R.id.layoutErrorEmptyState);
+        txtErrorEmptyTitle    = v.findViewById(R.id.txtErrorEmptyTitle);
+        txtErrorEmptySub      = v.findViewById(R.id.txtErrorEmptySub);
+        btnRetryEvents        = v.findViewById(R.id.btnRetryEvents);
+
+        if (btnRetryEvents != null) {
+            btnRetryEvents.setOnClickListener(view -> {
+                showLoadingState();
+                loadEventsFromFirestore();
+            });
+        }
     }
 
     // ── Insets — đồng bộ với HomeFragment ─────────────────────────────────────
@@ -113,67 +171,54 @@ public class EventsFragment extends Fragment {
         });
     }
 
-    // ── Mock data (tái dùng từ HomeFragment, sau này thay bằng Firestore) ──────
-    private void buildMockData() {
-        allEvents.clear();
-
-        // Âm nhạc
-        addEvent("e1",  "Mừng Ngày Hội Non Sông - Võ Hà Trâm", "01/05/2026", "TP.Hồ Chí Minh", "music",    350000, R.drawable.event_live_non_song);
-        addEvent("e2",  "Private Show in Fantasy - Quốc Thiên",  "16/05/2026", "Hà Nội",          "arts",     800000, R.drawable.event_arts_private_fantasy);
-        addEvent("e3",  "BẰNG KIỀU - CÒN MƯA NGANG QUA",        "19/05/2026", "TP.Hồ Chí Minh", "music",    350000, R.drawable.event_featured_bang_kieu);
-        addEvent("e4",  "Vì Lý Do Đời - Mr. Siro",               "01/06/2026", "TP.Hồ Chí Minh", "music",    600000, R.drawable.event_featured_vi_ly_doi);
-        addEvent("e5",  "The Story Concert",                     "27/06/2026", "TP.Hồ Chí Minh", "music",    580000, R.drawable.event_featured_the_story);
-        addEvent("e6",  "Đêm nhạc Trịnh Công Sơn",              "28/06/2026", "TP.Hồ Chí Minh", "music",    150000, R.drawable.event_live_concert_1);
-        addEvent("e7",  "NON SONG Live Show",                    "05/07/2026", "Hà Nội",          "music",    250000, R.drawable.event_live_non_song);
-        addEvent("e8",  "Jazz Night HCM",                        "10/07/2026", "TP.Hồ Chí Minh", "music",    300000, R.drawable.event_live_concert_2);
-
-        // Sân khấu & Nghệ thuật
-        addEvent("e9",  "Chèo Đất Việt",                        "30/06/2026", "Hà Nội",          "arts",     100000, R.drawable.event_arts_traditional);
-        addEvent("e10", "Opera Night 2026",                     "07/07/2026", "TP.Hồ Chí Minh", "arts",     450000, R.drawable.event_arts_concert);
-        addEvent("e11", "Quốc Thiên Live",                      "21/07/2026", "TP.Hồ Chí Minh", "arts",     300000, R.drawable.event_arts_quoc_thien);
-
-        // Workshop
-        addEvent("e12", "GSTAR SUMMIT 2026",                    "25/06/2026", "TP.Hồ Chí Minh", "workshop", 500000, R.drawable.event_ws_gstar_summit);
-        addEvent("e13", "Workshop Âm nhạc & Nghệ thuật",        "01/07/2026", "TP.Hồ Chí Minh", "workshop", 100000, R.drawable.event_ws_concert);
-
-        // Tour
-        addEvent("e14", "Tour Di tích Văn Hóa - Vân Mộc",      "29/06/2026", "Hà Nội",          "tour",     350000, R.drawable.event_tour_mountain);
-        addEvent("e15", "Trải nghiệm suối nước nóng Đà Lạt",   "10/07/2026", "Đà Lạt",          "tour",     200000, R.drawable.event_tour_outdoor);
-
-        // Thể thao
-        addEvent("e16", "FWS SEA 2026",                         "15/06/2026", "TP.Hồ Chí Minh", "sports",  1200000, R.drawable.event_trending_fws_sea);
-        addEvent("e17", "RISING FEST 2026",                     "22/06/2026", "Hà Nội",          "festival", 900000, R.drawable.event_trending_rising_fest);
-        addEvent("e18", "Ultra Vietnam 2026",                   "12/07/2026", "TP.Hồ Chí Minh", "sports",  1500000, R.drawable.event_trending_rising_2);
-        addEvent("e19", "THE GLOBAL CHAMPIONSHIP 2026",         "25/06/2026", "TP.Hồ Chí Minh", "sports",   200000, R.drawable.event_sports_global_champ);
-        addEvent("e20", "Playoffs 2026",                        "15/07/2026", "TP.Hồ Chí Minh", "sports",   100000, R.drawable.event_sports_playoffs);
-        addEvent("e21", "G-STAR Gaming Festival",               "20/07/2026", "TP.Hồ Chí Minh", "festival", 150000, R.drawable.event_sports_esport);
-
-        // Lễ hội
-        addEvent("e22", "OSTAR SUMMIT 2026",                    "25/06/2026", "TP.Hồ Chí Minh", "festival", 500000, R.drawable.event_featured_group);
+    private void showLoadingState() {
+        if (pbEventsLoading != null) pbEventsLoading.setVisibility(View.VISIBLE);
+        if (layoutErrorEmptyState != null) layoutErrorEmptyState.setVisibility(View.GONE);
+        if (rvEvents != null) rvEvents.setVisibility(View.GONE);
     }
 
-    private void addEvent(String id, String title, String date, String city,
-                          String category, long price, int imgRes) {
-        Event e = new Event(id, title, null, date, city, category, (int) price);
-        e.setVenueCity(city);
-        e.setStatus(Event.Status.APPROVED);
-        e.setLocalImageResId(imgRes);
-        allEvents.add(e);
+    private void showErrorOrEmptyState(boolean isError, String message) {
+        if (pbEventsLoading != null) pbEventsLoading.setVisibility(View.GONE);
+        if (rvEvents != null) rvEvents.setVisibility(View.GONE);
+        if (layoutErrorEmptyState != null) {
+            layoutErrorEmptyState.setVisibility(View.VISIBLE);
+            if (txtErrorEmptyTitle != null) {
+                txtErrorEmptyTitle.setText(isError ? "Không thể tải dữ liệu" : "Không tìm thấy sự kiện");
+            }
+            if (txtErrorEmptySub != null) {
+                txtErrorEmptySub.setText(message != null ? message : (isError ? "Vui lòng kiểm tra kết nối mạng và thử lại." : "Vui lòng thử chọn bộ lọc hoặc từ khóa khác."));
+            }
+            if (btnRetryEvents != null) {
+                btnRetryEvents.setVisibility(isError ? View.VISIBLE : View.GONE);
+            }
+        }
+    }
+
+    private void showSuccessState() {
+        if (pbEventsLoading != null) pbEventsLoading.setVisibility(View.GONE);
+        if (layoutErrorEmptyState != null) layoutErrorEmptyState.setVisibility(View.GONE);
+        if (rvEvents != null) rvEvents.setVisibility(View.VISIBLE);
     }
 
     // ── Load events từ Firestore dùng FirestoreHelper ─────────────────────────
     private void loadEventsFromFirestore() {
+        showLoadingState();
         FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
             @Override
             public void onSuccess(java.util.List<Event> events) {
-                if (!isAdded() || events.isEmpty()) return;
+                if (!isAdded()) return;
                 allEvents.clear();
-                allEvents.addAll(events);
-                applyFilters();
+                if (events != null && !events.isEmpty()) {
+                    allEvents.addAll(events);
+                    applyFilters();
+                } else {
+                    showErrorOrEmptyState(false, "Hiện chưa có sự kiện nào.");
+                }
             }
             @Override
             public void onFailure(Exception e) {
-                // Mock data vẫn hiển thị — không cần xử lý
+                if (!isAdded()) return;
+                showErrorOrEmptyState(true, "Không thể kết nối với máy chủ. Vui lòng thử lại.");
             }
         });
     }
@@ -323,10 +368,38 @@ public class EventsFragment extends Fragment {
     // ── RecyclerView ───────────────────────────────────────────────────────────
     private void setupRecyclerView() {
         adapter = new EventAdapter(requireContext(), displayList,
-                event -> Toast.makeText(requireContext(), event.getTitle(), Toast.LENGTH_SHORT).show(),
+                event -> openEventDetail(event.getId()),
                 R.layout.item_event_card_grid);
-        rvEvents.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        GridLayoutManager glm = new GridLayoutManager(requireContext(), 2);
+        rvEvents.setLayoutManager(glm);
         rvEvents.setAdapter(adapter);
+
+        rvEvents.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    int visibleItemCount = glm.getChildCount();
+                    int totalItemCount = glm.getItemCount();
+                    int pastVisibleItems = glm.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 2) {
+                        if (displayList.size() < filteredFullList.size()) {
+                            currentPage++;
+                            loadNextPage();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void openEventDetail(String eventId) {
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
+                    .addToBackStack("events")
+                    .commit();
+        }
     }
 
     // ── Listeners ──────────────────────────────────────────────────────────────
@@ -505,7 +578,7 @@ public class EventsFragment extends Fragment {
                 ? edtEventsSearch.getText().toString().trim().toLowerCase(Locale.ROOT)
                 : "";
 
-        displayList.clear();
+        filteredFullList.clear();
         for (Event e : allEvents) {
             // Category filter — activeCategory là UUID hoặc "all"
             // e.getCategory() là app key (music/arts/...) từ CAT_MAP
@@ -525,26 +598,39 @@ public class EventsFragment extends Fragment {
                         || (e.getVenueCity() != null && e.getVenueCity().toLowerCase(Locale.ROOT).contains(query));
                 if (!match) continue;
             }
-            displayList.add(e);
+            filteredFullList.add(e);
         }
 
         // Sort
         switch (activeSort) {
             case "oldest":
-                Collections.sort(displayList, (a, b) -> safeDate(a).compareTo(safeDate(b)));
+                Collections.sort(filteredFullList, (a, b) -> safeDate(a).compareTo(safeDate(b)));
                 break;
             case "price_asc":
-                Collections.sort(displayList, (a, b) -> Double.compare(a.getMinPrice(), b.getMinPrice()));
+                Collections.sort(filteredFullList, (a, b) -> Double.compare(a.getMinPrice(), b.getMinPrice()));
                 break;
             case "price_desc":
-                Collections.sort(displayList, (a, b) -> Double.compare(b.getMinPrice(), a.getMinPrice()));
+                Collections.sort(filteredFullList, (a, b) -> Double.compare(b.getMinPrice(), a.getMinPrice()));
                 break;
             default: // newest — sort descending by date string (dd/MM/yyyy → reverse)
-                Collections.sort(displayList, (a, b) -> safeDate(b).compareTo(safeDate(a)));
+                Collections.sort(filteredFullList, (a, b) -> safeDate(b).compareTo(safeDate(a)));
                 break;
         }
 
+        currentPage = 1;
+        loadNextPage();
+    }
+
+    private void loadNextPage() {
+        int end = Math.min(currentPage * PAGE_SIZE, filteredFullList.size());
+        displayList.clear();
+        displayList.addAll(filteredFullList.subList(0, end));
         adapter.notifyDataSetChanged();
+        if (displayList.isEmpty()) {
+            showErrorOrEmptyState(false, "Không tìm thấy sự kiện nào phù hợp với bộ lọc.");
+        } else {
+            showSuccessState();
+        }
     }
 
     /** Parse dd/MM/yyyy → "yyyy/MM/dd" cho sort đúng */

@@ -97,6 +97,17 @@
                     android:textSize="@dimen/text_xs" />
             </LinearLayout>
 
+            <!-- Giá bán lại -->
+            <TextView
+                android:id="@+id/txtResalePrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="0 đ"
+                android:textColor="@color/clr_primary_blue"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+
         </LinearLayout>
     </LinearLayout>
 

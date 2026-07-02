@@ -1,7 +1,5 @@
 package com.example.vibetix.Fragments.User;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,18 +17,35 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.vibetix.Adapters.EventAdapter;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 import com.example.vibetix.Repositories.EventRepository;
-import com.example.vibetix.Utils.Constants;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import android.webkit.WebView;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import com.example.vibetix.Firebase.FirebaseCollections;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class EventDetailFragment extends Fragment {
 
@@ -49,13 +64,31 @@ public class EventDetailFragment extends Fragment {
     private TextView txtDetailOrganizer;
     private TextView txtDetailCategory;
     private TextView txtDetailInterest;
-    private TextView txtDetailEventDescription;
+    private WebView webDetailDescription;
+    private View viewDescriptionGradient;
+    private FrameLayout layoutDescriptionContainer;
     private TextView txtDetailMinPrice;
+    private TextView txtDescriptionToggle;
+    private TextView txtScheduleTime;
+    private LinearLayout layoutScheduleContent;
+    private View layoutOrganizerCard;
+    private ImageView imvOrganizerAvatar;
+    private TextView txtOrganizerCardName;
+    private ImageView imvOrganizerVerified;
     private Button btnBookTickets;
 
+    private boolean isDescriptionExpanded = false;
     private boolean isFavorited = false;
+    private String organizerId = "";
     private int currentInterestCount = 0;
-    private String userEmail = "";
+    private String userId = "";
+
+    // Related events section
+    private LinearLayout layoutRelatedEvents;
+    private RecyclerView rvRelatedEvents;
+    private TextView txtRelatedSeeMore;
+    private final List<Event> relatedEventsList = new ArrayList<>();
+    private EventAdapter relatedEventsAdapter;
 
     public static EventDetailFragment newInstance(String eventId) {
         EventDetailFragment fragment = new EventDetailFragment();
@@ -96,9 +129,27 @@ public class EventDetailFragment extends Fragment {
         txtDetailOrganizer = view.findViewById(R.id.txtDetailOrganizer);
         txtDetailCategory = view.findViewById(R.id.txtDetailCategory);
         txtDetailInterest = view.findViewById(R.id.txtDetailInterest);
-        txtDetailEventDescription = view.findViewById(R.id.txtDetailEventDescription);
+        webDetailDescription = view.findViewById(R.id.webDetailDescription);
+        viewDescriptionGradient = view.findViewById(R.id.viewDescriptionGradient);
+        layoutDescriptionContainer = view.findViewById(R.id.layoutDescriptionContainer);
+        txtDescriptionToggle = view.findViewById(R.id.txtDescriptionToggle);
+        txtScheduleTime = view.findViewById(R.id.txtScheduleTime);
+        layoutScheduleContent = view.findViewById(R.id.layoutScheduleContent);
+        layoutOrganizerCard = view.findViewById(R.id.layoutOrganizerCard);
+        imvOrganizerAvatar = view.findViewById(R.id.imvOrganizerAvatar);
+        txtOrganizerCardName = view.findViewById(R.id.txtOrganizerCardName);
+        imvOrganizerVerified = view.findViewById(R.id.imvOrganizerVerified);
         txtDetailMinPrice = view.findViewById(R.id.txtDetailMinPrice);
         btnBookTickets = view.findViewById(R.id.btnBookTickets);
+
+        layoutRelatedEvents = view.findViewById(R.id.layoutRelatedEvents);
+        rvRelatedEvents = view.findViewById(R.id.rvRelatedEvents);
+        txtRelatedSeeMore = view.findViewById(R.id.txtRelatedSeeMore);
+
+        relatedEventsAdapter = new EventAdapter(requireContext(), relatedEventsList,
+                event -> openRelatedEvent(event));
+        rvRelatedEvents.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        rvRelatedEvents.setAdapter(relatedEventsAdapter);
     }
 
     private void applyInsets(View view) {
@@ -106,7 +157,7 @@ public class EventDetailFragment extends Fragment {
         if (header != null) {
             ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
                 int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-                v.setPadding(v.getPaddingLeft(), topInset, v.getPaddingRight(), v.getPaddingBottom());
+                v.setPadding(0, topInset, 0, 0);
                 return insets;
             });
         }
@@ -115,9 +166,9 @@ public class EventDetailFragment extends Fragment {
     private void loadEventDetails() {
         if (eventId.isEmpty()) return;
 
-        // Restore user email for wishlist
-        SharedPreferences prefs = requireContext().getSharedPreferences(Constants.PREFS_AUTH, Context.MODE_PRIVATE);
-        userEmail = prefs.getString(Constants.KEY_USER_EMAIL, "");
+        // Restore user ID for wishlist
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userId = currentUser != null ? currentUser.getUid() : "";
 
         checkWishlistStatus();
 
@@ -202,12 +253,16 @@ public class EventDetailFragment extends Fragment {
         }
         txtDetailEventLocation.setText(displayLocation);
 
-        // ── Description ─────────────────────────────────────────────────
-        if (event.getDescription() != null && !event.getDescription().isEmpty()) {
-            txtDetailEventDescription.setText(event.getDescription());
-        } else {
-            txtDetailEventDescription.setText("Chưa có mô tả cho sự kiện này.");
+        // ── Description (render HTML in WebView) ────────────────────────
+        if (webDetailDescription != null && event.getDescription() != null && !event.getDescription().isEmpty()) {
+            String css = "<style>body{font-family:sans-serif;font-size:14px;color:#666;line-height:1.6;margin:0;padding:0;} img{max-width:100%;height:auto;} h2{font-size:18px;color:#333;} iframe{display:none;}</style>";
+            String html = "<html><head><meta name='viewport' content='width=device-width,initial-scale=1'>" + css + "</head><body>" + event.getDescription() + "</body></html>";
+            webDetailDescription.getSettings().setJavaScriptEnabled(false);
+            webDetailDescription.getSettings().setLoadsImagesAutomatically(true);
+            webDetailDescription.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            webDetailDescription.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
         }
+        setupDescriptionToggle();
 
         // ── Category Name ───────────────────────────────────────────────
         String catDisplayName = resolveCategoryName(event.getCategory());
@@ -223,19 +278,42 @@ public class EventDetailFragment extends Fragment {
         // ── Organizer ───────────────────────────────────────────────────
         populateOrganizerUI(event);
 
+        // ── Schedule / Ticket Types ─────────────────────────────────────
+        if (txtScheduleTime != null) {
+            txtScheduleTime.setText(fullDate);
+        }
+        loadTicketTypes();
+
         // ── Cover Image ─────────────────────────────────────────────────
         populateCoverImage(event);
 
-        // ── Sold Out → disable booking ──────────────────────────────────
-        if (event.isSoldOut()) {
+        // ── Trạng thái sự kiện → booking button ────────────────────────
+        String evStatus = event.getStatus() != null ? event.getStatus().toLowerCase() : "";
+        if ("completed".equals(evStatus)) {
+            btnBookTickets.setEnabled(false);
+            btnBookTickets.setText("Sự kiện đã kết thúc");
+            btnBookTickets.setAlpha(0.5f);
+        } else if ("cancelled".equals(evStatus)) {
+            btnBookTickets.setEnabled(false);
+            btnBookTickets.setText("Sự kiện đã huỷ");
+            btnBookTickets.setAlpha(0.5f);
+        } else if (event.isSoldOut()) {
             btnBookTickets.setEnabled(false);
             btnBookTickets.setText("Đã hết vé");
             btnBookTickets.setAlpha(0.5f);
-        } else {
+        } else if ("approved".equals(evStatus) || "ongoing".equals(evStatus)) {
             btnBookTickets.setEnabled(true);
             btnBookTickets.setText("Đặt vé ngay");
             btnBookTickets.setAlpha(1f);
+        } else {
+            // pending/draft/rejected — không nên vào được màn này nhưng vẫn guard
+            btnBookTickets.setEnabled(false);
+            btnBookTickets.setText("Chưa mở bán");
+            btnBookTickets.setAlpha(0.5f);
         }
+
+        // Load related events after main event is populated
+        loadRelatedEvents(event);
     }
 
     /**
@@ -282,28 +360,28 @@ public class EventDetailFragment extends Fragment {
     }
 
     /**
-     * Hiển thị tên ban tổ chức.
-     * Nếu event chưa có organizer_name, thử resolve từ Firestore organizers collection.
+     * Hiển thị tên ban tổ chức + organizer card.
      */
     private void populateOrganizerUI(Event event) {
         if (event.getOrganizerName() != null && !event.getOrganizerName().isEmpty()) {
             txtDetailOrganizer.setText(event.getOrganizerName());
+            if (txtOrganizerCardName != null) txtOrganizerCardName.setText(event.getOrganizerName());
         } else {
-            // Fallback: hiển thị tên mặc định ngay,
-            // đồng thời thử resolve từ Firestore nếu có organizer_id
             txtDetailOrganizer.setText("Ban tổ chức VibeTix");
-            resolveOrganizerFromFirestore();
+            if (txtOrganizerCardName != null) txtOrganizerCardName.setText("Ban tổ chức VibeTix");
         }
+        resolveOrganizerFromFirestore();
     }
 
     /**
      * Thử lấy organizer_name từ event document → organizer_id → organizers collection.
+     * Cũng populate organizer card (avatar, verified badge).
      */
     private void resolveOrganizerFromFirestore() {
         if (eventId.isEmpty()) return;
 
         FirebaseFirestore.getInstance()
-                .collection("events")
+                .collection(FirebaseCollections.EVENTS)
                 .document(eventId)
                 .get()
                 .addOnSuccessListener(doc -> {
@@ -313,15 +391,16 @@ public class EventDetailFragment extends Fragment {
                     String orgName = doc.getString("organizer_name");
                     if (orgName != null && !orgName.isEmpty()) {
                         txtDetailOrganizer.setText(orgName);
-                        return;
+                        if (txtOrganizerCardName != null) txtOrganizerCardName.setText(orgName);
                     }
 
-                    // Thử resolve từ organizer_id
-                    String organizerId = doc.getString("organizer_id");
-                    if (organizerId != null && !organizerId.isEmpty()) {
+                    // Resolve organizer card từ organizer_id
+                    String orgId = doc.getString("organizer_id");
+                    if (orgId != null && !orgId.isEmpty()) {
+                        organizerId = orgId;
                         FirebaseFirestore.getInstance()
-                                .collection("organizers")
-                                .document(organizerId)
+                                .collection(FirebaseCollections.ORGANIZERS)
+                                .document(orgId)
                                 .get()
                                 .addOnSuccessListener(orgDoc -> {
                                     if (!isAdded() || orgDoc == null || !orgDoc.exists()) return;
@@ -329,10 +408,223 @@ public class EventDetailFragment extends Fragment {
                                     if (brandName == null) brandName = orgDoc.getString("name");
                                     if (brandName != null && !brandName.isEmpty()) {
                                         txtDetailOrganizer.setText(brandName);
+                                        if (txtOrganizerCardName != null) txtOrganizerCardName.setText(brandName);
+                                    }
+                                    // Avatar
+                                    String logoUrl = orgDoc.getString("logo_url");
+                                    if (imvOrganizerAvatar != null) {
+                                        if (logoUrl != null && !logoUrl.isEmpty()) {
+                                            Glide.with(requireContext()).load(logoUrl)
+                                                    .circleCrop()
+                                                    .placeholder(R.drawable.img_mascot_wave)
+                                                    .error(R.drawable.img_mascot_wave)
+                                                    .into(imvOrganizerAvatar);
+                                        }
+                                    }
+                                    // Verified badge
+                                    Boolean verified = orgDoc.getBoolean("is_verified");
+                                    if (imvOrganizerVerified != null) {
+                                        imvOrganizerVerified.setVisibility(
+                                                Boolean.TRUE.equals(verified) ? View.VISIBLE : View.GONE);
                                     }
                                 });
                     }
                 });
+    }
+
+    /**
+     * "Xem thêm" / "Thu gọn" toggle cho description.
+     */
+    private void setupDescriptionToggle() {
+        if (txtDescriptionToggle == null || webDetailDescription == null || layoutDescriptionContainer == null) return;
+        txtDescriptionToggle.setVisibility(View.VISIBLE);
+        txtDescriptionToggle.setOnClickListener(v -> {
+            isDescriptionExpanded = !isDescriptionExpanded;
+            ViewGroup.LayoutParams lp = webDetailDescription.getLayoutParams();
+            if (isDescriptionExpanded) {
+                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                txtDescriptionToggle.setText("Thu gọn ▲");
+                if (viewDescriptionGradient != null) viewDescriptionGradient.setVisibility(View.GONE);
+            } else {
+                lp.height = (int)(200 * getResources().getDisplayMetrics().density);
+                txtDescriptionToggle.setText("Xem thêm ▼");
+                if (viewDescriptionGradient != null) viewDescriptionGradient.setVisibility(View.VISIBLE);
+            }
+            webDetailDescription.setLayoutParams(lp);
+        });
+    }
+
+    // Cache ticket types + event time info cho lịch diễn
+    private final java.util.List<com.google.firebase.firestore.QueryDocumentSnapshot> cachedTicketDocs = new java.util.ArrayList<>();
+    private final java.util.List<String> eventDates = new java.util.ArrayList<>(); // dd/MM/yyyy
+    private String currentScheduleDate = null; // ngày đang hiển thị
+    private String eventTimeRange = ""; // HH:mm - HH:mm
+    private boolean isScheduleExpanded = true; // suất diễn mặc định mở sẵn
+
+    /**
+     * Load ticket types + build schedule: Ngày → Suất diễn (khung giờ) → Loại vé
+     * Logic: tất cả loại vé thuộc cùng 1 sự kiện, hiện dưới 1 khung giờ
+     */
+    private void loadTicketTypes() {
+        if (eventId.isEmpty() || layoutScheduleContent == null) return;
+
+        // Wire icon lịch
+        View v = getView();
+        View btnCal = v != null ? v.findViewById(R.id.btnScheduleCalendar) : null;
+        if (btnCal != null) btnCal.setOnClickListener(vv -> openScheduleCalendar());
+
+        // Lấy ngày + giờ event từ Firestore
+        FirebaseFirestore.getInstance().collection("events").document(eventId).get()
+                .addOnSuccessListener(eventDoc -> {
+                    if (!isAdded() || eventDoc == null) return;
+                    java.text.SimpleDateFormat sdfDate = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+                    java.text.SimpleDateFormat sdfTime = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
+
+                    // Lấy ngày diễn từ event start_time
+                    Timestamp startTs = eventDoc.getTimestamp("start_time");
+                    Timestamp endTs = eventDoc.getTimestamp("end_time");
+                    if (startTs != null) {
+                        currentScheduleDate = sdfDate.format(startTs.toDate());
+                        eventTimeRange = sdfTime.format(startTs.toDate());
+                        if (endTs != null) {
+                            eventTimeRange += " - " + sdfTime.format(endTs.toDate());
+                        }
+                    }
+                    eventDates.clear();
+                    if (currentScheduleDate != null) eventDates.add(currentScheduleDate);
+
+                    // Load ticket types
+                    fetchAndRenderTicketTypes();
+                });
+    }
+
+    private void fetchAndRenderTicketTypes() {
+        FirebaseFirestore.getInstance()
+                .collection(FirebaseCollections.TICKET_TYPES)
+                .whereEqualTo("event_id", eventId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (!isAdded()) return;
+                    cachedTicketDocs.clear();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : snap) {
+                        cachedTicketDocs.add(doc);
+                    }
+                    renderSchedule();
+                });
+    }
+
+    /** Render lịch diễn: Ngày hiện tại → Suất diễn (dropdown khung giờ) → Tất cả loại vé */
+    private void renderSchedule() {
+        if (layoutScheduleContent == null) return;
+        layoutScheduleContent.removeAllViews();
+        float dp = getResources().getDisplayMetrics().density;
+
+        // Hiện ngày diễn hiện tại
+        if (txtScheduleTime != null && currentScheduleDate != null) {
+            txtScheduleTime.setText(currentScheduleDate);
+        }
+
+        if (cachedTicketDocs.isEmpty()) return;
+
+        // Suất diễn header (khung giờ) — clickable dropdown
+        LinearLayout showRow = new LinearLayout(requireContext());
+        showRow.setOrientation(LinearLayout.HORIZONTAL);
+        showRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        showRow.setPadding((int)(12*dp), (int)(12*dp), (int)(12*dp), (int)(12*dp));
+        showRow.setBackgroundResource(R.drawable.bg_chip_active);
+        LinearLayout.LayoutParams showLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        showLp.bottomMargin = (int)(4*dp);
+        showRow.setLayoutParams(showLp);
+
+        // Chevron
+        ImageView chevron = new ImageView(requireContext());
+        chevron.setLayoutParams(new LinearLayout.LayoutParams((int)(18*dp), (int)(18*dp)));
+        chevron.setImageResource(isScheduleExpanded ? R.drawable.ic_chevron_down : R.drawable.ic_chevron_right);
+        chevron.setColorFilter(getResources().getColor(R.color.clr_text_white));
+        showRow.addView(chevron);
+
+        // Khung giờ + ngày
+        TextView txtTime = new TextView(requireContext());
+        txtTime.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        String timeDisplay = "  " + eventTimeRange;
+        if (currentScheduleDate != null) timeDisplay += "\n  " + currentScheduleDate;
+        txtTime.setText(timeDisplay);
+        txtTime.setTextSize(13f);
+        txtTime.setTextColor(getResources().getColor(R.color.clr_text_white));
+        txtTime.setTypeface(null, android.graphics.Typeface.BOLD);
+        showRow.addView(txtTime);
+
+        // "MUA VÉ NGAY"
+        TextView btnBuy = new TextView(requireContext());
+        btnBuy.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        btnBuy.setText("MUA VÉ NGAY");
+        btnBuy.setTextSize(11f);
+        btnBuy.setTextColor(getResources().getColor(R.color.clr_text_white));
+        btnBuy.setBackgroundResource(R.drawable.bg_resale_badge);
+        btnBuy.setPadding((int)(8*dp), (int)(4*dp), (int)(8*dp), (int)(4*dp));
+        btnBuy.setOnClickListener(vv -> btnBookTickets.performClick());
+        showRow.addView(btnBuy);
+
+        // Toggle
+        showRow.setOnClickListener(vv -> {
+            isScheduleExpanded = !isScheduleExpanded;
+            renderSchedule();
+        });
+        layoutScheduleContent.addView(showRow);
+
+        // Loại vé (sổ ra khi expanded)
+        if (isScheduleExpanded) {
+            for (com.google.firebase.firestore.QueryDocumentSnapshot doc : cachedTicketDocs) {
+                String name = doc.getString("name");
+                Long price = doc.getLong("price");
+                if (name == null) continue;
+
+                LinearLayout row = new LinearLayout(requireContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                rowLp.bottomMargin = (int)(4*dp);
+                row.setLayoutParams(rowLp);
+                row.setPadding((int)(16*dp), (int)(10*dp), (int)(12*dp), (int)(10*dp));
+                row.setBackgroundResource(R.drawable.bg_search_bar);
+
+                TextView txtName = new TextView(requireContext());
+                txtName.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+                txtName.setText(name);
+                txtName.setTextSize(14f);
+                txtName.setTextColor(getResources().getColor(R.color.clr_text_black));
+
+                TextView txtPrice = new TextView(requireContext());
+                txtPrice.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                txtPrice.setText(price != null && price > 0 ? formatter.format(price) + " đ" : "Miễn phí");
+                txtPrice.setTextSize(14f);
+                txtPrice.setTextColor(getResources().getColor(R.color.clr_primary_blue));
+                txtPrice.setTypeface(null, android.graphics.Typeface.BOLD);
+
+                row.addView(txtName);
+                row.addView(txtPrice);
+                layoutScheduleContent.addView(row);
+            }
+        }
+    }
+
+    /** Mở popup lịch highlight ngày diễn sự kiện */
+    private void openScheduleCalendar() {
+        DateFilterDialog dialog = new DateFilterDialog();
+        dialog.setHighlightDates(eventDates);
+        dialog.setOnDateFilterApplied((label, start, end) -> {
+            if (start != null) {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+                currentScheduleDate = sdf.format(start.getTime());
+                isScheduleExpanded = true;
+                renderSchedule();
+            }
+        });
+        dialog.show(getChildFragmentManager(), "schedule_calendar");
     }
 
     /**
@@ -353,11 +645,11 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void checkWishlistStatus() {
-        if (userEmail.isEmpty() || eventId.isEmpty()) return;
+        if (userId.isEmpty() || eventId.isEmpty()) return;
 
         FirebaseFirestore.getInstance()
-                .collection("wishlists")
-                .document(userEmail + "_" + eventId)
+                .collection("event_interests")
+                .document(userId + "_" + eventId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (isAdded() && documentSnapshot.exists()) {
@@ -380,7 +672,7 @@ public class EventDetailFragment extends Fragment {
     }
 
     private void toggleFavorite() {
-        if (userEmail.isEmpty()) {
+        if (userId.isEmpty()) {
             Toast.makeText(requireContext(), "Vui lòng đăng nhập để lưu sự kiện yêu thích", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -396,8 +688,8 @@ public class EventDetailFragment extends Fragment {
         updateInterestUI();
 
         DocumentReference docRef = FirebaseFirestore.getInstance()
-                .collection("wishlists")
-                .document(userEmail + "_" + eventId);
+                .collection("event_interests")
+                .document(userId + "_" + eventId);
 
         DocumentReference eventRef = FirebaseFirestore.getInstance()
                 .collection("events")
@@ -405,9 +697,11 @@ public class EventDetailFragment extends Fragment {
 
         if (isFavorited) {
             Map<String, Object> data = new HashMap<>();
-            data.put("userEmail", userEmail);
-            data.put("eventId", eventId);
-            data.put("timestamp", Timestamp.now());
+            data.put("user_id", userId);
+            data.put("event_id", eventId);
+            data.put("created_at", Timestamp.now());
+            data.put("notify_on_reminder", true);
+            data.put("notify_on_sale", true);
             docRef.set(data);
 
             // Increment interest_count on Firebase
@@ -434,11 +728,136 @@ public class EventDetailFragment extends Fragment {
         }
 
         btnBookTickets.setOnClickListener(v -> {
-            SelectTicketFragment selectFrag = SelectTicketFragment.newInstance(eventId);
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, selectFrag)
-                    .addToBackStack("booking")
-                    .commit();
+            // Xác minh CAPTCHA trước khi cho đặt vé
+            SliderCaptchaDialogFragment captcha = SliderCaptchaDialogFragment.newInstance();
+            captcha.setOnVerifiedListener(() -> {
+                SelectTicketFragment selectFrag = SelectTicketFragment.newInstance(eventId);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.frameContainerMain, selectFrag)
+                        .addToBackStack("booking")
+                        .commit();
+            });
+            captcha.show(getChildFragmentManager(), "captcha");
         });
+
+        // Organizer card → open StarDetailFragment (handles both stars and organizers)
+        if (layoutOrganizerCard != null) {
+            layoutOrganizerCard.setOnClickListener(v -> {
+                if (organizerId.isEmpty()) return;
+                String orgName = txtOrganizerCardName != null ? txtOrganizerCardName.getText().toString() : "";
+                StarDetailFragment frag = StarDetailFragment.newInstance(organizerId, orgName);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.frameContainerMain, frag)
+                        .addToBackStack("organizer_detail")
+                        .commit();
+            });
+        }
+
+        // Related events: "Xem thêm" → EventsFragment (tab Sự kiện)
+        if (txtRelatedSeeMore != null) {
+            txtRelatedSeeMore.setOnClickListener(v -> {
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openEventsFragment();
+                }
+            });
+        }
+    }
+
+    // ── Related Events ─────────────────────────────────────────────────────────
+
+    private void loadRelatedEvents(Event currentEvent) {
+        String catId = currentEvent.getCategoryId();
+        String currentTitle = currentEvent.getTitle() != null ? currentEvent.getTitle().toLowerCase() : "";
+        String currentCity = currentEvent.getVenueCity() != null ? currentEvent.getVenueCity().toLowerCase() : "";
+        Set<String> titleTokens = tokenize(currentTitle);
+
+        // Query events theo cùng category
+        com.google.firebase.firestore.Query query = FirebaseFirestore.getInstance()
+                .collection("events")
+                .limit(60);
+        if (catId != null && !catId.isEmpty()) {
+            query = FirebaseFirestore.getInstance()
+                    .collection("events")
+                    .whereEqualTo("category_id", catId)
+                    .limit(60);
+        }
+
+        query.get().addOnSuccessListener(snap -> {
+            if (!isAdded()) return;
+            List<ScoredEvent> scored = new ArrayList<>();
+            List<String> ACTIVE = Arrays.asList("approved", "ongoing");
+            long todayMs = com.example.vibetix.Firebase.HomepageLoader.getTodayStartMs();
+
+            for (com.google.firebase.firestore.QueryDocumentSnapshot doc : snap) {
+                if (doc.getId().equals(eventId)) continue; // bỏ chính nó
+                String status = doc.getString("status");
+                if (status == null || !ACTIVE.contains(status)) continue;
+                // Chỉ lấy event chưa kết thúc
+                com.google.firebase.Timestamp ts = doc.getTimestamp("end_time");
+                if (ts == null) ts = doc.getTimestamp("start_time");
+                if (ts != null && ts.toDate().getTime() < todayMs) continue;
+
+                Event e = com.example.vibetix.Firebase.FirestoreHelper.docToEvent(doc);
+                if (e == null) continue;
+
+                // Tính điểm tương đồng đơn giản
+                int score = 0;
+                String otherTitle = e.getTitle() != null ? e.getTitle().toLowerCase() : "";
+                Set<String> otherTokens = tokenize(otherTitle);
+                // Đếm token chung trong title
+                Set<String> inter = new HashSet<>(titleTokens);
+                inter.retainAll(otherTokens);
+                score += inter.size() * 3;
+                // Cùng thành phố
+                String otherCity = e.getVenueCity() != null ? e.getVenueCity().toLowerCase() : "";
+                if (!currentCity.isEmpty() && currentCity.equals(otherCity)) score += 2;
+                scored.add(new ScoredEvent(e, score));
+            }
+
+            // Sắp xếp: score cao → thấp, cùng score → ngày gần nhất
+            Collections.sort(scored, (a, b) -> {
+                if (b.score != a.score) return b.score - a.score;
+                String da = a.event.getDate() != null ? a.event.getDate() : "";
+                String db2 = b.event.getDate() != null ? b.event.getDate() : "";
+                String ka = da.length() == 10 ? da.substring(6)+da.substring(3,5)+da.substring(0,2) : da;
+                String kb = db2.length() == 10 ? db2.substring(6)+db2.substring(3,5)+db2.substring(0,2) : db2;
+                return ka.compareTo(kb);
+            });
+
+            relatedEventsList.clear();
+            for (int i = 0; i < Math.min(10, scored.size()); i++) {
+                relatedEventsList.add(scored.get(i).event);
+            }
+            relatedEventsAdapter.notifyDataSetChanged();
+
+            if (layoutRelatedEvents != null) {
+                layoutRelatedEvents.setVisibility(relatedEventsList.isEmpty() ? View.GONE : View.VISIBLE);
+            }
+        });
+    }
+
+    private Set<String> tokenize(String text) {
+        Set<String> tokens = new HashSet<>();
+        if (text == null || text.isEmpty()) return tokens;
+        // Tách theo khoảng trắng và dấu câu, bỏ stopwords ngắn
+        for (String word : text.split("[\\s\\[\\]()\\-:,./]+")) {
+            if (word.length() > 2) tokens.add(word);
+        }
+        return tokens;
+    }
+
+    private static class ScoredEvent {
+        final Event event;
+        final int score;
+        ScoredEvent(Event event, int score) { this.event = event; this.score = score; }
+    }
+
+    private void openRelatedEvent(Event event) {
+        if (event == null || event.getId() == null) return;
+        EventDetailFragment frag = EventDetailFragment.newInstance(event.getId());
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.frameContainerMain, frag)
+                .addToBackStack("event_detail_related")
+                .commit();
     }
 }

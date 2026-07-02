@@ -63,8 +63,6 @@
                         android:layout_width="84dp"
                         android:layout_height="84dp"
                         android:background="@drawable/bg_avatar_circle"
-                        android:padding="3dp"
-                        android:src="@drawable/img_mascot_normal"
                         android:scaleType="centerCrop"
                         android:contentDescription="@null" />
 

@@ -118,6 +118,31 @@
             android:textColor="@color/clr_primary_blue"
             android:textSize="12sp" />
 
+        <!-- Message block (optional) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Lời nhắn cho người mua (tuỳ chọn)"
+            android:textColor="@color/clr_text_black"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPassMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_input_normal"
+            android:gravity="top"
+            android:hint="Ví dụ: Vé chính chủ, sang nhượng do bận việc..."
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:maxLines="4"
+            android:padding="16dp"
+            android:textColor="@color/clr_text_black"
+            android:textSize="14sp" />
+
         <!-- Actions block -->
         <LinearLayout
             android:layout_width="match_parent"

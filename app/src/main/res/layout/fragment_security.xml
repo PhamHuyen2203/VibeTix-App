@@ -125,6 +125,20 @@
                             android:contentDescription="@null" />
                     </LinearLayout>
 
+                    <!-- Quên mã PIN -->
+                    <TextView
+                        android:id="@+id/txtForgotPin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="44dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="Quên mã PIN? Xác nhận qua SMS"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:visibility="gone" />
+
                     <View android:layout_width="match_parent" android:layout_height="1dp"
                         android:layout_marginStart="44dp" android:background="#F0F0F0" />
 

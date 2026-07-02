@@ -72,12 +72,53 @@
                 android:src="@android:drawable/ic_menu_gallery" />
         </androidx.cardview.widget.CardView>
 
+        <!-- QR navigation (mũi tên qua lại nếu nhiều vé) -->
+        <LinearLayout
+            android:id="@+id/layoutQrNav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/btnQrPrev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Vé trước"
+                android:padding="8dp"
+                android:rotation="180"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/clr_primary_blue" />
+
+            <TextView
+                android:id="@+id/txtQrCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="1 / 2"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/btnQrNext"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Vé sau"
+                android:padding="8dp"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/clr_primary_blue" />
+        </LinearLayout>
+
         <TextView
             android:id="@+id/txtQrDialogTicketId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:fontFamily="monospace"
             android:text="VTX-TICKET-ID-123456"
             android:textColor="@color/clr_text_black"

@@ -7,35 +7,40 @@
     android:background="@color/clr_bg_light">
 
     <!-- Top Toolbar Header -->
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layoutSelectHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/clr_bg_white"
         android:elevation="2dp"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/btnSelectBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:src="@drawable/ic_back" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingHorizontal="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:fontFamily="sans-serif-medium"
-            android:text="Chọn vé"
-            android:textColor="@color/clr_text_black"
-            android:textSize="18sp" />
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/btnSelectBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Chọn vé"
+                android:textColor="@color/clr_text_black"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </LinearLayout>
 
     <!-- Progress Step Indicator Bar -->
     <LinearLayout
@@ -236,7 +241,41 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Ticket Card Panel -->
+            <!-- Seatmap Card (hidden by default, shown if seatmap_url exists) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSeatmap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Sơ đồ chỗ ngồi"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <ImageView
+                        android:id="@+id/imvSeatmap"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scaleType="fitCenter" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Ticket Types Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -250,196 +289,54 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Title & Price -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Chọn loại vé"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Dynamically populated by SelectTicketFragment -->
+                    <LinearLayout
+                        android:id="@+id/layoutTicketTypeRows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <!-- Hidden legacy views (kept for backward compat, unused) -->
                     <TextView
                         android:id="@+id/txtSelectTicketTypeName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="Vé Tiêu chuẩn"
-                        android:textColor="@color/clr_text_black"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
+                        android:visibility="gone" />
                     <TextView
                         android:id="@+id/txtSelectTicketPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="400.000 đ"
-                        android:textColor="@color/clr_primary_blue"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <!-- Quantity selection row -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp">
-
-                        <TextView
-                            android:id="@+id/txtSelectRemainingBadge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_centerInParent="true"
-                            android:background="@drawable/bg_status_badge_ongoing"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="Còn 150 vé"
-                            android:textColor="@color/clr_success"
-                            android:textSize="12sp" />
-
-                        <!-- - 1 + Selector -->
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/bg_input_normal"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="4dp">
-
-                            <ImageButton
-                                android:id="@+id/btnSelectQtyMinus"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:src="@android:drawable/button_onoff_indicator_off"
-                                app:tint="@color/clr_primary_blue" />
-
-                            <TextView
-                                android:id="@+id/txtSelectQtyValue"
-                                android:layout_width="40dp"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="1"
-                                android:textColor="@color/clr_text_black"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <ImageButton
-                                android:id="@+id/btnSelectQtyPlus"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:src="@android:drawable/ic_input_add"
-                                app:tint="@color/clr_primary_blue" />
-                        </LinearLayout>
-                    </RelativeLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="16dp"
-                        android:background="@color/clr_divider" />
-
-                    <!-- Benefits list -->
+                        android:visibility="gone" />
                     <TextView
+                        android:id="@+id/txtSelectRemainingBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Quyền lợi bao gồm"
-                        android:textColor="@color/clr_text_black"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/layoutSelectBenefitsList"
-                        android:layout_width="match_parent"
+                        android:visibility="gone" />
+                    <android.widget.ImageButton
+                        android:id="@+id/btnSelectQtyMinus"
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
+                        android:visibility="gone" />
+                    <android.widget.ImageButton
+                        android:id="@+id/btnSelectQtyPlus"
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
+                        android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/txtSelectQtyValue"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="vertical">
-
-                        <!-- Benefit Item 1 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginVertical="4dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@android:drawable/checkbox_on_background"
-                                app:tint="@color/clr_primary_blue" />
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Tham dự workshop và trao đổi cùng chuyên gia"
-                                android:textColor="@color/clr_text_secondary"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-
-                        <!-- Benefit Item 2 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginVertical="4dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@android:drawable/checkbox_on_background"
-                                app:tint="@color/clr_primary_blue" />
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Tài liệu workshop (bản PDF)"
-                                android:textColor="@color/clr_text_secondary"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-
-                        <!-- Benefit Item 3 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginVertical="4dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@android:drawable/checkbox_on_background"
-                                app:tint="@color/clr_primary_blue" />
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Teabreak &amp; Networking"
-                                android:textColor="@color/clr_text_secondary"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingVertical="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Xem điều kiện"
-                            android:textColor="@color/clr_primary_blue"
-                            android:textSize="13sp" />
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerInParent="true"
-                            android:src="@drawable/ic_chevron_right"
-                            app:tint="@color/clr_primary_blue" />
-                    </RelativeLayout>
+                        android:visibility="gone" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -560,9 +457,10 @@
             android:id="@+id/btnSelectNext"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:backgroundTint="@color/clr_btn_blue"
+            android:backgroundTint="@color/clr_grey_1"
+            android:enabled="false"
             android:fontFamily="sans-serif-medium"
-            android:text="Tiếp tục ›"
+            android:text="Vui lòng chọn vé"
             android:textColor="@color/clr_text_white"
             android:textSize="14sp"
             app:cornerRadius="8dp" />

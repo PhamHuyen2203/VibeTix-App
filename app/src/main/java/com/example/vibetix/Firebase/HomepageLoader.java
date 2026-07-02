@@ -58,8 +58,9 @@ public class HomepageLoader {
     public static final String CAT_SPORTS   = "";
     public static final String CAT_OTHER    = "";
 
-    // approved(20) + ongoing(25) + completed(12) = 57 events có thể hiển thị
-    private static final List<String> ACTIVE = Arrays.asList("approved", "ongoing", "completed");
+    // Chỉ approved + ongoing mới được ưu tiên hiển thị trên trang chủ
+    // completed → ẩn khỏi homepage (còn hiện trong trang Browse ở cuối)
+    private static final List<String> ACTIVE = Arrays.asList("approved", "ongoing");
 
     public interface OnLoaded { void onSuccess(List<Event> events); }
 
@@ -91,14 +92,15 @@ public class HomepageLoader {
             .addOnSuccessListener(snap -> {
                 List<Event> list = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
-                    // Lọc status trong memory
                     String status = doc.getString("status");
                     if (status == null || !ACTIVE.contains(status)) continue;
+                    if (!isUpcomingOrOngoing(doc)) continue; // ẩn sự kiện đã qua ngày
                     Event e = FirestoreHelper.docToEvent(doc);
                     if (e != null) list.add(e);
                 }
                 // Sort: start_time ASC (sắp diễn ra sớm nhất trước)
                 sortByStartTime(list, true);
+                Log.d(TAG, "loadFeatured: " + snap.size() + " docs from query, " + list.size() + " after filter");
                 // Nếu không có featured events → lấy events bất kỳ
                 if (list.isEmpty()) loadAnyActiveEvents(8, callback);
                 else callback.onSuccess(list.subList(0, Math.min(8, list.size())));
@@ -150,22 +152,34 @@ public class HomepageLoader {
 
     // ── 4. THEO DANH MỤC ──────────────────────────────────────────────────────
     public static void loadByCategory(String categoryId, OnLoaded callback) {
-        // limit(100) đủ để lọc status trong memory mà không bỏ sót
         FirebaseFirestore.getInstance()
             .collection("events")
             .whereEqualTo("category_id", categoryId)
             .limit(100)
             .get()
             .addOnSuccessListener(snap -> {
-                List<Event> list = new ArrayList<>();
+                List<Event> active = new ArrayList<>();
+                List<Event> past = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
                     String status = doc.getString("status");
-                    if (status == null || !ACTIVE.contains(status)) continue;
+                    if (status == null) continue;
+                    boolean isActive = ACTIVE.contains(status) && isUpcomingOrOngoing(doc);
+                    boolean isPast = "completed".equals(status)
+                            || (ACTIVE.contains(status) && !isUpcomingOrOngoing(doc));
                     Event e = FirestoreHelper.docToEvent(doc);
-                    if (e != null) list.add(e);
+                    if (e == null) continue;
+                    if (isActive) active.add(e);
+                    else if (isPast) past.add(e);
                 }
-                sortByStartTime(list, true);
-                callback.onSuccess(list.subList(0, Math.min(10, list.size())));
+                // Ưu tiên: sắp diễn ra trước → sự kiện đã qua xếp sau (mới nhất trước)
+                sortByStartTime(active, true);
+                sortByStartTime(past, false);
+                List<Event> result = new ArrayList<>(active);
+                int remaining = 10 - result.size();
+                if (remaining > 0 && !past.isEmpty()) {
+                    result.addAll(past.subList(0, Math.min(remaining, past.size())));
+                }
+                callback.onSuccess(result.subList(0, Math.min(10, result.size())));
             })
             .addOnFailureListener(e -> {
                 Log.e(TAG, "loadByCategory(" + categoryId + ") failed: " + e.getMessage());
@@ -185,6 +199,7 @@ public class HomepageLoader {
                 for (QueryDocumentSnapshot doc : snap) {
                     String status = doc.getString("status");
                     if (!"approved".equals(status) && !"ongoing".equals(status)) continue;
+                    if (!isUpcomingOrOngoing(doc)) continue; // bỏ event đã qua ngày
                     Event e = FirestoreHelper.docToEvent(doc);
                     if (e != null) list.add(e);
                 }
@@ -198,52 +213,73 @@ public class HomepageLoader {
             });
     }
 
-    // ── Helper: fetch events theo list ID ─────────────────────────────────────
+    // ── Helper: fetch events theo list ID — dùng whereIn(documentId) batch (tránh N+1) ──
     private static void fetchByIds(List<String> ids, int limit, OnLoaded callback) {
         if (ids.isEmpty()) { callback.onSuccess(new ArrayList<>()); return; }
-        int count = Math.min(ids.size(), limit);
-        List<Event> results = new ArrayList<>();
-        AtomicInteger remaining = new AtomicInteger(count);
+        List<String> wanted = new ArrayList<>(ids.subList(0, Math.min(ids.size(), limit)));
+        Map<String, Event> byId = new HashMap<>();
+        fetchByIdsBatch(wanted, 0, byId, () -> {
+            // Giữ đúng thứ tự input (banner/trending cần top N theo thứ tự)
+            List<Event> ordered = new ArrayList<>();
+            for (String id : wanted) {
+                Event e = byId.get(id);
+                if (e != null) ordered.add(e);
+            }
+            callback.onSuccess(ordered);
+        });
+    }
 
-        for (int i = 0; i < count; i++) {
-            FirebaseFirestore.getInstance()
-                .collection("events").document(ids.get(i)).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        try {
-                            String title = doc.getString("title");
-                            if (title != null && !title.isEmpty()) {
-                                String imgUrl    = doc.getString("banner_url");
-                                String posterUrl = doc.getString("poster_url");
-                                if (imgUrl == null) imgUrl = posterUrl;
-                                String date = "";
-                                Timestamp ts = doc.getTimestamp("start_time");
-                                if (ts != null)
-                                    date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(ts.toDate());
-                                String venueId = doc.getString("venue_id");
-                                String city = venueId != null ? FirestoreHelper.VENUE_CACHE.getOrDefault(venueId, "Việt Nam") : "Việt Nam";
-                                String catId = doc.getString("category_id");
-                                String cat = catId != null ? FirestoreHelper.CAT_MAP.getOrDefault(catId, "music") : "music";
-                                long price = 0;
-                                Object p = doc.get("min_price");
-                                if (p instanceof Long) price = (Long) p;
-                                else if (p instanceof Double) price = ((Double) p).longValue();
-                                Event e = new Event(doc.getId(), title, imgUrl, date, city, cat, (int) price);
-                                e.setVenueCity(city);
-                                e.setStatus(Event.Status.APPROVED);
-                                Boolean feat = doc.getBoolean("is_featured");
-                                if (Boolean.TRUE.equals(feat)) e.setFeatured(true);
-                                if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
-                                synchronized (results) { results.add(e); }
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                    if (remaining.decrementAndGet() == 0) callback.onSuccess(results);
-                })
-                .addOnFailureListener(e -> {
-                    if (remaining.decrementAndGet() == 0) callback.onSuccess(results);
-                });
-        }
+    /** Fetch events theo batch 30 ID bằng whereIn(documentId) — 1 query / 30 doc thay vì N query */
+    private static void fetchByIdsBatch(List<String> ids, int offset,
+                                        Map<String, Event> acc, Runnable onDone) {
+        if (offset >= ids.size()) { onDone.run(); return; }
+        int end = Math.min(offset + 30, ids.size());
+        List<String> batch = new ArrayList<>(ids.subList(offset, end));
+
+        Log.d(TAG, "fetchByIdsBatch: querying " + batch.size() + " IDs, offset=" + offset);
+        FirebaseFirestore.getInstance()
+            .collection("events")
+            .whereIn(com.google.firebase.firestore.FieldPath.documentId(), batch)
+            .get()
+            .addOnSuccessListener(snap -> {
+                Log.d(TAG, "fetchByIdsBatch: got " + snap.size() + " docs");
+                for (QueryDocumentSnapshot doc : snap) {
+                    String st = doc.getString("status");
+                    if (!ACTIVE.contains(st)) continue; // bỏ completed/pending/draft
+                    Event e = FirestoreHelper.docToEvent(doc);
+                    if (e != null) acc.put(doc.getId(), e);
+                }
+                Log.d(TAG, "fetchByIdsBatch: acc size=" + acc.size());
+                fetchByIdsBatch(ids, end, acc, onDone);
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "fetchByIdsBatch FAILED: " + e.getMessage());
+                fetchByIdsBatch(ids, end, acc, onDone);
+            });
+    }
+
+    /**
+     * Trả về true nếu sự kiện chưa kết thúc, dựa vào end_time (hoặc start_time).
+     * Áp dụng cho cả "approved" lẫn "ongoing" — Firebase không tự update status theo ngày.
+     * Nếu không có timestamp → giữ lại (không đủ thông tin để loại).
+     */
+    private static boolean isUpcomingOrOngoing(QueryDocumentSnapshot doc) {
+        // Dùng end_time nếu có, fallback start_time
+        com.google.firebase.Timestamp ts = doc.getTimestamp("end_time");
+        if (ts == null) ts = doc.getTimestamp("start_time");
+        if (ts == null) return true; // không có ngày → giữ lại
+        long eventMs = ts.toDate().getTime();
+        long todayStart = getTodayStartMs();
+        return eventMs >= todayStart;
+    }
+
+    public static long getTodayStartMs() {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        cal.set(java.util.Calendar.MILLISECOND, 0);
+        return cal.getTimeInMillis();
     }
 
     // ── Sort helper ───────────────────────────────────────────────────────────

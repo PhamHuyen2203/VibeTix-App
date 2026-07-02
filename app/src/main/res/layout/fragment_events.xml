@@ -123,6 +123,72 @@
     <View android:layout_width="match_parent" android:layout_height="1dp"
         android:background="#F0F0F0" />
 
+    <!-- ══ LOADING INDICATOR ══ -->
+    <ProgressBar
+        android:id="@+id/pbEventsLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:visibility="visible" />
+
+    <!-- ══ ERROR / EMPTY STATE ══ -->
+    <LinearLayout
+        android:id="@+id/layoutErrorEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/imgErrorEmpty"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_search"
+            android:tint="#A0AAB0"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/txtErrorEmptyTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Không tìm thấy sự kiện"
+            android:textColor="#1C1B1B"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtErrorEmptySub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Vui lòng kiểm tra lại kết nối mạng hoặc thử lọc lại danh mục khác."
+            android:textColor="#808E92"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btnRetryEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_btn_primary"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Thử lại"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
     <!-- ══ EVENTS GRID ══ -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEvents"
@@ -133,6 +199,7 @@
         android:paddingEnd="12dp"
         android:paddingTop="12dp"
         android:paddingBottom="80dp"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -76,23 +76,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
                 android:background="@drawable/bg_chip_filter"
                 android:gravity="center"
                 android:paddingVertical="8dp"
                 android:text="Vé bán lại"
-                android:textColor="@color/clr_text_secondary"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tabCategoryMembership"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/bg_chip_filter"
-                android:gravity="center"
-                android:paddingVertical="8dp"
-                android:text="Thẻ thành viên"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -156,107 +143,160 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Sub-Tabs Row for "Vé bán lại" (Đang bán | Chờ thanh toán | Đã thanh toán | Đã hủy) -->
-            <LinearLayout
+            <!-- Sub-Tabs Row for "Vé bán lại" — 6 tabs, horizontally scrollable -->
+            <HorizontalScrollView
                 android:id="@+id/layoutSubTabsResale"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:scrollbars="none"
                 android:visibility="gone">
 
-                <!-- Đang bán -->
                 <LinearLayout
-                    android:id="@+id/tabResaleActive"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1.2"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/txtResaleActive"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingVertical="10dp"
-                        android:text="Đang bán"
-                        android:textColor="@color/clr_primary_blue"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                    <View
-                        android:id="@+id/indicatorResaleActive"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@color/clr_primary_blue" />
-                </LinearLayout>
+                    android:orientation="horizontal">
 
-                <!-- Chờ thanh toán -->
-                <LinearLayout
-                    android:id="@+id/tabResalePending"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.5"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/txtResalePending"
+                    <!-- Đang rao bán -->
+                    <LinearLayout
+                        android:id="@+id/tabResalePending"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="10dp"
-                        android:text="Chờ thanh toán"
-                        android:textColor="@color/clr_text_secondary"
-                        android:textSize="13sp" />
-                    <View
-                        android:id="@+id/indicatorResalePending"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@android:color/transparent" />
-                </LinearLayout>
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResalePending"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Đang rao bán"
+                            android:textColor="@color/clr_primary_blue"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                        <View
+                            android:id="@+id/indicatorResalePending"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@color/clr_primary_blue" />
+                    </LinearLayout>
 
-                <!-- Đã thanh toán -->
-                <LinearLayout
-                    android:id="@+id/tabResalePaid"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.4"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/txtResalePaid"
+                    <!-- Đã có người mua -->
+                    <LinearLayout
+                        android:id="@+id/tabResaleActive"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="10dp"
-                        android:text="Đã thanh toán"
-                        android:textColor="@color/clr_text_secondary"
-                        android:textSize="13sp" />
-                    <View
-                        android:id="@+id/indicatorResalePaid"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@android:color/transparent" />
-                </LinearLayout>
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResaleActive"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Chờ thanh toán"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp" />
+                        <View
+                            android:id="@+id/indicatorResaleActive"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
 
-                <!-- Đã hủy -->
-                <LinearLayout
-                    android:id="@+id/tabResaleCancelled"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    <TextView
-                        android:id="@+id/txtResaleCancelled"
+                    <!-- Đã bán -->
+                    <LinearLayout
+                        android:id="@+id/tabResaleSold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingVertical="10dp"
-                        android:text="Đã hủy"
-                        android:textColor="@color/clr_text_secondary"
-                        android:textSize="13sp" />
-                    <View
-                        android:id="@+id/indicatorResaleCancelled"
-                        android:layout_width="match_parent"
-                        android:layout_height="2dp"
-                        android:background="@android:color/transparent" />
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResaleSold"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Đã bán"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp" />
+                        <View
+                            android:id="@+id/indicatorResaleSold"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
+                    <!-- Đã hủy -->
+                    <LinearLayout
+                        android:id="@+id/tabResaleCancelled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResaleCancelled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Đã hủy"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp" />
+                        <View
+                            android:id="@+id/indicatorResaleCancelled"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
+                    <!-- Bị từ chối -->
+                    <LinearLayout
+                        android:id="@+id/tabResaleRejected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResaleRejected"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Bị từ chối"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp" />
+                        <View
+                            android:id="@+id/indicatorResaleRejected"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
+                    <!-- Hết hạn -->
+                    <LinearLayout
+                        android:id="@+id/tabResaleExpired"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="14dp">
+                        <TextView
+                            android:id="@+id/txtResaleExpired"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="10dp"
+                            android:text="Hết hạn"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp" />
+                        <View
+                            android:id="@+id/indicatorResaleExpired"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:background="@android:color/transparent" />
+                    </LinearLayout>
+
                 </LinearLayout>
-            </LinearLayout>
+            </HorizontalScrollView>
         </FrameLayout>
     </LinearLayout>
 

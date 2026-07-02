@@ -12,11 +12,16 @@
         android:id="@+id/headerHome"
         layout="@layout/include_home_header" />
 
+    <!-- Content area (scroll + loading overlay) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
     <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:fillViewport="true">
 
         <LinearLayout
@@ -34,12 +39,22 @@
                 android:paddingBottom="@dimen/spacing_xs"
                 android:paddingTop="@dimen/spacing_base">
 
+                <ProgressBar
+                    android:id="@+id/pbBanner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:layout_marginBottom="@dimen/spacing_md"
+                    android:visibility="gone" />
+
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/vpBanner"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/banner_height"
                     android:layout_marginEnd="@dimen/spacing_lg"
-                    android:layout_marginStart="@dimen/spacing_lg" />
+                    android:layout_marginStart="@dimen/spacing_lg"
+                    android:visibility="gone" />
 
                 <!-- Dots Indicator — below banner, centered -->
                 <LinearLayout
@@ -103,6 +118,15 @@
                     android:id="@+id/headerFeaturedEvents"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbFeaturedEvents"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvFeaturedEvents"
                     android:layout_width="match_parent"
@@ -112,7 +136,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -132,6 +157,15 @@
                     android:id="@+id/headerTrendingEvents"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbTrendingEvents"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvTrendingEvents"
                     android:layout_width="match_parent"
@@ -142,7 +176,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -268,6 +303,15 @@
                     android:id="@+id/headerLiveMusic"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbLiveMusic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvLiveMusic"
                     android:layout_width="match_parent"
@@ -277,7 +321,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -294,6 +339,15 @@
                     android:id="@+id/headerStageArts"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbStageArts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvStageArts"
                     android:layout_width="match_parent"
@@ -303,7 +357,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -320,6 +375,15 @@
                     android:id="@+id/headerWorkshop"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbWorkshop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvWorkshop"
                     android:layout_width="match_parent"
@@ -329,7 +393,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -346,6 +411,15 @@
                     android:id="@+id/headerTourExperience"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbTourExperience"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvTourExperience"
                     android:layout_width="match_parent"
@@ -355,7 +429,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -372,6 +447,15 @@
                     android:id="@+id/headerSports"
                     layout="@layout/include_section_header" />
 
+                <ProgressBar
+                    android:id="@+id/pbSports"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/spacing_base"
+                    android:layout_marginBottom="@dimen/spacing_base"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvSports"
                     android:layout_width="match_parent"
@@ -381,7 +465,8 @@
                     android:paddingBottom="@dimen/spacing_base"
                     android:paddingEnd="@dimen/spacing_base"
                     android:paddingStart="@dimen/spacing_base"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <!-- 24dp section gap -->
@@ -412,5 +497,15 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+        <!-- Loading overlay ban đầu — hiện khi đang tải lần đầu, ẩn khi có dữ liệu -->
+        <ProgressBar
+            android:id="@+id/pbHomeInitial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </LinearLayout>

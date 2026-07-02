@@ -36,11 +36,11 @@ import com.example.vibetix.Models.Category;
 import com.example.vibetix.Models.Destination;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.Models.FeaturedStar;
-import com.example.vibetix.Models.Ticket;
+import com.example.vibetix.Models.TicketTransfer;
 import com.example.vibetix.R;
 import com.example.vibetix.Firebase.FirestoreHelper;
 import com.example.vibetix.Firebase.HomepageLoader;
-import com.example.vibetix.Repositories.TicketRepository;
+import com.example.vibetix.Repositories.TicketTransferRepository;
 import com.example.vibetix.Utils.Constants;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment {
     ArrayList<Destination> danhSachDestination = new ArrayList<>();
 
     // Repositories
-    private final TicketRepository ticketRepository = new TicketRepository();
+    private final TicketTransferRepository ticketTransferRepository = new TicketTransferRepository();
 
     // Banner auto-scroll
     Handler bannerHandler = new Handler(Looper.getMainLooper());
@@ -189,6 +189,32 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    /** Ẩn ProgressBar và hiện RecyclerView tương ứng khi data arrive. */
+    private void hidePb(int pbId) {
+        View v = getView();
+        if (v == null) return;
+        View pb = v.findViewById(pbId);
+        if (pb != null) pb.setVisibility(View.GONE);
+    }
+
+    /** Hiện RecyclerView (chuyển từ GONE → VISIBLE) khi có data. */
+    private void showRv(RecyclerView rv) {
+        if (rv != null) rv.setVisibility(View.VISIBLE);
+    }
+
+    /** Ẩn TẤT CẢ progress bar — dùng khi query fail/hang để tránh spinner kẹt mãi. */
+    private void hideAllSectionPbs() {
+        hidePb(R.id.pbBanner);
+        hidePb(R.id.pbFeaturedEvents);
+        hidePb(R.id.pbTrendingEvents);
+        hidePb(R.id.pbLiveMusic);
+        hidePb(R.id.pbStageArts);
+        hidePb(R.id.pbWorkshop);
+        hidePb(R.id.pbTourExperience);
+        hidePb(R.id.pbSports);
+        hidePb(R.id.pbHomeInitial);
+    }
+
     private void addEvents(View view) {
         // Search icon → expand search bar; ✕ button → collapse back to default
         layoutSearchBar.setOnClickListener(new View.OnClickListener() {
@@ -210,23 +236,13 @@ public class HomeFragment extends Fragment {
             });
         }
 
-        // Resale banner click (background tap)
-        layoutResaleBanner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(requireContext(), getString(R.string.str_resale_ticket), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Resale banner click → mở trang Vé bán lại (marketplace)
+        layoutResaleBanner.setOnClickListener(v -> openResaleMarketplace());
 
-        // "Xem thêm ›" link inside the resale panel
+        // "Xem thêm ›" link inside the resale panel → mở trang Vé bán lại
         View txtResaleSeeMore = view.findViewById(R.id.txtResaleSeeMore);
         if (txtResaleSeeMore != null) {
-            txtResaleSeeMore.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(requireContext(), getString(R.string.str_resale_ticket), Toast.LENGTH_SHORT).show();
-                }
-            });
+            txtResaleSeeMore.setOnClickListener(v -> openResaleMarketplace());
         }
 
         // Bell (notification) click → show notification popup
@@ -239,15 +255,15 @@ public class HomeFragment extends Fragment {
         // Promo banner click → show popup chi tiết
         imvPromoBanner.setOnClickListener(v -> showPromoDialog());
 
-        // See more clicks
-        setSeeMoreClick(headerFeaturedEvents, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerTrendingEvents, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerLiveMusic, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerStageArts, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerWorkshop, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerTourExperience, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerSports, Constants.EVENT_STATUS_PUBLISHED);
-        setSeeMoreClick(headerDestinations, Constants.EVENT_STATUS_PUBLISHED);
+        // See more clicks — chuyển sang trang Events với category tương ứng
+        setSeeMoreClick(headerFeaturedEvents, "all");
+        setSeeMoreClick(headerTrendingEvents, "all");
+        setSeeMoreClick(headerLiveMusic, "music");
+        setSeeMoreClick(headerStageArts, "arts");
+        setSeeMoreClick(headerWorkshop, "workshop");
+        setSeeMoreClick(headerTourExperience, "tour");
+        setSeeMoreClick(headerSports, "sports");
+        setSeeMoreClick(headerDestinations, "all");
 
         // Banner auto-scroll
         bannerRunnable = new Runnable() {
@@ -268,15 +284,14 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void setSeeMoreClick(View headerView, final String category) {
+    private void setSeeMoreClick(View headerView, final String categoryKey) {
         if (headerView == null) return;
         TextView txtSeeMore = headerView.findViewById(R.id.txtSeeMore);
         if (txtSeeMore != null) {
-            txtSeeMore.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TODO: navigate to SearchFragment với category filter
-                    Toast.makeText(requireContext(), getString(R.string.str_see_more), Toast.LENGTH_SHORT).show();
+            txtSeeMore.setOnClickListener(v -> {
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity())
+                            .openEventsFragmentWithFilter(categoryKey, null);
                 }
             });
         }
@@ -291,121 +306,68 @@ public class HomeFragment extends Fragment {
         danhSachCategory.add(new Category("c5", getString(R.string.str_sports), "sports", R.drawable.ic_cat_sports, R.color.clr_cat_sports));
         danhSachCategory.add(new Category("c6", getString(R.string.str_cat_festival), "festival", R.drawable.ic_cat_festival, R.color.clr_cat_festival));
 
-        // Banner, Featured, Trending → load từ Firebase (không hardcode)
-        // Mock Featured Stars
-        FeaturedStar s1 = new FeaturedStar("s1", "Sơn Tùng M-TP", null);
-        s1.setLocalImageResId(R.drawable.star_son_tung);
-        danhSachStar.add(s1);
-
-        FeaturedStar s2 = new FeaturedStar("s2", "Hà Anh Tuấn", null);
-        s2.setLocalImageResId(R.drawable.star_ha_anh_tuan);
-        danhSachStar.add(s2);
-
-        FeaturedStar s3 = new FeaturedStar("s3", "Mỹ Tâm", null);
-        s3.setLocalImageResId(R.drawable.star_my_tam);
-        danhSachStar.add(s3);
-
-        FeaturedStar s4 = new FeaturedStar("s4", "Hoàng Dũng", null);
-        s4.setLocalImageResId(R.drawable.star_hoang_dung);
-        danhSachStar.add(s4);
-
-        FeaturedStar s5 = new FeaturedStar("s5", "Tăng Duy Tân", null);
-        s5.setLocalImageResId(R.drawable.star_tang_duy_tan);
-        danhSachStar.add(s5);
-
-        FeaturedStar s6 = new FeaturedStar("s6", "Bảo Thy", null);
-        s6.setLocalImageResId(R.drawable.star_bao_thy);
-        danhSachStar.add(s6);
-
-        FeaturedStar s7 = new FeaturedStar("s7", "Đen Vâu", null);
-        s7.setLocalImageResId(R.drawable.star_den_vau);
-        danhSachStar.add(s7);
-
-        FeaturedStar s8 = new FeaturedStar("s8", "Soobin Hoàng Sơn", null);
-        s8.setLocalImageResId(R.drawable.star_soobin_hoang_son);
-        danhSachStar.add(s8);
-
-        FeaturedStar s9 = new FeaturedStar("s9", "Noo Phước Thịnh", null);
-        s9.setLocalImageResId(R.drawable.star_noo_phuoc_thinh);
-        danhSachStar.add(s9);
-
-        // ── Events sections (Featured/Trending/Category) load từ Firebase ──────
-        // Không hardcode mock events → sections trống ban đầu, Firebase fill vào
-        // (xem loadEventsFromFirestore() bên dưới)
-
-        // ── VÉ BÁN LẠI (Mock) ─────────────────────────────────────────────────
-        // Firebase chưa có data: tickets collection trống, orders không có status "reselling"
-        // Giữ mock để UI hiển thị. Khi teammate bổ sung data thật → TicketRepository.getAllResellingTickets() sẽ tự load
-        Event rs1 = new Event("rs1", "NON SONG Live Show", null, "05/06/2026", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 420000);
-        rs1.setLocalImageResId(R.drawable.event_live_non_song); rs1.setVenueCity("TP.Hồ Chí Minh"); rs1.setSoldOut(true);
-        danhSachResale.add(rs1);
-
-        Event rs2 = new Event("rs2", "Private Show in Fantasy", null, "16/05/2026", "Hà Nội", Constants.EVENT_STATUS_PUBLISHED, 650000);
-        rs2.setLocalImageResId(R.drawable.event_arts_private_fantasy); rs2.setVenueCity("Hà Nội"); rs2.setSoldOut(true);
-        danhSachResale.add(rs2);
-
-        Event rs3 = new Event("rs3", "FORESTIVAL CHIẾN BINH BÌNH MINH", null, "20/07/2026", "TP.HCM", Constants.EVENT_STATUS_PUBLISHED, 900000);
-        rs3.setLocalImageResId(R.drawable.event_trending_rising_fest); rs3.setVenueCity("TP.Hồ Chí Minh"); rs3.setSoldOut(true);
-        danhSachResale.add(rs3);
-
-        // Destinations
-        Destination d1 = new Destination("d1", "TP.Hồ Chí Minh", null, 120);
-        d1.setLocalImageResId(R.drawable.destination_hcmc);
-        danhSachDestination.add(d1);
-
-        Destination d2 = new Destination("d2", "Hà Nội", null, 89);
-        d2.setLocalImageResId(R.drawable.destination_hanoi);
-        danhSachDestination.add(d2);
-
-        Destination d3 = new Destination("d3", "Đà Nẵng", null, 45);
-        d3.setLocalImageResId(R.drawable.destination_da_nang);
-        danhSachDestination.add(d3);
-
-        Destination d4 = new Destination("d4", "Hội An", null, 32);
-        d4.setLocalImageResId(R.drawable.destination_hoi_an);
-        danhSachDestination.add(d4);
-
-        Destination d5 = new Destination("d5", "Đà Lạt", null, 28);
-        d5.setLocalImageResId(R.drawable.destination_da_lat);
-        danhSachDestination.add(d5);
-        // Huế đã bị xóa — không có đủ data Firestore
+        // Stars + Resale + Destinations → load/derive từ Firebase (không hardcode)
 
         setupAdapters();
         setupBannerDots();
         startBannerAutoScroll();
-        fetchLiveResaleTickets();
-        loadEventsFromFirestore(); // Fetch Firestore sau khi mock đã hiển thị
+        loadFeaturedStars();      // Nghệ sĩ nổi bật từ collection stars
+        fetchLiveResaleTickets(); // Vé bán lại từ ticket_transfers (pending)
+        loadEventsFromFirestore();
+    }
+
+    /** Hiện spinner cho các section trước khi bắt đầu tải dữ liệu. */
+    private void showAllSectionPbs() {
+        View v = getView();
+        if (v == null) return;
+        int[] ids = { R.id.pbBanner, R.id.pbFeaturedEvents, R.id.pbTrendingEvents,
+                R.id.pbLiveMusic, R.id.pbStageArts, R.id.pbWorkshop,
+                R.id.pbTourExperience, R.id.pbSports };
+        for (int id : ids) {
+            View pb = v.findViewById(id);
+            if (pb != null) pb.setVisibility(View.VISIBLE);
+        }
     }
 
     // ── Firestore: load category cache trước, rồi load từng section ──────────
     private void loadEventsFromFirestore() {
+        showAllSectionPbs();
         // Bước 1: Load categories + venues song song
         FirestoreHelper.loadCategoryCache(() -> {
             // Bước 2: Sau khi category cache sẵn, load venues + events
             FirestoreHelper.loadEvents(new FirestoreHelper.OnEventsLoaded() {
-                @Override public void onSuccess(java.util.List<Event> ignored) {
+                @Override public void onSuccess(java.util.List<Event> allEvents) {
                     if (!isAdded()) return;
+                    buildDestinationsFromEvents(allEvents);
                     loadBannerSection();
                     loadFeaturedSection();
                     loadTrendingSection();
                     // Dùng getCatId() để lấy UUID thật từ cache
-                    loadCategorySection(HomepageLoader.getCatId("music"),    danhSachLiveMusic,   liveMusicAdapter);
-                    loadCategorySection(HomepageLoader.getCatId("arts"),     danhSachStageArts,   stageArtsAdapter);
-                    loadCategorySection(HomepageLoader.getCatId("workshop"), danhSachWorkshop,    workshopAdapter);
-                    loadCategorySection(HomepageLoader.getCatId("tour"),     danhSachTour,        tourExperienceAdapter);
-                    loadCategorySection(HomepageLoader.getCatId("sports"),   danhSachSports,      sportsAdapter);
+                    loadCategorySection(HomepageLoader.getCatId("music"),    danhSachLiveMusic,   liveMusicAdapter,      R.id.pbLiveMusic,      rvLiveMusic);
+                    loadCategorySection(HomepageLoader.getCatId("arts"),     danhSachStageArts,   stageArtsAdapter,      R.id.pbStageArts,      rvStageArts);
+                    loadCategorySection(HomepageLoader.getCatId("workshop"), danhSachWorkshop,    workshopAdapter,       R.id.pbWorkshop,       rvWorkshop);
+                    loadCategorySection(HomepageLoader.getCatId("tour"),     danhSachTour,        tourExperienceAdapter, R.id.pbTourExperience, rvTourExperience);
+                    loadCategorySection(HomepageLoader.getCatId("sports"),   danhSachSports,      sportsAdapter,         R.id.pbSports,         rvSports);
                 }
-                @Override public void onFailure(Exception e) {}
+                @Override public void onFailure(Exception e) {
+                    if (isAdded()) hideAllSectionPbs();
+                }
             });
         });
+        // Safety: nếu mạng treo > 10s → ẩn hết spinner để UI không bị kẹt
+        bannerHandler.postDelayed(() -> { if (isAdded()) hideAllSectionPbs(); }, 10000);
     }
 
     /** Banner: admin-controlled qua app_config/homepage, fallback is_featured */
     private void loadBannerSection() {
         HomepageLoader.loadBanners(events -> {
-            if (!isAdded() || events.isEmpty()) return;
+            if (!isAdded()) return;
+            hidePb(R.id.pbBanner);
+            if (events.isEmpty()) return;
             danhSachBanner.clear();
             danhSachBanner.addAll(events);
+            showRv(null); // banner dùng ViewPager2, luôn visible
+            if (vpBanner != null) vpBanner.setVisibility(View.VISIBLE);
             if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
             setupBannerDots();
         });
@@ -414,9 +376,12 @@ public class HomeFragment extends Fragment {
     /** Featured: is_featured=true, sắp diễn ra */
     private void loadFeaturedSection() {
         HomepageLoader.loadFeatured(events -> {
-            if (!isAdded() || events.isEmpty()) return;
+            if (!isAdded()) return;
+            hidePb(R.id.pbFeaturedEvents);
+            if (events.isEmpty()) return;
             danhSachFeatured.clear();
             danhSachFeatured.addAll(events);
+            showRv(rvFeaturedEvents);
             if (featuredEventsAdapter != null) featuredEventsAdapter.notifyDataSetChanged();
         });
     }
@@ -424,21 +389,29 @@ public class HomeFragment extends Fragment {
     /** Trending: xếp hạng theo vé bán (order_items), fallback interest_count */
     private void loadTrendingSection() {
         HomepageLoader.loadTrending(events -> {
-            if (!isAdded() || events.isEmpty()) return;
+            if (!isAdded()) return;
+            hidePb(R.id.pbTrendingEvents);
+            if (events.isEmpty()) return;
             danhSachTrending.clear();
             danhSachTrending.addAll(events);
+            showRv(rvTrendingEvents);
             if (trendingEventsAdapter != null) trendingEventsAdapter.notifyDataSetChanged();
         });
     }
 
-    /** Category: nếu Firestore có data → replace mock; nếu trống → giữ mock */
+    /** Category: nếu Firestore có data → hiện RV; nếu trống → giấu section */
     private void loadCategorySection(String categoryId,
                                      java.util.ArrayList<Event> list,
-                                     com.example.vibetix.Adapters.EventAdapter adapter) {
+                                     com.example.vibetix.Adapters.EventAdapter adapter,
+                                     int pbId,
+                                     RecyclerView rv) {
         HomepageLoader.loadByCategory(categoryId, events -> {
-            if (!isAdded() || events.isEmpty()) return; // giữ mock
+            if (!isAdded()) return;
+            hidePb(pbId);
+            if (events.isEmpty()) return;
             list.clear();
             list.addAll(events);
+            showRv(rv);
             if (adapter != null) adapter.notifyDataSetChanged();
         });
     }
@@ -454,12 +427,20 @@ public class HomeFragment extends Fragment {
 
         // Banner
         bannerAdapter = new BannerAdapter(requireContext(), danhSachBanner,
-                event -> Toast.makeText(requireContext(), event.getTitle(), Toast.LENGTH_SHORT).show());
+                event -> onEventClick(event));
         vpBanner.setAdapter(bannerAdapter);
 
         // Featured Stars
         featuredStarAdapter = new FeaturedStarAdapter(requireContext(), danhSachStar,
-                star -> Toast.makeText(requireContext(), star.getName(), Toast.LENGTH_SHORT).show());
+                star -> {
+                    if (getActivity() != null) {
+                        StarDetailFragment frag = StarDetailFragment.newInstance(star.getId(), star.getName());
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.frameContainerMain, frag)
+                                .addToBackStack("star_detail")
+                                .commit();
+                    }
+                });
         rvFeaturedStars.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvFeaturedStars.setAdapter(featuredStarAdapter);
 
@@ -475,9 +456,9 @@ public class HomeFragment extends Fragment {
         rvTrendingEvents.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvTrendingEvents.setAdapter(trendingEventsAdapter);
 
-        // Resale Tickets — uses dedicated ResaleEventAdapter (item_resale_card layout)
+        // Resale Tickets — bấm card → mở chi tiết vé bán lại của sự kiện đó
         resaleEventsAdapter = new ResaleEventAdapter(requireContext(), danhSachResale,
-                event -> onEventClick(event));
+                event -> openResaleEventDetail(event.getId()));
         rvResaleEvents.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvResaleEvents.setAdapter(resaleEventsAdapter);
 
@@ -516,6 +497,15 @@ public class HomeFragment extends Fragment {
                 dest -> openSearchWithCity(dest.getName()));
         rvDestinations.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         rvDestinations.setAdapter(destinationAdapter);
+
+        // Tắt nested scrolling cho tất cả RV trong NestedScrollView
+        // → wrap_content đo đúng height khi data arrive async
+        RecyclerView[] rvs = { rvFeaturedStars, rvFeaturedEvents, rvTrendingEvents,
+                rvResaleEvents, rvLiveMusic, rvStageArts, rvWorkshop,
+                rvTourExperience, rvSports, rvDestinations };
+        for (RecyclerView rv : rvs) {
+            if (rv != null) rv.setNestedScrollingEnabled(false);
+        }
     }
 
     private void setupBannerDots() {
@@ -560,33 +550,120 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    // ── Nghệ sĩ nổi bật — load từ collection stars (Firebase) ─────────────────
+    private void loadFeaturedStars() {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection(com.example.vibetix.Firebase.FirebaseCollections.STARS)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!isAdded() || querySnapshot.isEmpty()) return;
+                    java.util.ArrayList<com.example.vibetix.Models.Star> allStars = new java.util.ArrayList<>();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : querySnapshot) {
+                        com.example.vibetix.Models.Star star = doc.toObject(com.example.vibetix.Models.Star.class);
+                        if (star.getStarId() == null) star.setStarId(doc.getId());
+                        if (star.isActive()) allStars.add(star);
+                    }
+                    // Ưu tiên star có ảnh, rồi sort follower_count giảm dần
+                    java.util.Collections.sort(allStars, (a, b) -> {
+                        boolean aImg = a.getAvatarUrl() != null && !a.getAvatarUrl().isEmpty();
+                        boolean bImg = b.getAvatarUrl() != null && !b.getAvatarUrl().isEmpty();
+                        if (aImg != bImg) return aImg ? -1 : 1;
+                        return Integer.compare(b.getFollowerCount(), a.getFollowerCount());
+                    });
+                    danhSachStar.clear();
+                    int limit = Math.min(allStars.size(), 15);
+                    for (int i = 0; i < limit; i++) {
+                        com.example.vibetix.Models.Star s = allStars.get(i);
+                        danhSachStar.add(new FeaturedStar(s.getStarId(), s.getStageName(), s.getAvatarUrl()));
+                    }
+                    if (featuredStarAdapter != null) featuredStarAdapter.notifyDataSetChanged();
+                });
+    }
+
+    // ── Điểm đến — derive từ events thật: đếm số sự kiện theo thành phố ────────
+    private void buildDestinationsFromEvents(java.util.List<Event> allEvents) {
+        if (allEvents == null) return;
+        java.util.LinkedHashMap<String, Integer> cityCount = new java.util.LinkedHashMap<>();
+        for (Event e : allEvents) {
+            String city = e.getVenueCity();
+            if (city == null || city.isEmpty() || "Việt Nam".equals(city)) continue;
+            cityCount.merge(city, 1, Integer::sum);
+        }
+        java.util.List<java.util.Map.Entry<String, Integer>> entries = new java.util.ArrayList<>(cityCount.entrySet());
+        entries.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        danhSachDestination.clear();
+        int idx = 0;
+        for (java.util.Map.Entry<String, Integer> en : entries) {
+            Destination d = new Destination("city_" + (idx++), en.getKey(), null, en.getValue());
+            d.setLocalImageResId(cityToDrawable(en.getKey()));
+            danhSachDestination.add(d);
+        }
+        if (destinationAdapter != null) destinationAdapter.notifyDataSetChanged();
+        if (headerDestinations != null)
+            headerDestinations.setVisibility(danhSachDestination.isEmpty() ? View.GONE : View.VISIBLE);
+        if (rvDestinations != null)
+            rvDestinations.setVisibility(danhSachDestination.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    private int cityToDrawable(String city) {
+        if (city == null) return R.drawable.destination_hcmc;
+        if (city.contains("Hồ Chí Minh") || city.contains("HCM")) return R.drawable.destination_hcmc;
+        if (city.contains("Hà Nội"))  return R.drawable.destination_hanoi;
+        if (city.contains("Đà Nẵng")) return R.drawable.destination_da_nang;
+        if (city.contains("Hội An"))  return R.drawable.destination_hoi_an;
+        if (city.contains("Đà Lạt"))  return R.drawable.destination_da_lat;
+        return R.drawable.destination_hcmc;
+    }
+
+    // ── Navigation tới marketplace bán lại ───────────────────────────────────
+    private void openResaleMarketplace() {
+        if (getActivity() == null) return;
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameContainerMain, new ResaleMarketplaceFragment())
+                .addToBackStack("resale_marketplace")
+                .commit();
+    }
+
+    private void openResaleEventDetail(String eventId) {
+        if (getActivity() == null) return;
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameContainerMain, ResaleEventDetailFragment.newInstance(eventId))
+                .addToBackStack("resale_event_detail")
+                .commit();
+    }
+
     private void fetchLiveResaleTickets() {
-        ticketRepository.getAllResellingTickets(new TicketRepository.OnTicketsLoadedListener() {
+        ticketTransferRepository.getAllPendingTransfers(new TicketTransferRepository.OnTransfersLoadedListener() {
             @Override
-            public void onSuccess(List<Ticket> tickets) {
-                if (tickets != null && !tickets.isEmpty()) {
-                    ArrayList<Event> liveResale = new ArrayList<>();
-                    for (Ticket t : tickets) {
-                        Event ev = new Event(t.getEventId(), t.getEventTitle(), null, t.getEventDate(), t.getEventLocation(), "resale", (int) t.getResalePrice());
+            public void onSuccess(List<TicketTransfer> transfers) {
+                if (!isAdded()) return;
+                danhSachResale.clear();
+                if (transfers != null) {
+                    for (TicketTransfer t : transfers) {
+                        Event ev = new Event(
+                                t.getEventId() != null ? t.getEventId() : t.getTransferId(),
+                                t.getEventTitle(),
+                                t.getEventImageUrl(),
+                                t.getEventDate(),
+                                t.getEventLocation(),
+                                "resale",
+                                t.getPrice());
                         ev.setSoldOut(true);
-                        
-                        int coverResId = R.drawable.event_live_non_song;
-                        if (!"b1".equals(t.getEventId()) && !"e1".equals(t.getEventId()) && !"rs1".equals(t.getEventId())) {
-                            coverResId = R.drawable.event_arts_private_fantasy;
-                        }
-                        ev.setLocalImageResId(coverResId);
-                        liveResale.add(ev);
+                        ev.setImageUrl(t.getEventImageUrl());
+                        danhSachResale.add(ev);
                     }
-                    danhSachResale.addAll(0, liveResale);
-                    if (resaleEventsAdapter != null) {
-                        resaleEventsAdapter.notifyDataSetChanged();
-                    }
+                }
+                if (resaleEventsAdapter != null) resaleEventsAdapter.notifyDataSetChanged();
+                if (layoutResaleBanner != null) {
+                    layoutResaleBanner.setVisibility(danhSachResale.isEmpty() ? View.GONE : View.VISIBLE);
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                // Fail silently
+                if (!isAdded()) return;
+                if (layoutResaleBanner != null) layoutResaleBanner.setVisibility(View.GONE);
             }
         });
     }
@@ -609,9 +686,8 @@ public class HomeFragment extends Fragment {
         stopBannerAutoScroll();
     }
 
-    // ── Mở Search Fragment với bộ lọc thành phố đã chọn sẵn ──────────────────
+    // ── Mở Events Fragment với bộ lọc thành phố đã chọn sẵn ──────────────────
     private void openSearchWithCity(String displayName) {
-        // Map tên hiển thị → keyword dùng để filter (khớp với venue_city trong Firestore)
         String cityKeyword;
         if (displayName.contains("Hồ Chí Minh"))   cityKeyword = "Hồ Chí Minh";
         else if (displayName.contains("Hà Nội"))    cityKeyword = "Hà Nội";
@@ -620,19 +696,9 @@ public class HomeFragment extends Fragment {
         else if (displayName.contains("Đà Lạt"))    cityKeyword = "Đà Lạt";
         else                                         cityKeyword = displayName;
 
-        // Truyền keyword qua Bundle sang SearchFragment
-        android.os.Bundle args = new android.os.Bundle();
-        args.putString("preset_city", cityKeyword);
-
-        SearchFragment searchFragment = new SearchFragment();
-        searchFragment.setArguments(args);
-
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameContainerMain, searchFragment)
-                .addToBackStack("search_city")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity())
+                    .openEventsFragmentWithFilter(null, cityKeyword);
         }
     }
 

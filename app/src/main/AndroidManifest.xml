@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".VibeTixApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -113,6 +114,14 @@
             android:name=".Activities.User.EventDetailActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".Activities.User.NotificationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activities.User.NotificationDetailActivity"
+            android:exported="false" />
 
     </application>
 

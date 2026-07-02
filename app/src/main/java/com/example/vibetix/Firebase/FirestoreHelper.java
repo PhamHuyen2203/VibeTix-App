@@ -103,11 +103,25 @@ public class FirestoreHelper {
             .whereIn("status", Arrays.asList("approved", "ongoing", "completed"))
             .get()
             .addOnSuccessListener(snap -> {
-                List<Event> events = new ArrayList<>();
+                List<Event> ongoing   = new ArrayList<>();
+                List<Event> approved  = new ArrayList<>();
+                List<Event> completed = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
                     Event e = docToEvent(doc);
-                    if (e != null) events.add(e);
+                    if (e == null) continue;
+                    String st = doc.getString("status");
+                    if ("ongoing".equals(st))        ongoing.add(e);
+                    else if ("approved".equals(st))  approved.add(e);
+                    else                             completed.add(e);
                 }
+                // Sort: ongoing đầu, approved (sắp diễn ra gần nhất), completed cuối
+                sortByDate(approved, true);
+                sortByDate(ongoing, true);
+                sortByDate(completed, false); // mới nhất lên đầu trong completed
+                List<Event> events = new ArrayList<>();
+                events.addAll(ongoing);
+                events.addAll(approved);
+                events.addAll(completed);
                 callback.onSuccess(events);
             })
             .addOnFailureListener(callback::onFailure);
@@ -149,7 +163,20 @@ public class FirestoreHelper {
 
             Event e = new Event(doc.getId(), title, imageUrl, date, city, category, price);
             e.setVenueCity(city);
-            e.setStatus(Constants.EVENT_STATUS_PUBLISHED);
+            if (catId != null) e.setCategoryId(catId);
+
+            // Đọc status thực từ Firestore
+            String firestoreStatus = doc.getString("status");
+            if (firestoreStatus == null) firestoreStatus = "";
+            // Nếu event approved nhưng end_time đã qua → coi như completed ở client
+            if ("approved".equals(firestoreStatus) || "ongoing".equals(firestoreStatus)) {
+                com.google.firebase.Timestamp endTs = doc.getTimestamp("end_time");
+                if (endTs == null) endTs = doc.getTimestamp("start_time");
+                if (endTs != null && endTs.toDate().getTime() < System.currentTimeMillis()) {
+                    firestoreStatus = "completed";
+                }
+            }
+            e.setStatus(firestoreStatus);
             if (posterUrl != null) e.setPortraitImageUrl(posterUrl);
             
             long maxPrice = 0;
@@ -170,5 +197,16 @@ public class FirestoreHelper {
 
             return e;
         } catch (Exception ex) { return null; }
+    }
+
+    private static void sortByDate(List<Event> list, boolean ascending) {
+        list.sort((a, b) -> {
+            String da = a.getDate() != null ? a.getDate() : "";
+            String db2 = b.getDate() != null ? b.getDate() : "";
+            // dd/MM/yyyy → compare as yyyy/MM/dd
+            String ka = da.length() == 10 ? da.substring(6)+da.substring(3,5)+da.substring(0,2) : da;
+            String kb = db2.length() == 10 ? db2.substring(6)+db2.substring(3,5)+db2.substring(0,2) : db2;
+            return ascending ? ka.compareTo(kb) : kb.compareTo(ka);
+        });
     }
 }

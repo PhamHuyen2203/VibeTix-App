@@ -109,6 +109,18 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Autocomplete dropdown (gợi ý nhanh top 5) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAutoSuggest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:background="@color/clr_bg_white"
+                android:elevation="4dp"
+                android:maxHeight="220dp"
+                android:nestedScrollingEnabled="false"
+                android:visibility="gone" />
+
             <!-- Filter chips row -->
             <LinearLayout
                 android:layout_width="match_parent"

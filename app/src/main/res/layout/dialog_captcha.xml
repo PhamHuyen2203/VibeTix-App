@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_rounded"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Title row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Xác Minh Người Dùng"
+                android:textColor="@color/clr_text_black"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Chống bot tự động mua vé"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnCaptchaClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@color/clr_text_secondary" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="Kéo mảnh ghép vào đúng vị trí để hoàn thiện bức hình"
+        android:textColor="@color/clr_text_secondary"
+        android:textSize="13sp" />
+
+    <!-- Puzzle view -->
+    <com.example.vibetix.Views.PuzzleCaptchaView
+        android:id="@+id/puzzleCaptchaView"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:clipToOutline="true" />
+
+    <!-- Slider track label -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="← Kéo sang phải để ghép hình →"
+        android:textColor="@color/clr_text_secondary"
+        android:textSize="12sp" />
+
+    <!-- SeekBar -->
+    <SeekBar
+        android:id="@+id/seekBarCaptcha"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="4dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@color/clr_primary_blue"
+        android:thumbTint="@color/clr_primary_blue" />
+
+    <!-- Result message -->
+    <TextView
+        android:id="@+id/txtCaptchaResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:text=""
+        android:textSize="13sp"
+        android:visibility="invisible" />
+
+    <!-- Reload button -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@android:drawable/ic_menu_rotate"
+            app:tint="@color/clr_text_secondary" />
+
+        <TextView
+            android:id="@+id/btnCaptchaReload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Tải lại"
+            android:textColor="@color/clr_text_secondary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+</LinearLayout>
