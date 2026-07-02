@@ -250,6 +250,8 @@
     <string name="str_empty_title">Nothing here yet!</string>
     <string name="str_empty_desc">We couldn\'t find any data to display.</string>
 
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE.apps.googleusercontent.com</string>
+
     <string name="tab_pending">Pending</string>
     <string name="tab_verified">Verified</string>
     <string name="btn_approve">Approve</string>
