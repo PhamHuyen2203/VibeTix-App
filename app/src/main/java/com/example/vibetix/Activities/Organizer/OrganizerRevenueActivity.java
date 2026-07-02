@@ -50,6 +50,8 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
     // Organizer info card views
     private ImageView ivOrgLogo;
     private TextView tvOrgBrandName, tvOrgVerifiedBadge, tvOrgDescription, tvOrgWebsite;
+    private TextView tvOrgEmail, tvOrgPhone;
+    private View layoutOrgEmail, layoutOrgPhone, layoutOrgWebsite;
 
     private FirebaseFirestore db;
     private SessionManager sessionManager;
@@ -85,6 +87,12 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
         tvOrgVerifiedBadge = findViewById(R.id.tvOrgVerifiedBadge);
         tvOrgDescription = findViewById(R.id.tvOrgDescription);
         tvOrgWebsite = findViewById(R.id.tvOrgWebsite);
+        tvOrgEmail = findViewById(R.id.tvOrgEmail);
+        tvOrgPhone = findViewById(R.id.tvOrgPhone);
+        
+        layoutOrgEmail = findViewById(R.id.layoutOrgEmail);
+        layoutOrgPhone = findViewById(R.id.layoutOrgPhone);
+        layoutOrgWebsite = findViewById(R.id.layoutOrgWebsite);
 
         // Load organizer profile info
         String orgId = getIntent().getStringExtra(EXTRA_ORGANIZER_ID);
@@ -100,6 +108,8 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                     String description = doc.getString("description");
                     String website = doc.getString("website_url");
                     String logoUrl = doc.getString("logo_url");
+                    String email = doc.getString("contact_email");
+                    String phone = doc.getString("contact_phone");
                     Boolean isVerified = doc.getBoolean("is_verified");
 
                     if (tvOrgName != null)
@@ -118,7 +128,18 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
 
                     if (tvOrgWebsite != null && website != null && !website.isEmpty()) {
                         tvOrgWebsite.setText(website);
-                        tvOrgWebsite.setVisibility(View.VISIBLE);
+                        if (layoutOrgWebsite != null) layoutOrgWebsite.setVisibility(View.VISIBLE);
+                        else tvOrgWebsite.setVisibility(View.VISIBLE);
+                    }
+
+                    if (tvOrgEmail != null && email != null && !email.isEmpty()) {
+                        tvOrgEmail.setText(email);
+                        if (layoutOrgEmail != null) layoutOrgEmail.setVisibility(View.VISIBLE);
+                    }
+
+                    if (tvOrgPhone != null && phone != null && !phone.isEmpty()) {
+                        tvOrgPhone.setText(phone);
+                        if (layoutOrgPhone != null) layoutOrgPhone.setVisibility(View.VISIBLE);
                     }
 
                     if (ivOrgLogo != null && logoUrl != null && !logoUrl.isEmpty()) {
@@ -130,12 +151,22 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         adapter = new EventRevenueAdapter(summaries, summary -> {
-            Intent intent = new Intent(this, EventRevenueDetailActivity.class);
-            intent.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_ID, summary.eventId);
-            intent.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_TITLE, summary.title);
-            intent.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_DATE, summary.date);
-            intent.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_POSTER, summary.posterUrl);
-            startActivity(intent);
+            String status = summary.status != null ? summary.status.toLowerCase() : "draft";
+            boolean isDraftOrPending = "draft".equals(status) || "pending".equals(status);
+            
+            if (isDraftOrPending) {
+                Intent intent = new Intent(this, CreateEditEventActivity.class);
+                intent.putExtra(CreateEditEventActivity.EXTRA_EVENT_ID, summary.eventId);
+                if ("pending".equals(status)) {
+                    intent.putExtra("IS_READ_ONLY", true);
+                }
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(this, EventHubActivity.class);
+                intent.putExtra(EventHubActivity.EXTRA_EVENT_ID, summary.eventId);
+                intent.putExtra(EventHubActivity.EXTRA_ROLE, "owner"); // Assume owner since viewing from Organizer Profile
+                startActivity(intent);
+            }
         });
         rvEvents.setLayoutManager(new LinearLayoutManager(this));
         rvEvents.setAdapter(adapter);
@@ -352,14 +383,16 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                 for (Map.Entry<String, List<OrderItem>> entry : itemsByEvent.entrySet()) {
                     Set<String> ids = new HashSet<>();
                     for (OrderItem oi : entry.getValue()) {
-                        if (oi.getOrderId() != null) ids.add(oi.getOrderId());
+                        String st = orderStatus.get(oi.getOrderId());
+                        boolean isPaid = st != null && (st.equals("completed") || st.equals("confirmed") || st.equals("paid"));
+                        if (isPaid && oi.getOrderId() != null) {
+                            ids.add(oi.getOrderId());
+                        }
                     }
                     ordersByEvent.put(entry.getKey(), ids);
                 }
 
                 // Calculate per-event revenue
-                // Tính TẤT CẢ đơn (kể cả pending) để hiển thị doanh thu kỳ vọng
-                // Đơn cancelled/refunded thì bỏ qua
                 long totalRevenue = 0, totalTickets = 0;
                 for (EventRevenueAdapter.EventRevenueSummary s : summaries) {
                     List<OrderItem> items = itemsByEvent.get(s.eventId);
@@ -367,9 +400,9 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                     long rev = 0, tickets = 0;
                     for (OrderItem oi : items) {
                         String st = orderStatus.get(oi.getOrderId());
-                        // Bỏ qua đơn đã hủy hoặc hoàn tiền
-                        boolean cancelled = st != null && (st.equals("cancelled") || st.equals("refunded"));
-                        if (!cancelled) {
+                        // Chỉ tính đơn thành công (paid, completed, confirmed)
+                        boolean isPaid = st != null && (st.equals("completed") || st.equals("confirmed") || st.equals("paid"));
+                        if (isPaid) {
                             tickets += oi.getQuantity();
                             rev += oi.getQuantity() * oi.getPricePerTicket();
                         }

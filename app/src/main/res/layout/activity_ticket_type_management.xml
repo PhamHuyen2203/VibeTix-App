@@ -83,15 +83,15 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TỔNG DOANH THU"
+                            android:text="TỔNG VÉ ĐÃ BÁN"
                             android:textColor="#E2E8F0"
                             android:textSize="12sp"
                             android:textStyle="bold" />
                         <TextView
-                            android:id="@+id/tvTotalRevenue"
+                            android:id="@+id/tvTotalSoldTickets"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 ₫"
+                            android:text="0"
                             android:textColor="@color/clr_text_white"
                             android:textSize="20sp"
                             android:textStyle="bold"

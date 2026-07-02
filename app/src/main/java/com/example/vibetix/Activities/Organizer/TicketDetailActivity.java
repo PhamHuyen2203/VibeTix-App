@@ -67,7 +67,10 @@ public class TicketDetailActivity extends AppCompatActivity {
         }
 
         bindViews();
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbarTicketDetail);
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
 
         // Fill event info from intent (so it shows immediately)
         String eTitle = getIntent().getStringExtra(EXTRA_EVENT_TITLE);

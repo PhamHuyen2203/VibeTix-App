@@ -115,9 +115,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name=".Activities.Organizer.EventAnalyticsActivity"
-            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

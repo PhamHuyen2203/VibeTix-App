@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="Nội dung thông báo"
-            android:textColor="#808E92"
+            android:textColor="#4E5969"
             android:textSize="12sp"
             android:maxLines="2"
             android:ellipsize="end"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="5 phút trước"
-            android:textColor="#B0B8C1"
+            android:textColor="#86909C"
             android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

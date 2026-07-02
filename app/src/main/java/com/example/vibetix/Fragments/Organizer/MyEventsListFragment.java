@@ -265,25 +265,32 @@ public class MyEventsListFragment extends Fragment {
 
     private void handleEventClick(Event event) {
         String role = event.getUserRole();
-        if (role == null || role.isEmpty()) {
-            // Fallback: nếu role chưa được gán, giả định owner
-            role = "owner";
-        }
+        if (role == null || role.isEmpty()) role = "owner";
 
-        // Lưu context sự kiện vào session
         sessionManager.setActiveEvent(event.getEventId(), role);
 
         String status = event.getStatusStr();
-        boolean isDraftOrPending = "draft".equals(status) || "pending".equals(status);
-        
-        if (isDraftOrPending) {
+
+        if ("draft".equals(status) || "rejected".equals(status)) {
+            // Draft case 1: user tự lưu, chưa gửi
+            // Draft case 2: admin từ chối pending → có rejection_reason / status = rejected
             Intent intent = new Intent(getActivity(), CreateEditEventActivity.class);
             intent.putExtra(CreateEditEventActivity.EXTRA_EVENT_ID, event.getEventId());
-            if ("pending".equals(status)) {
-                intent.putExtra("IS_READ_ONLY", true);
+            // Nếu có lý do từ chối: truyền sang để hiển banner
+            if (event.getRejectionReason() != null) {
+                intent.putExtra(CreateEditEventActivity.EXTRA_REJECTION_REASON, event.getRejectionReason());
             }
             createEventLauncher.launch(intent);
+
+        } else if ("pending".equals(status)) {
+            // Pending: mở dưới dạng read-only — user chờ admin duyệt
+            Intent intent = new Intent(getActivity(), CreateEditEventActivity.class);
+            intent.putExtra(CreateEditEventActivity.EXTRA_EVENT_ID, event.getEventId());
+            intent.putExtra(CreateEditEventActivity.EXTRA_IS_READ_ONLY, true);
+            createEventLauncher.launch(intent);
+
         } else {
+            // Approved / Ongoing / Completed / Cancelled → EventHub
             Intent intent = new Intent(getActivity(), EventHubActivity.class);
             intent.putExtra(EventHubActivity.EXTRA_EVENT_ID, event.getEventId());
             intent.putExtra(EventHubActivity.EXTRA_ROLE, role);

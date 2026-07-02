@@ -70,7 +70,17 @@ public class DiscountManagementActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         
         rvDiscounts.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DiscountAdapter(new ArrayList<>());
+        adapter = new DiscountAdapter(new ArrayList<>(), new DiscountAdapter.Listener() {
+            @Override
+            public void onItemClick(Discount discount) {
+                openDiscountSheet(discount);
+            }
+
+            @Override
+            public void onToggleActive(Discount discount) {
+                toggleDiscountActiveState(discount);
+            }
+        });
         rvDiscounts.setAdapter(adapter);
 
         fabAddDiscount.setOnClickListener(v -> openDiscountSheet(null));
@@ -375,5 +385,19 @@ public class DiscountManagementActivity extends AppCompatActivity {
             sb.append(chars.charAt(rnd.nextInt(chars.length())));
         }
         return sb.toString();
+    }
+
+    private void toggleDiscountActiveState(Discount discount) {
+        boolean nextState = !discount.isActive();
+        db.collection(FirebaseCollections.DISCOUNTS).document(discount.getId())
+                .update("is_active", nextState)
+                .addOnSuccessListener(v -> {
+                    String msg = nextState ? "Đã kích hoạt mã" : "Đã tắt áp dụng mã";
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                    loadDiscounts();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

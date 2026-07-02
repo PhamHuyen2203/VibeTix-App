@@ -2,6 +2,7 @@ package com.example.vibetix.Activities.Organizer;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -9,8 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import com.example.vibetix.Adapters.Organizer.TicketSaleAdapter;
 import com.example.vibetix.Adapters.Organizer.TicketTypeRevenueAdapter;
@@ -20,12 +26,12 @@ import com.example.vibetix.Models.Order;
 import com.example.vibetix.Models.TicketType;
 import com.example.vibetix.Models.UserTicket;
 import com.example.vibetix.R;
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -58,9 +64,8 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
     private View scrollBody, layoutEmpty;
     private TextView tvToolbarTitle, tvEventTitle, tvEventDate;
     private TextView tvTotalRevenue, tvTicketsSold, tvTotalOrders;
-    private TextView layoutEmptyTickets;
-    private RecyclerView rvTicketTypes, rvTickets;
-    private BarChart revenueChart;
+    private RecyclerView rvTicketTypes;
+    private LineChart revenueChart;
 
     private FirebaseFirestore db;
     private String eventId;
@@ -68,7 +73,6 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
     private final List<TicketTypeRevenueAdapter.TicketTypeStat> ticketTypeStats = new ArrayList<>();
     private final List<UserTicket> ticketList = new ArrayList<>();
     private TicketTypeRevenueAdapter ticketTypeAdapter;
-    private TicketSaleAdapter ticketAdapter;
 
     // Loaded data holders
     private final List<OrderItem> allOrderItems = new ArrayList<>();
@@ -98,6 +102,10 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         setupRecyclerViews();
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        View btnExportCSV = findViewById(R.id.btnExportCSV);
+        if (btnExportCSV != null) {
+            btnExportCSV.setOnClickListener(v -> exportToCSV());
+        }
 
         if (title != null) {
             tvEventTitle.setText(title);
@@ -119,7 +127,6 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         tvTicketsSold = findViewById(R.id.tvTicketsSold);
         tvTotalOrders = findViewById(R.id.tvTotalOrders);
         rvTicketTypes = findViewById(R.id.rvTicketTypes);
-        rvTickets = findViewById(R.id.rvTickets);
         revenueChart = findViewById(R.id.revenueChart);
     }
 
@@ -128,21 +135,6 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         rvTicketTypes.setLayoutManager(new LinearLayoutManager(this));
         rvTicketTypes.setNestedScrollingEnabled(false);
         rvTicketTypes.setAdapter(ticketTypeAdapter);
-
-        ticketAdapter = new TicketSaleAdapter(ticketList, ticket -> {
-            Intent intent = new Intent(this, TicketDetailActivity.class);
-            intent.putExtra(TicketDetailActivity.EXTRA_TICKET_ID, ticket.getUserTicketId());
-            intent.putExtra(TicketDetailActivity.EXTRA_EVENT_TITLE,
-                    getIntent().getStringExtra(EXTRA_EVENT_TITLE));
-            intent.putExtra(TicketDetailActivity.EXTRA_EVENT_DATE,
-                    getIntent().getStringExtra(EXTRA_EVENT_DATE));
-            intent.putExtra(TicketDetailActivity.EXTRA_EVENT_POSTER,
-                    getIntent().getStringExtra(EXTRA_EVENT_POSTER));
-            startActivity(intent);
-        });
-        rvTickets.setLayoutManager(new LinearLayoutManager(this));
-        rvTickets.setNestedScrollingEnabled(false);
-        rvTickets.setAdapter(ticketAdapter);
     }
 
     private void loadData() {
@@ -354,12 +346,12 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         Set<String> uniqueOrders = new HashSet<>();
         for (OrderItem oi : allOrderItems) {
             String st = orderStatusMap.get(oi.getOrderId());
-            boolean cancelled = st != null && (st.equals("cancelled") || st.equals("refunded"));
-            if (!cancelled) {
+            boolean isPaid = st != null && (st.equals("completed") || st.equals("confirmed") || st.equals("paid"));
+            if (isPaid) {
                 totalTickets += oi.getQuantity();
                 totalRev += oi.getQuantity() * oi.getPricePerTicket();
+                if (oi.getOrderId() != null) uniqueOrders.add(oi.getOrderId());
             }
-            if (oi.getOrderId() != null) uniqueOrders.add(oi.getOrderId());
         }
 
         long finalTotalRev = totalRev;
@@ -377,12 +369,6 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
             } else {
                 showEmpty(false);
                 ticketTypeAdapter.updateData(ticketTypeStats);
-                ticketAdapter.updateData(ticketList);
-
-                View emptyTickets = findViewById(R.id.layoutEmptyTickets);
-                if (emptyTickets != null) {
-                    emptyTickets.setVisibility(ticketList.isEmpty() ? View.VISIBLE : View.GONE);
-                }
 
                 setupRevenueChart();
             }
@@ -405,24 +391,30 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
             }
         }
 
-        ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<Entry> entries = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, -6);
         for (int i = 0; i < 7; i++) {
             String ds = sdfOut.format(cal.getTime());
             labels.add(ds);
-            entries.add(new BarEntry(i, revByDate.getOrDefault(ds, 0L)));
+            entries.add(new Entry(i, revByDate.getOrDefault(ds, 0L)));
             cal.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "Doanh thu (₫)");
+        LineDataSet dataSet = new LineDataSet(entries, "Doanh thu (₫)");
         dataSet.setColor(Color.parseColor("#226CEB"));
+        dataSet.setCircleColor(Color.parseColor("#226CEB"));
+        dataSet.setLineWidth(2.5f);
+        dataSet.setCircleRadius(4f);
+        dataSet.setDrawCircleHole(false);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.parseColor("#A8C4F8"));
+        dataSet.setFillAlpha(80);
         dataSet.setValueTextSize(8f);
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.5f);
+        LineData lineData = new LineData(dataSet);
 
-        revenueChart.setData(barData);
+        revenueChart.setData(lineData);
         revenueChart.getDescription().setEnabled(false);
         revenueChart.getLegend().setEnabled(false);
 
@@ -438,7 +430,7 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         leftAxis.setAxisMinimum(0f);
         leftAxis.setTextSize(9f);
         revenueChart.getAxisRight().setEnabled(false);
-        revenueChart.animateY(600);
+        revenueChart.animateX(600);
         revenueChart.invalidate();
     }
 
@@ -467,5 +459,85 @@ public class EventRevenueDetailActivity extends AppCompatActivity {
         if (amount >= 1_000_000) return String.format(Locale.getDefault(), "%.1fM₫", amount / 1_000_000.0);
         if (amount >= 1_000) return String.format(Locale.getDefault(), "%.0fK₫", amount / 1_000.0);
         return new DecimalFormat("#,###").format(amount) + "đ";
+    }
+
+    private void exportToCSV() {
+        if (ticketList.isEmpty()) {
+            Toast.makeText(this, getString(R.string.msg_no_tickets_to_export), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            File exportDir = new File(getCacheDir(), "exports");
+            if (!exportDir.exists()) exportDir.mkdirs();
+            
+            File file = new File(exportDir, "vibetix_tickets_" + eventId + ".csv");
+            FileWriter writer = new FileWriter(file);
+            
+            // Header
+            writer.append(getString(R.string.csv_header));
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            
+            // Data
+            for (UserTicket ticket : ticketList) {
+                String code = ticket.getTicketCode() != null ? ticket.getTicketCode() : "";
+                String status = ticket.getStatusStr() != null ? ticket.getStatusStr() : "";
+                String owner = ticket.getOwnerId() != null ? ticket.getOwnerId() : "";
+                String name = ticket.getFullName() != null ? ticket.getFullName().replace(",", " ") : "";
+                String email = ticket.getEmail() != null ? ticket.getEmail() : "";
+                
+                String typeName = ticket.getTicketTypeName() != null ? ticket.getTicketTypeName().replace(",", " ") : "N/A";
+                String priceStr = "0";
+                String dateStr = "N/A";
+                
+                if (ticket.getOrderItemId() != null) {
+                    // find order item
+                    OrderItem foundItem = null;
+                    for (OrderItem oi : allOrderItems) {
+                        if (oi.getOrderItemId() != null && oi.getOrderItemId().equals(ticket.getOrderItemId())) {
+                            foundItem = oi;
+                            break;
+                        }
+                    }
+                    if (foundItem != null) {
+                        priceStr = String.valueOf(foundItem.getPricePerTicket());
+                        if (foundItem.getOrderId() != null) {
+                            Date d = orderDateMap.get(foundItem.getOrderId());
+                            if (d != null) dateStr = dateFormat.format(d);
+                        }
+                    }
+                }
+                
+                writer.append(code).append(",")
+                      .append(typeName).append(",")
+                      .append(priceStr).append(",")
+                      .append(dateStr).append(",")
+                      .append(status).append(",")
+                      .append(owner).append(",")
+                      .append(email).append(",")
+                      .append(name).append(",")
+                      .append(eventId).append("\n");
+            }
+            writer.flush();
+            writer.close();
+            
+            shareCSVFile(file);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, getString(R.string.err_export_csv), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareCSVFile(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
+        
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        
+        startActivity(Intent.createChooser(intent, getString(R.string.share_report)));
     }
 }

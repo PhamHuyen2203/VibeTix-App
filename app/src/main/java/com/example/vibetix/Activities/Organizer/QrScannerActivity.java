@@ -163,12 +163,18 @@ public class QrScannerActivity extends AppCompatActivity {
         btnDownloadData.setEnabled(false);
         db.collection("user_tickets").whereEqualTo("event_id", eventId).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // Key = ticket_code (để tra cứu khi quét QR)
+                    // Value.userTicketId = document ID (để sync lên DB sau)
                     Map<String, com.example.vibetix.Models.UserTicket> ticketsMap = new HashMap<>();
                     for (com.google.firebase.firestore.DocumentSnapshot doc : queryDocumentSnapshots) {
                         com.example.vibetix.Models.UserTicket ticket = doc.toObject(com.example.vibetix.Models.UserTicket.class);
                         if (ticket != null) {
-                            String key = doc.getId();
-                            ticketsMap.put(key, ticket);
+                            if (ticket.getUserTicketId() == null) ticket.setUserTicketId(doc.getId());
+                            // Dùng ticket_code làm key để tra cứu khi quét QR
+                            String key = ticket.getTicketCode();
+                            if (key != null && !key.isEmpty()) {
+                                ticketsMap.put(key, ticket);
+                            }
                         }
                     }
                     offlineSyncManager.saveOfflineTickets(ticketsMap);
@@ -192,6 +198,7 @@ public class QrScannerActivity extends AppCompatActivity {
         tvInstruction.setText("Đang đồng bộ...");
         btnSyncData.setEnabled(false);
         
+        // pendingIds lưu theo userTicketId (document ID) để update chính xác
         WriteBatch batch = db.batch();
         for (String id : pendingIds) {
             batch.update(db.collection("user_tickets").document(id),
@@ -343,9 +350,14 @@ public class QrScannerActivity extends AppCompatActivity {
 
         tvInstruction.setText("Đang kiểm tra...");
         
-        db.collection("user_tickets").document(code).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
+        // Dùng ticket_code thay vì document ID để an toàn hơn
+        db.collection("user_tickets")
+                .whereEqualTo("ticket_code", code)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                        com.google.firebase.firestore.DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
                         com.example.vibetix.Models.UserTicket ticket = documentSnapshot.toObject(com.example.vibetix.Models.UserTicket.class);
                         if (ticket != null) {
                             if (!eventId.equals(ticket.getEventId())) {
@@ -358,8 +370,10 @@ public class QrScannerActivity extends AppCompatActivity {
                             
                             if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
                                 showScanError("Vé đã được sử dụng (Check-in rồi)!");
+                            } else if (com.example.vibetix.Models.UserTicket.Status.CANCELLED.equals(ticket.getStatus())) {
+                                showScanError("Vé đã bị huỷ, không thể check-in!");
                             } else {
-                                // Cập nhật trạng thái
+                                // Cập nhật trạng thái bằng document reference thực
                                 documentSnapshot.getReference().update(
                                         "status", "used",
                                         "checked_in_at", new java.util.Date()
@@ -381,16 +395,26 @@ public class QrScannerActivity extends AppCompatActivity {
         tvInstruction.setText("Đang kiểm tra offline...");
         Map<String, com.example.vibetix.Models.UserTicket> offlineTickets = offlineSyncManager.getOfflineTickets();
         
+        // Map được build bằng ticket_code làm key (xem downloadOfflineData)
         if (offlineTickets.containsKey(code)) {
             com.example.vibetix.Models.UserTicket ticket = offlineTickets.get(code);
             if (ticket != null) {
+                // Kiểm tra event_id để không cho check-in nhầm sự kiện khi offline
+                if (ticket.getEventId() != null && !eventId.equals(ticket.getEventId())) {
+                    showScanError("Vé này không thuộc sự kiện hiện tại!");
+                    return;
+                }
                 tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
                 tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
                 
                 if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
                     showScanError("Vé đã được sử dụng (Check-in rồi)!");
+                } else if (com.example.vibetix.Models.UserTicket.Status.CANCELLED.equals(ticket.getStatus())) {
+                    showScanError("Vé đã bị huỷ, không thể check-in!");
                 } else {
-                    boolean success = offlineSyncManager.markTicketUsedOffline(code);
+                    // Dùng userTicketId (document ID) để sync lên DB sau
+                    String docId = ticket.getUserTicketId() != null ? ticket.getUserTicketId() : code;
+                    boolean success = offlineSyncManager.markTicketUsedOfflineByCode(code, docId);
                     if (success) {
                         showScanSuccess("Check-in Offline thành công!");
                         updateSyncButtonText();

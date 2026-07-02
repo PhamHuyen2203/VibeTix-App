@@ -163,7 +163,9 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                     binding.tvTicketTypeCount.setText(ticketTypes.size() + " loại vé");
 
                     com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(eventId, (totalTickets, totalRevenue) -> {
-                        binding.tvTotalRevenue.setText(getString(R.string.dash_total_revenue_vnd, vndFmt.format(totalRevenue)));
+                        if (binding.tvTotalSoldTickets != null) {
+                            binding.tvTotalSoldTickets.setText(String.valueOf(totalTickets));
+                        }
                     });
                     
                     if (ticketTypes.isEmpty()) {

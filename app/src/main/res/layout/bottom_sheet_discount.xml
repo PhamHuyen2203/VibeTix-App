@@ -60,7 +60,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="textCapCharacters"
                     android:imeOptions="actionNext"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:textColor="@color/clr_text_black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,7 +83,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="textCapWords"
                     android:imeOptions="actionNext"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:textColor="@color/clr_text_black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,7 +112,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
-                        android:focusable="false" />
+                        android:focusable="false"
+                        android:textColor="@color/clr_text_black" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -131,7 +134,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:imeOptions="actionNext" />
+                        android:imeOptions="actionNext"
+                        android:textColor="@color/clr_text_black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -161,7 +165,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:imeOptions="actionNext" />
+                        android:imeOptions="actionNext"
+                        android:textColor="@color/clr_text_black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -184,7 +189,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:imeOptions="actionNext" />
+                        android:imeOptions="actionNext"
+                        android:textColor="@color/clr_text_black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -207,7 +213,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:imeOptions="actionNext" />
+                    android:imeOptions="actionNext"
+                    android:textColor="@color/clr_text_black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -250,7 +257,8 @@
                         android:focusableInTouchMode="false"
                         android:cursorVisible="false"
                         android:inputType="none"
-                        android:hint="dd/MM/yyyy" />
+                        android:hint="dd/MM/yyyy"
+                        android:textColor="@color/clr_text_black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -276,7 +284,8 @@
                         android:focusableInTouchMode="false"
                         android:cursorVisible="false"
                         android:inputType="none"
-                        android:hint="dd/MM/yyyy" />
+                        android:hint="dd/MM/yyyy"
+                        android:textColor="@color/clr_text_black" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

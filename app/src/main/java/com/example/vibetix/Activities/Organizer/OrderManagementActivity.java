@@ -14,6 +14,7 @@ import com.example.vibetix.Models.Order;
 import com.example.vibetix.Models.OrderItem;
 import com.example.vibetix.Models.TicketType;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.CosineSimilarityUtils;
 import com.example.vibetix.Utils.NotificationTriggerManager;
 import com.example.vibetix.databinding.ActivityOrderManagementBinding;
 import com.github.mikephil.charting.components.XAxis;
@@ -31,7 +32,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,8 +50,10 @@ public class OrderManagementActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private OrganizerOrderAdapter adapter;
     private final List<OrderItem> allOrderItems = new ArrayList<>();
+    private final List<OrganizerOrderAdapter.OrderWrapper> allOrderWrappers = new ArrayList<>();
 
     private final NumberFormat vndFmt = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+    private String eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,13 @@ public class OrderManagementActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         db = FirebaseFirestore.getInstance();
+
+        eventId = getIntent().getStringExtra("EXTRA_EVENT_ID");
+        if (eventId == null || eventId.isEmpty()) {
+            Toast.makeText(this, "Không có sự kiện được chọn", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         setSupportActionBar(binding.toolbarOrders);
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -75,7 +84,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                 if (tab.getPosition() == 0) {
                     binding.layoutOrdersTab.setVisibility(View.VISIBLE);
                     binding.svRevenue.setVisibility(View.GONE);
-                    if (!allOrderItems.isEmpty()) {
+                    if (!allOrderWrappers.isEmpty()) {
                         filterOrders();
                     } else {
                         showEmptyState();
@@ -106,23 +115,14 @@ public class OrderManagementActivity extends AppCompatActivity {
             filterOrders();
         });
 
-        binding.swipeRefresh.setOnRefreshListener(() -> {
-            loadOrders();
-        });
+        binding.swipeRefresh.setOnRefreshListener(this::loadOrders);
 
-        adapter.setOnItemClickListener(this::showOrderDetails);
+        adapter.setOnItemClickListener(this::confirmOrder);
 
         loadOrders();
     }
 
     private void loadOrders() {
-        String eventId = getIntent().getStringExtra("EXTRA_EVENT_ID");
-        if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "Không có sự kiện được chọn", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
         binding.pbLoading.setVisibility(View.VISIBLE);
         binding.layoutOrdersTab.setVisibility(View.GONE);
         binding.layoutEmpty.setVisibility(View.GONE);
@@ -199,19 +199,14 @@ public class OrderManagementActivity extends AppCompatActivity {
                                         item.setParentOrder(orderMap.get(item.getOrderId()));
                                         item.setTicketTypeName(ticketTypeMap.get(item.getTicketTypeId()));
                                     }
-
-                                    allOrderItems.sort((i1, i2) -> {
-                                        Order o1 = i1.getParentOrder();
-                                        Order o2 = i2.getParentOrder();
-                                        if (o1 == null || o2 == null || o1.getOrderDate() == null || o2.getOrderDate() == null) return 0;
-                                        return o2.getOrderDate().compareTo(o1.getOrderDate());
-                                    });
+                                    
+                                    buildOrderWrappers();
 
                                     binding.pbLoading.setVisibility(View.GONE);
                                     binding.swipeRefresh.setRefreshing(false);
                                     updateStatsHeader();
 
-                                    if (allOrderItems.isEmpty()) {
+                                    if (allOrderWrappers.isEmpty()) {
                                         showEmptyState();
                                     } else {
                                         binding.layoutOrdersTab.setVisibility(View.VISIBLE);
@@ -232,20 +227,42 @@ public class OrderManagementActivity extends AppCompatActivity {
                 });
     }
 
+    private void buildOrderWrappers() {
+        Map<String, OrganizerOrderAdapter.OrderWrapper> map = new HashMap<>();
+        for (OrderItem item : allOrderItems) {
+            Order o = item.getParentOrder();
+            if (o == null || o.getOrderId() == null) continue;
+            OrganizerOrderAdapter.OrderWrapper w = map.get(o.getOrderId());
+            if (w == null) {
+                w = new OrganizerOrderAdapter.OrderWrapper();
+                w.order = o;
+                w.items = new ArrayList<>();
+                map.put(o.getOrderId(), w);
+            }
+            w.items.add(item);
+        }
+        allOrderWrappers.clear();
+        allOrderWrappers.addAll(map.values());
+        
+        allOrderWrappers.sort((w1, w2) -> {
+            if (w1.order.getOrderDate() == null || w2.order.getOrderDate() == null) return 0;
+            return w2.order.getOrderDate().compareTo(w1.order.getOrderDate());
+        });
+    }
+
     private void updateStatsHeader() {
-        // Đếm số đơn hàng unique
         Set<String> uniqueOrders = new HashSet<>();
         long totalTickets = 0;
         long totalRevenue = 0;
 
         for (OrderItem item : allOrderItems) {
-            if (item.getOrderId() != null) uniqueOrders.add(item.getOrderId());
             Order o = item.getParentOrder();
             boolean isPaid = o != null && o.getStatusStr() != null &&
                     (o.getStatusStr().equalsIgnoreCase("completed") ||
                      o.getStatusStr().equalsIgnoreCase("confirmed") ||
                      o.getStatusStr().equalsIgnoreCase("paid"));
             if (isPaid) {
+                if (item.getOrderId() != null) uniqueOrders.add(item.getOrderId());
                 totalTickets += item.getQuantity();
                 totalRevenue += item.getQuantity() * item.getPricePerTicket();
             }
@@ -257,23 +274,30 @@ public class OrderManagementActivity extends AppCompatActivity {
     }
 
     private void filterOrders() {
-        String query = binding.etSearchOrder.getText() != null ? binding.etSearchOrder.getText().toString().toLowerCase().trim() : "";
+        String query = binding.etSearchOrder.getText() != null ? binding.etSearchOrder.getText().toString().trim() : "";
         int selectedChipId = binding.cgOrderStatus.getCheckedChipId();
         String statusFilter = "all";
         if (selectedChipId == R.id.chipSuccess) statusFilter = "success";
         else if (selectedChipId == R.id.chipPending) statusFilter = "pending";
         else if (selectedChipId == R.id.chipCancelled) statusFilter = "cancelled";
 
-        List<OrderItem> filteredList = new ArrayList<>();
-        for (OrderItem item : allOrderItems) {
-            Order o = item.getParentOrder();
-            String id = item.getOrderId() != null ? item.getOrderId().toLowerCase() : "";
-            String shortId = id.length() > 8 ? id.substring(0, 8) : id;
+        List<OrganizerOrderAdapter.OrderWrapper> filteredList = new ArrayList<>();
+        for (OrganizerOrderAdapter.OrderWrapper w : allOrderWrappers) {
+            Order o = w.order;
+            String id = o.getOrderId() != null ? o.getOrderId() : "";
             
-            boolean matchesSearch = id.contains(query) || shortId.contains(query);
+            boolean matchesSearch = false;
+            if (query.isEmpty()) {
+                matchesSearch = true;
+            } else {
+                double sim = CosineSimilarityUtils.calculateSimilarity(query, id);
+                if (sim > 0.3 || id.toLowerCase().contains(query.toLowerCase())) {
+                    matchesSearch = true;
+                }
+            }
+            
             boolean matchesStatus = true;
-            
-            if (o != null && o.getStatusStr() != null) {
+            if (o.getStatusStr() != null) {
                 String status = o.getStatusStr().toLowerCase();
                 if (statusFilter.equals("success")) {
                     matchesStatus = status.equals("completed") || status.equals("confirmed") || status.equals("paid");
@@ -287,8 +311,17 @@ public class OrderManagementActivity extends AppCompatActivity {
             }
             
             if (matchesSearch && matchesStatus) {
-                filteredList.add(item);
+                w.isExpanded = !query.isEmpty(); // Auto expand on search
+                filteredList.add(w);
             }
+        }
+        
+        if (!query.isEmpty()) {
+            filteredList.sort((w1, w2) -> {
+                double s1 = CosineSimilarityUtils.calculateSimilarity(query, w1.order.getOrderId());
+                double s2 = CosineSimilarityUtils.calculateSimilarity(query, w2.order.getOrderId());
+                return Double.compare(s2, s1);
+            });
         }
         
         adapter.updateData(filteredList);
@@ -302,74 +335,25 @@ public class OrderManagementActivity extends AppCompatActivity {
         }
     }
 
-    private void showOrderList() {
-        adapter.updateData(allOrderItems);
-        binding.layoutOrdersTab.setVisibility(View.VISIBLE);
-        binding.layoutEmpty.setVisibility(View.GONE);
-    }
-
     private void showEmptyState() {
         binding.layoutOrdersTab.setVisibility(View.GONE);
         binding.svRevenue.setVisibility(View.GONE);
         binding.layoutEmpty.setVisibility(View.VISIBLE);
     }
-
-    private void showOrderDetails(OrderItem item) {
-        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(this, com.google.android.material.R.style.ThemeOverlay_MaterialComponents_BottomSheetDialog);
-        com.example.vibetix.databinding.BottomSheetOrderDetailsBinding sheetBinding = com.example.vibetix.databinding.BottomSheetOrderDetailsBinding.inflate(getLayoutInflater());
-        dialog.setContentView(sheetBinding.getRoot());
-
-        Order o = item.getParentOrder();
-        String id = item.getOrderId();
-        if (id != null && id.length() > 8) {
-            id = id.substring(0, 8).toUpperCase();
-        }
-        sheetBinding.tvOrderIdDetails.setText("#" + id);
-
-        if (o != null && o.getOrderDate() != null) {
-            SimpleDateFormat dispFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-            sheetBinding.tvOrderDateDetails.setText(dispFmt.format(o.getOrderDate().toDate()));
-        }
-
-        String status = (o != null && o.getStatusStr() != null) ? o.getStatusStr() : "pending";
-        String paymentMethod = (o != null && o.getPaymentMethod() != null) ? o.getPaymentMethod() : "unknown";
+    
+    private void confirmOrder(OrganizerOrderAdapter.OrderWrapper wrapper) {
+        Order o = wrapper.order;
+        if (o == null || o.getOrderId() == null) return;
         
-        sheetBinding.btnConfirmOrder.setVisibility(View.GONE);
-
-        switch (status.toLowerCase()) {
-            case "completed": case "confirmed": case "paid":
-                sheetBinding.tvOrderStatusDetails.setText("Thành công");
-                sheetBinding.tvOrderStatusDetails.setTextColor(0xFF4CAF50);
-                sheetBinding.tvOrderStatusDetails.setBackgroundResource(R.drawable.bg_ticket_type_active);
-                break;
-            case "cancelled":
-                sheetBinding.tvOrderStatusDetails.setText("Đã hủy");
-                sheetBinding.tvOrderStatusDetails.setTextColor(0xFFF44336);
-                sheetBinding.tvOrderStatusDetails.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
-                break;
-            case "refunded":
-                sheetBinding.tvOrderStatusDetails.setText("Hoàn tiền");
-                sheetBinding.tvOrderStatusDetails.setTextColor(0xFFFF9800);
-                sheetBinding.tvOrderStatusDetails.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
-                break;
-            default:
-                sheetBinding.tvOrderStatusDetails.setText("Chờ xử lý");
-                sheetBinding.tvOrderStatusDetails.setTextColor(0xFF226CEB);
-                sheetBinding.tvOrderStatusDetails.setBackgroundResource(R.drawable.bg_ticket_type_active);
-                if ("transfer".equalsIgnoreCase(paymentMethod)) {
-                    sheetBinding.btnConfirmOrder.setVisibility(View.VISIBLE);
-                }
-                break;
-        }
-
-        sheetBinding.btnConfirmOrder.setOnClickListener(v -> {
-            if (o != null && o.getOrderId() != null) {
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Xác nhận Đơn hàng")
+            .setMessage("Duyệt đơn hàng " + (o.getOrderId().length() > 8 ? o.getOrderId().substring(0,8).toUpperCase() : o.getOrderId()) + "?")
+            .setPositiveButton("Duyệt", (dialog, which) -> {
                 binding.pbLoading.setVisibility(View.VISIBLE);
                 db.collection(FirebaseCollections.ORDERS).document(o.getOrderId())
                         .update("status", "confirmed")
                         .addOnSuccessListener(unused -> {
                             Toast.makeText(this, "Đã duyệt đơn hàng", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
                             NotificationTriggerManager.triggerOrderConfirmed(o.getUserId(), o.getOrderId());
                             loadOrders();
                         })
@@ -377,40 +361,13 @@ public class OrderManagementActivity extends AppCompatActivity {
                             binding.pbLoading.setVisibility(View.GONE);
                             Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
-            }
-        });
-
-        if (o != null && o.getUserId() != null) {
-            db.collection(FirebaseCollections.USERS).document(o.getUserId()).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        String email = doc.getString("email");
-                        String name = doc.getString("full_name");
-                        sheetBinding.tvCustomerEmail.setText((name != null ? name + "\n" : "") + (email != null ? email : "ID: " + o.getUserId()));
-                    } else {
-                        sheetBinding.tvCustomerEmail.setText("Người dùng ID: " + o.getUserId());
-                    }
-                })
-                .addOnFailureListener(e -> sheetBinding.tvCustomerEmail.setText("Người dùng ID: " + o.getUserId()));
-        } else {
-            sheetBinding.tvCustomerEmail.setText("Không xác định");
-        }
-
-        String ticketName = item.getTicketTypeName() != null ? item.getTicketTypeName() : "Vé không rõ";
-        sheetBinding.tvTicketNameAndQty.setText(item.getQuantity() + "x " + ticketName);
-
-        long totalAmount = item.getQuantity() * item.getPricePerTicket();
-        sheetBinding.tvTicketPriceDetails.setText(vndFmt.format(totalAmount) + " ₫");
-        sheetBinding.tvTotalAmountDetails.setText(vndFmt.format(totalAmount) + " ₫");
-
-        sheetBinding.btnClose.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
     }
 
     private void setupRevenueChart() {
         Map<String, Long> revenueByDate = new HashMap<>();
-        SimpleDateFormat sdfInput  = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-        SimpleDateFormat sdfInput2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault());
         SimpleDateFormat sdfOutput = new SimpleDateFormat("dd/MM", Locale.getDefault());
 
         for (OrderItem item : allOrderItems) {

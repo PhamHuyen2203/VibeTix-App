@@ -5,6 +5,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,20 +15,35 @@ import com.example.vibetix.Models.Order;
 import com.example.vibetix.R;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class OrganizerOrderAdapter extends RecyclerView.Adapter<OrganizerOrderAdapter.ViewHolder> {
 
-    public interface OnItemClickListener {
-        void onItemClick(OrderItem orderItem);
+    public static class OrderWrapper {
+        public Order order;
+        public List<OrderItem> items = new ArrayList<>();
+        public boolean isExpanded = false;
+        
+        public long getTotalAmount() {
+            long total = 0;
+            for (OrderItem i : items) {
+                total += i.getQuantity() * i.getPricePerTicket();
+            }
+            return total;
+        }
     }
 
-    private List<OrderItem> list;
+    public interface OnItemClickListener {
+        void onItemClick(OrderWrapper orderWrapper);
+    }
+
+    private List<OrderWrapper> list;
     private final SimpleDateFormat dispFmt = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
     private OnItemClickListener listener;
 
-    public OrganizerOrderAdapter(List<OrderItem> list) {
+    public OrganizerOrderAdapter(List<OrderWrapper> list) {
         this.list = list;
     }
 
@@ -43,29 +60,24 @@ public class OrganizerOrderAdapter extends RecyclerView.Adapter<OrganizerOrderAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        OrderItem item = list.get(position);
-        Order o = item.getParentOrder();
+        OrderWrapper wrapper = list.get(position);
+        Order o = wrapper.order;
         
-        String id = item.getOrderId();
+        String id = o.getOrderId();
         if (id != null && id.length() > 8) {
             id = id.substring(0, 8).toUpperCase();
         }
         holder.tvOrderId.setText("#" + id);
         
-        if (o != null && o.getOrderDate() != null) {
+        if (o.getOrderDate() != null) {
             holder.tvOrderDate.setText(formatDate(o.getOrderDate()));
         } else {
             holder.tvOrderDate.setText("");
         }
 
-        long totalAmount = item.getQuantity() * item.getPricePerTicket();
-        holder.tvTotalAmount.setText(new DecimalFormat("#,###").format(totalAmount) + " ₫");
+        holder.tvTotalAmount.setText(new DecimalFormat("#,###").format(wrapper.getTotalAmount()) + " ₫");
 
-        String ticketName = item.getTicketTypeName() != null ? item.getTicketTypeName() : "Vé không rõ";
-        holder.tvTicketInfo.setText(item.getQuantity() + "x " + ticketName);
-
-        String status = (o != null && o.getStatusStr() != null) ? o.getStatusStr() : "pending";
-        
+        String status = o.getStatusStr() != null ? o.getStatusStr() : "pending";
         switch (status.toLowerCase()) {
             case "completed":
             case "confirmed":
@@ -90,20 +102,39 @@ public class OrganizerOrderAdapter extends RecyclerView.Adapter<OrganizerOrderAd
                 setRoundedBadgeBg(holder.tvStatus, 0x1A226CEB);
                 break;
         }
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(item);
-            }
+        
+        holder.vDivider.setVisibility(wrapper.isExpanded ? View.VISIBLE : View.GONE);
+        holder.llOrderItemsContainer.setVisibility(wrapper.isExpanded ? View.VISIBLE : View.GONE);
+        holder.ivExpand.setRotation(wrapper.isExpanded ? 180 : 0);
+        
+        holder.llOrderHeader.setOnClickListener(v -> {
+            wrapper.isExpanded = !wrapper.isExpanded;
+            notifyItemChanged(position);
         });
-    }
 
-    private String formatDate(com.google.firebase.Timestamp ts) {
-        if (ts == null) return "";
-        try {
-            return dispFmt.format(ts.toDate());
-        } catch (Exception e) {
-            return "";
+        holder.llOrderItemsContainer.removeAllViews();
+        for (OrderItem item : wrapper.items) {
+            TextView tv = new TextView(holder.itemView.getContext());
+            String ticketName = item.getTicketTypeName() != null ? item.getTicketTypeName() : "Vé không rõ";
+            tv.setText(item.getQuantity() + "x " + ticketName + " - " + new DecimalFormat("#,###").format(item.getPricePerTicket()) + " ₫");
+            tv.setTextColor(0xFF333333);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            tv.setPadding(0, 8, 0, 8);
+            holder.llOrderItemsContainer.addView(tv);
+        }
+
+        if (holder.btnConfirmOrder != null) {
+            if ("pending".equalsIgnoreCase(status) && "transfer".equalsIgnoreCase(o.getPaymentMethod())) {
+                holder.btnConfirmOrder.setVisibility(View.VISIBLE);
+                holder.llOrderItemsContainer.addView(holder.btnConfirmOrder);
+                holder.btnConfirmOrder.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onItemClick(wrapper);
+                    }
+                });
+            } else {
+                holder.btnConfirmOrder.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -112,34 +143,45 @@ public class OrganizerOrderAdapter extends RecyclerView.Adapter<OrganizerOrderAd
         return list != null ? list.size() : 0;
     }
 
-    /**
-     * Tạo badge nền bo tròn cho TextView trạng thái đơn hàng.
-     * Dùng GradientDrawable thay vì setBackgroundColor để tạo corner radius.
-     */
-    private void setRoundedBadgeBg(TextView view, int bgColor) {
-        GradientDrawable bg = new GradientDrawable();
-        bg.setShape(GradientDrawable.RECTANGLE);
-        bg.setCornerRadius(TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 8f,
-                view.getContext().getResources().getDisplayMetrics()));
-        bg.setColor(bgColor);
-        view.setBackground(bg);
-    }
-
-    public void updateData(List<OrderItem> newList) {
+    public void updateData(List<OrderWrapper> newList) {
         this.list = newList;
         notifyDataSetChanged();
     }
 
+    private String formatDate(Object d) {
+        if (d instanceof java.util.Date) {
+            return dispFmt.format((java.util.Date) d);
+        } else if (d instanceof com.google.firebase.Timestamp) {
+            return dispFmt.format(((com.google.firebase.Timestamp) d).toDate());
+        }
+        return d.toString();
+    }
+
+    private void setRoundedBadgeBg(TextView tv, int colorARGB) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setColor(colorARGB);
+        gd.setCornerRadius(tv.getContext().getResources().getDisplayMetrics().density * 6);
+        tv.setBackground(gd);
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvOrderId, tvStatus, tvOrderDate, tvTotalAmount, tvTicketInfo;
+        LinearLayout llOrderHeader, llOrderItemsContainer;
+        TextView tvOrderId, tvOrderDate, tvStatus, tvTotalAmount;
+        ImageView ivExpand;
+        View vDivider;
+        com.google.android.material.button.MaterialButton btnConfirmOrder;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvOrderId     = itemView.findViewById(R.id.tvOrderId);
-            tvStatus      = itemView.findViewById(R.id.tvStatus);
-            tvOrderDate   = itemView.findViewById(R.id.tvOrderDate);
+            llOrderHeader = itemView.findViewById(R.id.llOrderHeader);
+            llOrderItemsContainer = itemView.findViewById(R.id.llOrderItemsContainer);
+            tvOrderId = itemView.findViewById(R.id.tvOrderId);
+            tvOrderDate = itemView.findViewById(R.id.tvOrderDate);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
             tvTotalAmount = itemView.findViewById(R.id.tvTotalAmount);
-            tvTicketInfo  = itemView.findViewById(R.id.tvTicketInfo);
+            ivExpand = itemView.findViewById(R.id.ivExpand);
+            vDivider = itemView.findViewById(R.id.vDivider);
+            btnConfirmOrder = itemView.findViewById(R.id.btnConfirmOrder);
         }
     }
 }

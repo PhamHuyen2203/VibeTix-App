@@ -61,6 +61,7 @@ public class EventHubActivity extends AppCompatActivity {
     private RecyclerView rvHubFeatures;
 
     private String eventId, role;
+    private String eventStatus = ""; // trạng thái sự kiện, dùng để ẩn chức năng không phù hợp
     private FirebaseFirestore db;
     private SessionManager sessionManager;
 
@@ -89,7 +90,7 @@ public class EventHubActivity extends AppCompatActivity {
 
         bindViews();
         setupToolbar();
-        setupFeatureGrid();
+        // Feature grid sẽ được dựng sau khi load xong thông tin sự kiện
         loadEventDetails();
         loadStats();
     }
@@ -188,29 +189,57 @@ public class EventHubActivity extends AppCompatActivity {
     private void setupFeatureGrid() {
         boolean isOwner   = "owner".equalsIgnoreCase(role);
         boolean isManager = "manager".equalsIgnoreCase(role);
+        boolean isCancelled = "cancelled".equalsIgnoreCase(eventStatus);
 
-        // Ẩn stats với check_in_staff
+        // Ẩn stats với check_in_staff hoặc khi sự kiện bị huỷ
         if (cardStats != null) {
             cardStats.setVisibility((!isOwner && !isManager) ? View.GONE : View.VISIBLE);
         }
 
-        // Apply role badge
         applyRoleBadge();
 
-        // Xây dựng danh sách tính năng theo role
-        List<FeatureAdapter.FeatureItem> features = buildFeatureList(isOwner, isManager);
+        List<FeatureAdapter.FeatureItem> features = buildFeatureList(isOwner, isManager, isCancelled);
 
-        // Gắn vào RecyclerView với GridLayoutManager 2 cột
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvHubFeatures.setLayoutManager(gridLayoutManager);
         rvHubFeatures.setAdapter(new FeatureAdapter(this, features));
         rvHubFeatures.setNestedScrollingEnabled(false);
     }
 
-    private List<FeatureAdapter.FeatureItem> buildFeatureList(boolean isOwner, boolean isManager) {
+    private List<FeatureAdapter.FeatureItem> buildFeatureList(boolean isOwner, boolean isManager, boolean isCancelled) {
         List<FeatureAdapter.FeatureItem> list = new ArrayList<>();
 
-        // Ưu tiên cao: 2 tính năng real-time luôn enabled và nổi bật (isHighlighted=true)
+        // Khi sự kiện bị Cancelled: chỉ cho phép xem thông tin, không cho thực hiện các chức năng vận hành
+        if (isCancelled) {
+            list.add(new FeatureAdapter.FeatureItem(
+                R.drawable.ic_trending_up, "Báo cáo doanh thu", isOwner || isManager, false,
+                () -> {
+                    String title = tvEventTitle != null ? tvEventTitle.getText().toString() : "Sự kiện";
+                    String date  = tvEventDate  != null ? tvEventDate.getText().toString()  : "—";
+                    Intent i = new Intent(this, EventRevenueDetailActivity.class);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_ID,    eventId);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_TITLE, title);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_DATE,  date);
+                    startActivity(i);
+                }));
+            list.add(new FeatureAdapter.FeatureItem(
+                R.drawable.ic_role_person, "D.S Khách", true, false,
+                () -> {
+                    Intent i = new Intent(this, AttendeesActivity.class);
+                    i.putExtra(AttendeesActivity.EXTRA_EVENT_ID, eventId);
+                    startActivity(i);
+                }));
+            list.add(new FeatureAdapter.FeatureItem(
+                R.drawable.ic_trending_up, "Đơn hàng", isOwner || isManager, false,
+                () -> {
+                    Intent i = new Intent(this, OrderManagementActivity.class);
+                    i.putExtra("EXTRA_EVENT_ID", eventId);
+                    startActivity(i);
+                }));
+            return list; // Trả sớm, không hiện QR Scan, Nhân sự, Thông báo mới
+        }
+
+        // Sự kiện bình thường — ưu tiên cao: 2 tính năng real-time nổi bật (isHighlighted=true)
         list.add(new FeatureAdapter.FeatureItem(
                 R.drawable.ic_camera, "Quét QR", true, true,
                 () -> {
@@ -227,7 +256,6 @@ public class EventHubActivity extends AppCompatActivity {
                     startActivity(i);
                 }));
 
-        // Tính năng quản lý theo role
         list.add(new FeatureAdapter.FeatureItem(
                 R.drawable.ic_edit, "Chỉnh sửa", isOwner, false,
                 () -> {
@@ -241,7 +269,7 @@ public class EventHubActivity extends AppCompatActivity {
                 () -> {
                     String title = tvEventTitle != null ? tvEventTitle.getText().toString() : "Sự kiện";
                     Intent i = new Intent(this, TicketTypeManagementActivity.class);
-                    i.putExtra(TicketTypeManagementActivity.EXTRA_EVENT_ID, eventId);
+                    i.putExtra(TicketTypeManagementActivity.EXTRA_EVENT_ID,    eventId);
                     i.putExtra(TicketTypeManagementActivity.EXTRA_EVENT_TITLE, title);
                     startActivity(i);
                 }));
@@ -295,10 +323,14 @@ public class EventHubActivity extends AppCompatActivity {
                 }));
 
         list.add(new FeatureAdapter.FeatureItem(
-                R.drawable.ic_trending_up, "Báo cáo", isOwner || isManager, false,
+                R.drawable.ic_trending_up, "Báo cáo doanh thu", isOwner || isManager, false,
                 () -> {
-                    Intent i = new Intent(this, EventAnalyticsActivity.class);
-                    i.putExtra(EventAnalyticsActivity.EXTRA_EVENT_ID, eventId);
+                    String title = tvEventTitle != null ? tvEventTitle.getText().toString() : "Sự kiện";
+                    String date  = tvEventDate  != null ? tvEventDate.getText().toString()  : "—";
+                    Intent i = new Intent(this, EventRevenueDetailActivity.class);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_ID,    eventId);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_TITLE, title);
+                    i.putExtra(EventRevenueDetailActivity.EXTRA_EVENT_DATE,  date);
                     startActivity(i);
                 }));
 
@@ -328,6 +360,10 @@ public class EventHubActivity extends AppCompatActivity {
                     Event event = doc.toObject(Event.class);
                     if (event == null) return;
 
+                    // Lưu status và dựng feature grid ngay sau khi có dữ liệu
+                    eventStatus = event.getStatusStr() != null ? event.getStatusStr() : "";
+                    setupFeatureGrid();
+
                     if (tvEventTitle != null) tvEventTitle.setText(event.getTitle());
                     if (tvEventDate  != null) tvEventDate.setText(
                             event.getStartTime() != null ? "📅 " + event.getStartTime() : "");
@@ -338,7 +374,7 @@ public class EventHubActivity extends AppCompatActivity {
                                     .addOnSuccessListener(venueDoc -> {
                                         if (venueDoc.exists()) {
                                             String address = venueDoc.getString("address");
-                                            String name = venueDoc.getString("name");
+                                            String name    = venueDoc.getString("name");
                                             if (address != null && !address.isEmpty()) {
                                                 String displayText = name != null ? name + " - " + address : address;
                                                 tvEventVenue.setText("📍 " + displayText);

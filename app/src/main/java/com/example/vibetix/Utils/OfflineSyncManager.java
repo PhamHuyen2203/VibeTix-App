@@ -66,16 +66,38 @@ public class OfflineSyncManager {
         prefs.edit().putString(KEY_PENDING_SYNC + eventId, json).apply();
     }
 
-    // Cập nhật trạng thái một vé trong Offline Cache
-    public boolean markTicketUsedOffline(String ticketId) {
+    // Cập nhật trạng thái một vé trong Offline Cache (key theo ticket_code)
+    public boolean markTicketUsedOffline(String ticketCode) {
         Map<String, UserTicket> ticketsMap = getOfflineTickets();
-        if (ticketsMap.containsKey(ticketId)) {
-            UserTicket ticket = ticketsMap.get(ticketId);
+        if (ticketsMap.containsKey(ticketCode)) {
+            UserTicket ticket = ticketsMap.get(ticketCode);
             if (ticket != null) {
                 ticket.setStatus(UserTicket.Status.USED);
-                ticket.setCheckedInAt(new java.util.Date().getTime()); // Lưu local bằng long
+                ticket.setCheckedInAt(new java.util.Date().getTime());
                 saveOfflineTickets(ticketsMap);
-                addPendingSyncTicket(ticketId);
+                // pendingSync dùng userTicketId (document ID) để update DB
+                String docId = ticket.getUserTicketId() != null ? ticket.getUserTicketId() : ticketCode;
+                addPendingSyncTicket(docId);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Mớ́i: Đánh dấu vé đã sử dụng bằng cả ticket_code và document ID riêng biệt.
+     * @param ticketCode mã QR (key trong offline map)
+     * @param docId      Firestore document ID (dùng khi sync lên DB)
+     */
+    public boolean markTicketUsedOfflineByCode(String ticketCode, String docId) {
+        Map<String, UserTicket> ticketsMap = getOfflineTickets();
+        if (ticketsMap.containsKey(ticketCode)) {
+            UserTicket ticket = ticketsMap.get(ticketCode);
+            if (ticket != null) {
+                ticket.setStatus(UserTicket.Status.USED);
+                ticket.setCheckedInAt(new java.util.Date().getTime());
+                saveOfflineTickets(ticketsMap);
+                addPendingSyncTicket(docId); // dùng document ID để sync
                 return true;
             }
         }

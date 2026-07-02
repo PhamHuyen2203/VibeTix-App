@@ -126,10 +126,23 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_chip_active);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_text_white));
                     break;
-                default: // draft
-                    holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_draft_caps)));
+                case "rejected":
+                    holder.tvStatusBadge.setText("⚠️ Bị từ chối");
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
-                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+                    break;
+                default: // draft
+                    if (event.isRejected() || "rejected".equalsIgnoreCase(event.getStatusStr())) {
+                        // Draft case 2: admin từ chối
+                        holder.tvStatusBadge.setText("⚠️ Bị từ chối");
+                        holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                        holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+                    } else {
+                        // Draft case 1: tự lưu
+                        holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_draft_caps)));
+                        holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                        holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_grey_1));
+                    }
                     break;
             }
         } else if (event.getStatus() != null) {
@@ -151,6 +164,11 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
                     holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
                     break;
+                case REJECTED:
+                    holder.tvStatusBadge.setText("⚠️ Bị từ chối");
+                    holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
+                    holder.tvStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+                    break;
                 default:
                     holder.tvStatusBadge.setText(String.format(holder.itemView.getContext().getString(R.string.status_dot_prefix), holder.itemView.getContext().getString(R.string.status_draft_caps)));
                     holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_status_badge_draft);
@@ -168,9 +186,9 @@ public class EventDashboardAdapter extends RecyclerView.Adapter<EventDashboardAd
         boolean isDraftOrPending = false;
         if (event.getStatusStr() != null) {
             String s = event.getStatusStr().toLowerCase();
-            isDraftOrPending = s.equals("draft") || s.equals("pending");
+            isDraftOrPending = s.equals("draft") || s.equals("pending") || s.equals("rejected");
         } else if (event.getStatusEnum() != null) {
-            isDraftOrPending = (event.getStatusEnum() == Event.Status.DRAFT || event.getStatusEnum() == Event.Status.PENDING);
+            isDraftOrPending = (event.getStatusEnum() == Event.Status.DRAFT || event.getStatusEnum() == Event.Status.PENDING || event.getStatusEnum() == Event.Status.REJECTED);
         }
 
         // Hide stats if draft or pending

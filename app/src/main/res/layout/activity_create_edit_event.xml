@@ -16,6 +16,54 @@
         app:navigationIcon="@drawable/ic_back"
         app:navigationIconTint="@color/clr_text_white" />
 
+    <!-- Rejection Banner (hidden by default, shown when event was rejected by admin) -->
+    <LinearLayout
+        android:id="@+id/bannerRejection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="14dp"
+        android:background="#FFFEEBEB"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="⚠️"
+            android:textSize="16sp"
+            android:layout_marginEnd="10dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sự kiện bị từ chối"
+                android:textColor="#C0392B"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvRejectionReason"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="#C0392B"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/dividerRejection"
+        android:background="#FFC9B1B1"
+        android:visibility="gone" />
+
     <!-- Step Indicator -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -161,10 +209,101 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Side-by-side Category & Event Type -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Chọn danh mục"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:textColorHint="#757575"
+                        app:hintTextColor="@color/clr_primary_blue"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        android:layout_marginEnd="8dp">
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/ddCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:textColor="@color/clr_text_black"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Hình thức tổ chức *"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:textColorHint="#757575"
+                        app:hintTextColor="@color/clr_primary_blue"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        android:layout_marginStart="8dp">
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/ddEventType"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none"
+                            android:focusable="false"
+                            android:textColor="@color/clr_text_black"
+                            android:textSize="16sp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                </LinearLayout>
+
+                <!-- Is Free Switch -->
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/swIsFree"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sự kiện miễn phí"
+                    android:textSize="16sp"
+                    android:textColor="@color/clr_text_black"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Online Link Input (Visible only when Online is selected) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilOnlineLink"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Đường dẫn trực tuyến (Zoom, Google Meet...)"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:textColorHint="#757575"
+                    app:hintTextColor="@color/clr_primary_blue"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etOnlineLink"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textUri"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Age Restriction Dropdown -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Chọn danh mục"
+                    android:hint="Giới hạn độ tuổi *"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -172,14 +311,35 @@
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusBottomEnd="12dp"
-                    app:startIconDrawable="@drawable/ic_cat_music"
-                    app:startIconTint="@color/clr_primary_blue">
+                    android:layout_marginBottom="16dp">
                     <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/ddCategory"
+                        android:id="@+id/ddAgeRestriction"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
                         android:focusable="false"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Max tickets per transaction -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Số vé tối đa mỗi giao dịch *"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:textColorHint="#757575"
+                    app:hintTextColor="@color/clr_primary_blue"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    android:layout_marginBottom="16dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMaxTicketsPerTransaction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
                         android:textColor="@color/clr_text_black"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -655,6 +815,196 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+            </LinearLayout>
+
+            <!-- STEP 4: Ticket Types -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Loại vé"
+                            android:textColor="@color/clr_text_black"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thêm ít nhất 1 loại vé để gửi duyệt"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddTicketType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+ Thêm loại vé"
+                        android:textSize="13sp"
+                        app:cornerRadius="20dp"
+                        app:backgroundTint="@color/clr_primary_blue"
+                        style="@style/Widget.MaterialComponents.Button" />
+                </LinearLayout>
+
+                <!-- Empty state -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyTicketTypes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:background="@drawable/bg_card_rounded"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🎫"
+                        android:textSize="40sp"
+                        android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chưa có loại vé nào"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nhấn '+ Thêm loại vé' để bắt đầu"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="13sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Ticket type list -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTicketTypesDraft"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+            <!-- STEP 5: Stars / Artists (optional) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nghệ sĩ tham gia"
+                            android:textColor="@color/clr_text_black"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tuỳ chọn — có thể bỏ qua"
+                            android:textColor="@color/clr_text_secondary"
+                            android:textSize="13sp"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddStar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+ Thêm nghệ sĩ"
+                        android:textSize="13sp"
+                        app:cornerRadius="20dp"
+                        app:backgroundTint="#7C3AED"
+                        style="@style/Widget.MaterialComponents.Button" />
+                </LinearLayout>
+
+                <!-- Empty state stars -->
+                <LinearLayout
+                    android:id="@+id/layoutEmptyStars"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:background="@drawable/bg_card_rounded"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⭐"
+                        android:textSize="36sp"
+                        android:layout_marginBottom="8dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chưa có nghệ sĩ nào"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Không bắt buộc — bạn có thể thêm sau"
+                        android:textColor="@color/clr_text_secondary"
+                        android:textSize="12sp"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <!-- Star list -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvStarsDraft"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/clr_divider"
+                    android:layout_marginVertical="20dp" />
+
+                <!-- Action buttons -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSaveDraft"
                     android:layout_width="match_parent"
@@ -674,7 +1024,9 @@
                     app:cornerRadius="16dp"
                     app:backgroundTint="@color/clr_primary_blue"
                     style="@style/Widget.MaterialComponents.Button" />
+
             </LinearLayout>
+
         </ViewFlipper>
     </androidx.core.widget.NestedScrollView>
 

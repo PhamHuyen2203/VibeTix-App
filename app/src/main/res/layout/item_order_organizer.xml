@@ -14,89 +14,121 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Hàng 1: Mã đơn + Badge trạng thái -->
+        <!-- Header -->
         <LinearLayout
+            android:id="@+id/llOrderHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="?attr/selectableItemBackground">
 
-            <TextView
-                android:id="@+id/tvOrderId"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="#ORD-12345"
-                android:textColor="@color/clr_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="Thành công"
-                android:textSize="11sp"
-                android:textColor="@color/clr_success"
-                android:background="@drawable/bg_ticket_type_active"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Divider mỏng -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="12dp"
-            android:background="@color/clr_divider" />
-
-        <!-- Hàng 2: Thông tin vé -->
-        <TextView
-            android:id="@+id/tvTicketInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="2x Vé VIP"
-            android:textColor="@color/clr_text_primary"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvOrderDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="01/06/2026 14:30"
-            android:textColor="@color/clr_text_secondary"
-            android:textSize="12sp" />
-
-        <!-- Hàng 3: Tổng tiền -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tổng tiền:"
-                android:textColor="@color/clr_text_secondary"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/tvTotalAmount"
+            <!-- Row 1: Order ID + Status -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:text="500,000 ₫"
-                android:textColor="@color/clr_primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvOrderId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="#ORD-12345"
+                    android:textColor="@color/clr_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Thành công"
+                    android:textSize="11sp"
+                    android:textColor="@color/clr_success"
+                    android:background="@drawable/bg_ticket_type_active"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Row 2: Date -->
+            <TextView
+                android:id="@+id/tvOrderDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="01/06/2026 14:30"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="12sp" />
+
+            <!-- Row 3: Total -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng tiền:"
+                    android:textColor="@color/clr_text_secondary"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvTotalAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="500,000 ₫"
+                    android:textColor="@color/clr_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                    
+                <ImageView
+                    android:id="@+id/ivExpand"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_chevron_down"
+                    app:tint="@color/clr_text_secondary" />
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:id="@+id/vDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="gone"
+            android:background="@color/clr_divider" />
+
+        <!-- Items Container -->
+        <LinearLayout
+            android:id="@+id/llOrderItemsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:background="#F8FAFC">
+            
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmOrder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Duyệt đơn hàng"
+                android:visibility="gone"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

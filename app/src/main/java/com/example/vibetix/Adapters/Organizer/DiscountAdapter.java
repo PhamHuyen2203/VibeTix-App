@@ -15,10 +15,17 @@ import java.util.Locale;
 
 public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHolder> {
 
-    private List<Discount> list;
+    public interface Listener {
+        void onItemClick(Discount discount);
+        void onToggleActive(Discount discount);
+    }
 
-    public DiscountAdapter(List<Discount> list) {
+    private List<Discount> list;
+    private Listener listener;
+
+    public DiscountAdapter(List<Discount> list, Listener listener) {
         this.list = list;
+        this.listener = listener;
     }
 
     @NonNull
@@ -70,6 +77,22 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHo
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         holder.tvExpiry.setText("Hết hạn: " + (expiryTime > 0 ? sdf.format(new Date(expiryTime)) : "N/A"));
+
+        if (d.isActive()) {
+            holder.btnToggleActive.setText("Tắt áp dụng");
+            holder.btnToggleActive.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
+        } else {
+            holder.btnToggleActive.setText("Kích hoạt");
+            holder.btnToggleActive.setTextColor(holder.itemView.getContext().getColor(R.color.clr_success));
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(d);
+        });
+
+        holder.btnToggleActive.setOnClickListener(v -> {
+            if (listener != null) listener.onToggleActive(d);
+        });
     }
 
     @Override
@@ -84,6 +107,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvCode, tvTitle, tvValue, tvUsage, tvStatus, tvExpiry;
+        com.google.android.material.button.MaterialButton btnToggleActive;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCode = itemView.findViewById(R.id.tvCode);
@@ -92,6 +116,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHo
             tvUsage = itemView.findViewById(R.id.tvUsage);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvExpiry = itemView.findViewById(R.id.tvExpiry);
+            btnToggleActive = itemView.findViewById(R.id.btnToggleActive);
         }
     }
 }

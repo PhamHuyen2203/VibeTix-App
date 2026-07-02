@@ -265,12 +265,25 @@ public class EventStarManagementActivity extends AppCompatActivity {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                String query = s.toString().toLowerCase().trim();
+                String query = s.toString().trim();
                 List<Star> filtered = new ArrayList<>();
-                for (Star star : allActiveStars) {
-                    if (star.getStageName() != null && star.getStageName().toLowerCase().contains(query)) {
-                        filtered.add(star);
+                if (query.isEmpty()) {
+                    filtered.addAll(allActiveStars);
+                } else {
+                    for (Star star : allActiveStars) {
+                        if (star.getStageName() != null) {
+                            double sim = com.example.vibetix.Utils.CosineSimilarityUtils.calculateSimilarity(query, star.getStageName());
+                            if (sim > 0.3 || star.getStageName().toLowerCase().contains(query.toLowerCase())) {
+                                filtered.add(star);
+                            }
+                        }
                     }
+                    // Sort by similarity if needed, but simple filtering is okay here
+                    Collections.sort(filtered, (s1, s2) -> {
+                        double sim1 = com.example.vibetix.Utils.CosineSimilarityUtils.calculateSimilarity(query, s1.getStageName());
+                        double sim2 = com.example.vibetix.Utils.CosineSimilarityUtils.calculateSimilarity(query, s2.getStageName());
+                        return Double.compare(sim2, sim1);
+                    });
                 }
                 searchAdapter.updateData(filtered);
                 sheetBinding.tvEmptySearch.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);

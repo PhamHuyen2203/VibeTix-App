@@ -130,6 +130,7 @@ public class StaffManagementActivity extends AppCompatActivity {
                         for (DocumentSnapshot doc : query.getDocuments()) {
                             EventStaff staff = doc.toObject(EventStaff.class);
                             if (staff != null) {
+                                if (staff.getRole() == EventStaff.Role.OWNER) continue; // Bỏ qua owner (Task 6)
                                 tempStaffList.add(staff);
                                 if (staff.getUserId() != null && !userIds.contains(staff.getUserId())) {
                                     userIds.add(staff.getUserId());

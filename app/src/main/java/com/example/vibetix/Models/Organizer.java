@@ -66,14 +66,14 @@ public class Organizer {
     @PropertyName("website_url")
     public void setWebsiteUrl(String websiteUrl) { this.websiteUrl = websiteUrl; }
 
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("contact_email")
     public String getContactEmail() { return contactEmail; }
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("contact_email")
     public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
 
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("contact_phone")
     public String getContactPhone() { return contactPhone; }
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("contact_phone")
     public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
 
     @PropertyName("is_verified")
@@ -86,9 +86,9 @@ public class Organizer {
     @PropertyName("is_default")
     public void setDefault(boolean aDefault) { isDefault = aDefault; }
 
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("business_license_url")
     public String getBusinessLicenseUrl() { return businessLicenseUrl; }
-    @com.google.firebase.firestore.Exclude
+    @PropertyName("business_license_url")
     public void setBusinessLicenseUrl(String businessLicenseUrl) { this.businessLicenseUrl = businessLicenseUrl; }
 
     @PropertyName("created_at")

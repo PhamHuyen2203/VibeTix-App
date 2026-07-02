@@ -7,13 +7,14 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class Event {
     public enum Status {
-        DRAFT, PENDING, APPROVED, ONGOING, COMPLETED, CANCELLED
+        DRAFT, PENDING, APPROVED, ONGOING, COMPLETED, CANCELLED, REJECTED
     }
 
     public static final String APPROVED = "approved";
     public static final String ONGOING = "ongoing";
     public static final String PENDING = "pending";
     public static final String CANCELLED = "cancelled";
+    public static final String REJECTED = "rejected";
 
     private String eventId;
     private String organizerId;
@@ -37,6 +38,8 @@ public class Event {
     private Object createdAt;
     private Object updatedAt;
     private long ticketsSold = 0;
+    private String rejectionReason;
+    private Object rejectedAt;
 
     private int localImageResId;
     private int localPortraitImageResId;
@@ -46,6 +49,10 @@ public class Event {
     private String location;
     private String category;
     private boolean isFree;
+    private String eventType;
+    private String onlineLink;
+    private String ageRestriction;
+    private int maxTicketsPerTransaction;
     private String portraitImageUrl;
     private String organizerName;
     private int price;
@@ -105,8 +112,30 @@ public class Event {
     public void setMinPrice(long minPrice) { this.minPrice = minPrice; }
     @PropertyName("min_price") public void setMinPriceDouble(double v) { this.minPrice = v; }
 
+    @PropertyName("is_free")
     public boolean isFree() { return isFree || (price == 0 && minPrice == 0); }
+    @PropertyName("is_free")
     public void setFree(boolean free) { isFree = free; }
+
+    @PropertyName("event_type")
+    public String getEventType() { return eventType; }
+    @PropertyName("event_type")
+    public void setEventType(String eventType) { this.eventType = eventType; }
+
+    @PropertyName("online_link")
+    public String getOnlineLink() { return onlineLink; }
+    @PropertyName("online_link")
+    public void setOnlineLink(String onlineLink) { this.onlineLink = onlineLink; }
+
+    @PropertyName("age_restriction")
+    public String getAgeRestriction() { return ageRestriction; }
+    @PropertyName("age_restriction")
+    public void setAgeRestriction(String ageRestriction) { this.ageRestriction = ageRestriction; }
+
+    @PropertyName("max_tickets_per_transaction")
+    public int getMaxTicketsPerTransaction() { return maxTicketsPerTransaction; }
+    @PropertyName("max_tickets_per_transaction")
+    public void setMaxTicketsPerTransaction(int maxTicketsPerTransaction) { this.maxTicketsPerTransaction = maxTicketsPerTransaction; }
 
     public boolean isSoldOut() { return isSoldOut; }
     public void setSoldOut(boolean soldOut) { isSoldOut = soldOut; }
@@ -205,9 +234,24 @@ public class Event {
 
     @Exclude public String getUserRole() { return userRole; }
     @Exclude public void setUserRole(String role) { this.userRole = role; }
-
     @PropertyName("seatmap_url")
     public String getSeatmapUrl() { return seatmapUrl; }
     @PropertyName("seatmap_url")
     public void setSeatmapUrl(String url) { this.seatmapUrl = url; }
+
+    @PropertyName("rejection_reason")
+    public String getRejectionReason() { return rejectionReason; }
+    @PropertyName("rejection_reason")
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
+
+    @PropertyName("rejected_at")
+    public Object getRejectedAt() { return rejectedAt; }
+    @PropertyName("rejected_at")
+    public void setRejectedAt(Object rejectedAt) { this.rejectedAt = rejectedAt; }
+
+    /** Kiểm tra xem draft này có phải do admin từ chối không. */
+    @Exclude
+    public boolean isRejected() {
+        return rejectionReason != null && !rejectionReason.isEmpty();
+    }
 }

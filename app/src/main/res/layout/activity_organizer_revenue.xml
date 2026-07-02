@@ -7,11 +7,11 @@
     android:background="@color/clr_bg_light"
     android:orientation="vertical">
 
-    <!-- ── GRADIENT HEADER ─────────────────────────────── -->
+    <!-- ── HEADER ─────────────────────────────── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_auth_header"
+        android:background="@color/clr_primary"
         android:orientation="vertical"
         android:paddingTop="16dp"
         android:paddingBottom="24dp"
@@ -249,15 +249,87 @@
                             android:visibility="gone"
                             tools:text="Đơn vị tổ chức sự kiện âm nhạc" />
 
-                        <TextView
-                            android:id="@+id/tvOrgWebsite"
-                            android:layout_width="wrap_content"
+                        <!-- Contact Info Section -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:textColor="@color/clr_primary_blue"
-                            android:textSize="11sp"
-                            android:visibility="gone"
-                            tools:text="vibetix.vn" />
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical">
+
+                            <!-- Email -->
+                            <LinearLayout
+                                android:id="@+id/layoutOrgEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginBottom="4dp">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_auth_email"
+                                    app:tint="@color/clr_text_secondary"/>
+                                <TextView
+                                    android:id="@+id/tvOrgEmail"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:textColor="@color/clr_text_secondary"
+                                    android:textSize="12sp"
+                                    tools:text="contact@vibetix.vn"/>
+                            </LinearLayout>
+
+                            <!-- Phone -->
+                            <LinearLayout
+                                android:id="@+id/layoutOrgPhone"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                android:layout_marginBottom="4dp">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_auth_phone"
+                                    app:tint="@color/clr_text_secondary"/>
+                                <TextView
+                                    android:id="@+id/tvOrgPhone"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:textColor="@color/clr_text_secondary"
+                                    android:textSize="12sp"
+                                    tools:text="0987654321"/>
+                            </LinearLayout>
+
+                            <!-- Website -->
+                            <LinearLayout
+                                android:id="@+id/layoutOrgWebsite"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+                                <ImageView
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:src="@drawable/ic_globe"
+                                    app:tint="@color/clr_primary_blue"/>
+                                <TextView
+                                    android:id="@+id/tvOrgWebsite"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:textColor="@color/clr_primary_blue"
+                                    android:textSize="12sp"
+                                    tools:text="vibetix.vn"/>
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -40,12 +40,10 @@ public class OrganizerProfileFragment extends Fragment {
     private SessionManager sessionManager;
 
     private TextView tvUserDisplayName, tvOrgCount, tvProfileError;
-    private TextView tvUserInfoName, tvUserInfoEmail, tvUserInfoPhone;
-    private android.widget.ImageView ivUserAvatar;
     private ProgressBar pbProfileLoading;
     private RecyclerView rvOrganizerProfiles;
     private LinearLayout layoutOrgEmpty;
-    private MaterialButton btnAddOrgProfile, btnOrgLogout;
+    private MaterialButton btnAddOrgProfile;
 
     private OrgProfileAdapter adapter;
     private final List<OrgCardData> orgList = new ArrayList<>();
@@ -69,21 +67,16 @@ public class OrganizerProfileFragment extends Fragment {
         tvOrgCount = view.findViewById(R.id.tvOrgCount);
         tvProfileError = view.findViewById(R.id.tvProfileError);
         pbProfileLoading = view.findViewById(R.id.pbProfileLoading);
-        tvUserInfoName = view.findViewById(R.id.tvUserInfoName);
-        tvUserInfoEmail = view.findViewById(R.id.tvUserInfoEmail);
-        tvUserInfoPhone = view.findViewById(R.id.tvUserInfoPhone);
-        ivUserAvatar = view.findViewById(R.id.ivUserAvatar);
         rvOrganizerProfiles = view.findViewById(R.id.rvOrganizerProfiles);
         layoutOrgEmpty = view.findViewById(R.id.layoutOrgEmpty);
         btnAddOrgProfile = view.findViewById(R.id.btnAddOrgProfile);
-        btnOrgLogout = view.findViewById(R.id.btnOrgLogout);
 
         adapter = new OrgProfileAdapter(orgList, this::openOrgDetail);
         rvOrganizerProfiles.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvOrganizerProfiles.setAdapter(adapter);
         rvOrganizerProfiles.setNestedScrollingEnabled(false);
 
-        btnOrgLogout.setOnClickListener(v -> logout());
+
         btnAddOrgProfile.setOnClickListener(v -> {
             // Navigate to CreateOrganizerActivity if available
             try {
@@ -107,20 +100,8 @@ public class OrganizerProfileFragment extends Fragment {
                     String name = userDoc.getString("full_name");
                     String email = userDoc.getString("email");
                     String phone = userDoc.getString("phone");
-                    String avatarUrl = userDoc.getString("avatar_url");
-
                     String displayName = name != null && !name.isEmpty() ? name : "Ban tổ chức";
                     tvUserDisplayName.setText(displayName);
-                    if (tvUserInfoName != null) tvUserInfoName.setText(displayName);
-                    if (tvUserInfoEmail != null && email != null) tvUserInfoEmail.setText(email);
-                    if (tvUserInfoPhone != null && phone != null && !phone.isEmpty()) {
-                        tvUserInfoPhone.setText(phone);
-                        tvUserInfoPhone.setVisibility(View.VISIBLE);
-                    }
-                    if (ivUserAvatar != null && avatarUrl != null && !avatarUrl.isEmpty()) {
-                        Glide.with(this).load(avatarUrl).circleCrop()
-                                .placeholder(R.drawable.bg_avatar_circle).into(ivUserAvatar);
-                    }
                 });
 
         showLoading(true);
