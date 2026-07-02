@@ -29,6 +29,7 @@ public class DateFilterDialog extends BottomSheetDialogFragment {
     private Calendar displayMonth;
     private Calendar selectedStart = null;
     private Calendar selectedEnd   = null;
+    private java.util.List<String> highlightDates = new java.util.ArrayList<>();
     // selectedQuick: 0=All, 1=Today, 2=Tomorrow, 3=Weekend, 4=Month, -1=custom range
     private int selectedQuick = 0;
 
@@ -40,6 +41,10 @@ public class DateFilterDialog extends BottomSheetDialogFragment {
 
     public void setOnDateFilterApplied(OnDateFilterApplied listener) {
         this.listener = listener;
+    }
+
+    public void setHighlightDates(java.util.List<String> dates) {
+        this.highlightDates = dates != null ? dates : new java.util.ArrayList<>();
     }
 
     @Nullable
@@ -302,8 +307,9 @@ public class DateFilterDialog extends BottomSheetDialogFragment {
             boolean isStart = (selectedStart != null) && isSameDay(dayCal, selectedStart);
             boolean isEnd   = (selectedEnd   != null) && isSameDay(dayCal, selectedEnd);
             boolean inRange = isInRange(dayCal);
+            boolean isEventDay = isDayHighlighted(dayCal);
 
-            if (isStart || isEnd) {
+            if (isStart || isEnd || isEventDay) {
                 dayTv.setBackgroundResource(R.drawable.bg_calendar_selected);
                 dayTv.setTextColor(requireContext().getColor(R.color.clr_text_white));
                 dayTv.setTypeface(null, Typeface.BOLD);
@@ -361,5 +367,15 @@ public class DateFilterDialog extends BottomSheetDialogFragment {
     private boolean isInRange(Calendar day) {
         if (selectedStart == null || selectedEnd == null) return false;
         return day.after(selectedStart) && day.before(selectedEnd);
+    }
+
+    private boolean isDayHighlighted(Calendar cal) {
+        if (highlightDates == null || highlightDates.isEmpty()) return false;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String calStr = sdf.format(cal.getTime());
+        for (String h : highlightDates) {
+            if (h != null && h.contains(calStr)) return true;
+        }
+        return false;
     }
 }

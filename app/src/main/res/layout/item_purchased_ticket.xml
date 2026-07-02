@@ -76,21 +76,25 @@
             android:background="@color/clr_divider" />
 
         <!-- Bottom row: Ticket Type / Price, Status Badge, and Actions -->
-        <RelativeLayout
+        <!-- Ticket info + actions dạng dọc để tránh overlap -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- Dòng 1: Loại vé + giá -->
             <LinearLayout
                 android:id="@+id/layoutTicketMeta"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/txtTicketTypeName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Vé Tiêu chuẩn"
                     android:textColor="@color/clr_text_black"
                     android:textSize="12sp"
@@ -100,36 +104,38 @@
                     android:id="@+id/txtTicketPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="8dp"
                     android:text="400.000 đ"
                     android:textColor="@color/clr_primary_blue"
                     android:textSize="13sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Status Tag (ACTIVE, RESELLING, USED, EXPIRED) -->
-            <TextView
-                android:id="@+id/txtTicketStatusBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/layoutTicketMeta"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/bg_status_badge_ongoing"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="Còn hiệu lực"
-                android:textColor="@color/clr_success"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-            <!-- Action buttons container -->
+            <!-- Dòng 2: Status + actions -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
+
+                <!-- Status Tag -->
+                <TextView
+                    android:id="@+id/txtTicketStatusBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_status_badge_ongoing"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Còn hiệu lực"
+                    android:textColor="@color/clr_success"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <!-- Resell button -->
                 <Button
@@ -138,7 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:layout_marginEnd="6dp"
-                    android:text="Bán lại vé"
+                    android:text="BÁN LẠI VÉ"
                     android:textColor="@color/clr_primary_blue"
                     android:textSize="11sp" />
 
@@ -154,6 +160,6 @@
                     android:textSize="11sp"
                     app:cornerRadius="6dp" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -129,6 +129,28 @@ public class EventRepository extends BaseRepository {
         void onFailure(Exception e);
     }
 
+    public interface OnSessionsLoadedListener {
+        void onSuccess(java.util.List<com.example.vibetix.Models.EventSession> sessions);
+        void onFailure(Exception e);
+    }
+
+    public void getSessionsForEvent(String eventId, OnSessionsLoadedListener listener) {
+        db.collection(FirebaseCollections.EVENTS).document(eventId)
+                .collection(FirebaseCollections.SESSIONS)
+                .orderBy("start_time", Query.Direction.ASCENDING)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    java.util.List<com.example.vibetix.Models.EventSession> list = new java.util.ArrayList<>();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : snap) {
+                        com.example.vibetix.Models.EventSession s = doc.toObject(com.example.vibetix.Models.EventSession.class);
+                        s.setSessionId(doc.getId());
+                        list.add(s);
+                    }
+                    listener.onSuccess(list);
+                })
+                .addOnFailureListener(listener::onFailure);
+    }
+
     public interface OnTicketTypesLoadedListener {
         void onSuccess(java.util.List<com.example.vibetix.Models.TicketType> ticketTypes);
         void onFailure(Exception e);
@@ -138,7 +160,8 @@ public class EventRepository extends BaseRepository {
         getEventById(eventId)
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Event event = documentSnapshot.toObject(Event.class);
+                        // Use FirestoreHelper to map Firestore field names (banner_url, start_time, etc.)
+                        Event event = com.example.vibetix.Firebase.FirestoreHelper.docToEvent(documentSnapshot);
                         if (event != null) {
                             if (event.getId() == null) event.setId(documentSnapshot.getId());
                             listener.onSuccess(event);
@@ -151,9 +174,28 @@ public class EventRepository extends BaseRepository {
     }
 
     public void getTicketTypesForEvent(String eventId, OnTicketTypesLoadedListener listener) {
+        db.collection("ticket_types")
+                .whereEqualTo("event_id", eventId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    java.util.List<com.example.vibetix.Models.TicketType> list = new java.util.ArrayList<>();
+                    for (com.google.firebase.firestore.QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        com.example.vibetix.Models.TicketType t = doc.toObject(com.example.vibetix.Models.TicketType.class);
+                        t.setTicketTypeId(doc.getId());
+                        list.add(t);
+                    }
+                    if (!list.isEmpty()) {
+                        listener.onSuccess(list);
+                    } else {
+                        fetchSubcollectionTicketTypes(eventId, listener);
+                    }
+                })
+                .addOnFailureListener(e -> fetchSubcollectionTicketTypes(eventId, listener));
+    }
+
+    private void fetchSubcollectionTicketTypes(String eventId, OnTicketTypesLoadedListener listener) {
         db.collection(FirebaseCollections.EVENTS).document(eventId)
                 .collection(FirebaseCollections.TICKET_TYPES)
-                .orderBy("sort_order", Query.Direction.ASCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     java.util.List<com.example.vibetix.Models.TicketType> list = new java.util.ArrayList<>();

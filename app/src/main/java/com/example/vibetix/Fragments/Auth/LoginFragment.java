@@ -9,16 +9,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.vibetix.Activities.Admin.AdminMainActivity;
 import com.example.vibetix.Activities.Auth.AuthActivity;
 import com.example.vibetix.Activities.User.UserMainActivity;
-import com.example.vibetix.Activities.Admin.AdminMainActivity;
 import com.example.vibetix.Firebase.FirebaseCollections;
 import com.example.vibetix.Models.Organizer;
 import com.example.vibetix.Models.User;
@@ -26,37 +28,38 @@ import com.example.vibetix.R;
 import com.example.vibetix.Repositories.UserRepository;
 import com.example.vibetix.Utils.Constants;
 import com.example.vibetix.Utils.SessionManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * LoginFragment — Đăng nhập bằng Firebase Auth.
- *
- * Sau khi xác thực:
- *  1. Fetch User document từ Firestore
- *  2. Fetch danh sách Organizer profiles của user (1:N)
- *  3. Lưu vào SessionManager
- *  4. Điều hướng → UserMainActivity (luôn bắt đầu từ User mode)
- *     (User tự chuyển sang Organizer mode từ Profile)
- *
- * Exception: Admin user → AdminMainActivity
- */
 public class LoginFragment extends Fragment {
+
+    private static final int RC_GOOGLE_SIGN_IN = 1001;
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
     private CheckBox cbRememberMe;
     private TextView txtLoginError;
     private ProgressBar pbLogin;
+    private LinearLayout btnLoginGoogle, btnLoginApple;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private UserRepository userRepository;
     private SessionManager sessionManager;
+    private GoogleSignInClient googleSignInClient;
 
     @Nullable
     @Override
@@ -69,19 +72,30 @@ public class LoginFragment extends Fragment {
         userRepository = new UserRepository();
         sessionManager = new SessionManager(requireContext());
 
+        setupGoogleSignIn();
         bindViews(view);
         restoreRememberMe();
         setupClickListeners(view);
         return view;
     }
 
+    private void setupGoogleSignIn() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+    }
+
     private void bindViews(View view) {
-        etEmail       = view.findViewById(R.id.etEmail);
-        etPassword    = view.findViewById(R.id.etPassword);
-        btnLogin      = view.findViewById(R.id.btnLogin);
-        cbRememberMe  = view.findViewById(R.id.cbRememberMe);
-        txtLoginError = view.findViewById(R.id.txtLoginError);
-        pbLogin       = view.findViewById(R.id.pbLogin);
+        etEmail        = view.findViewById(R.id.etEmail);
+        etPassword     = view.findViewById(R.id.etPassword);
+        btnLogin       = view.findViewById(R.id.btnLogin);
+        cbRememberMe   = view.findViewById(R.id.cbRememberMe);
+        txtLoginError  = view.findViewById(R.id.txtLoginError);
+        pbLogin        = view.findViewById(R.id.pbLogin);
+        btnLoginGoogle = view.findViewById(R.id.btnLoginGoogle);
+        btnLoginApple  = view.findViewById(R.id.btnLoginApple);
     }
 
     private void restoreRememberMe() {
@@ -94,7 +108,15 @@ public class LoginFragment extends Fragment {
     private void setupClickListeners(View view) {
         if (btnLogin != null) btnLogin.setOnClickListener(v -> attemptLogin());
 
-        // Nút Register
+        if (btnLoginGoogle != null) {
+            btnLoginGoogle.setOnClickListener(v -> startGoogleSignIn());
+        }
+
+        if (btnLoginApple != null) {
+            btnLoginApple.setOnClickListener(v ->
+                Toast.makeText(requireContext(), "Đăng nhập bằng Apple chưa được hỗ trợ", Toast.LENGTH_SHORT).show());
+        }
+
         TextView txtGoRegister = view.findViewById(R.id.txtGoToRegister);
         if (txtGoRegister != null) {
             txtGoRegister.setOnClickListener(v -> {
@@ -104,15 +126,15 @@ public class LoginFragment extends Fragment {
             });
         }
 
-        // Nút Quên mật khẩu
         TextView txtForgot = view.findViewById(R.id.txtForgotPassword);
         if (txtForgot != null) {
             txtForgot.setOnClickListener(v -> {
-                // TODO: Điều hướng sang ForgotPasswordFragment nếu có
+                // TODO: ForgotPasswordFragment
             });
         }
     }
 
+    // ── Đăng nhập Email/Password ──────────────────────────────────────────────
     private void attemptLogin() {
         if (etEmail == null || etPassword == null) return;
 
@@ -141,16 +163,85 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    /**
-     * Bước 1: Lấy thông tin User từ Firestore.
-     */
+    // ── Google Sign-In ────────────────────────────────────────────────────────
+    private void startGoogleSignIn() {
+        // Sign out khỏi Google trước để luôn hiện account picker
+        googleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_GOOGLE_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                if (e.getStatusCode() != 12501) { // 12501 = user cancelled
+                    showError("Đăng nhập Google thất bại: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        setLoading(true);
+        hideError();
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(result -> {
+                    String uid = mAuth.getCurrentUser().getUid();
+                    // Kiểm tra đã có Firestore document chưa, nếu chưa thì tạo mới
+                    userRepository.getUserById(uid).addOnSuccessListener(doc -> {
+                        String phone = doc.exists() ? doc.getString("phone") : null;
+                        if (doc.exists() && phone != null && !phone.isEmpty()) {
+                            // User đã có đầy đủ thông tin → vào thẳng app
+                            fetchUserData(uid);
+                        } else {
+                            // User mới hoặc chưa hoàn tất → tạo document tối thiểu rồi redirect sang RegisterFragment
+                            java.util.Map<String, Object> base = new java.util.HashMap<>();
+                            base.put("user_id", uid);
+                            base.put("email", account.getEmail() != null ? account.getEmail() : "");
+                            base.put("full_name", account.getDisplayName() != null ? account.getDisplayName() : "");
+                            base.put("avatar_url", account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : null);
+                            base.put("phone", "");
+                            base.put("role", Constants.ROLE_CUSTOMER);
+                            base.put("is_active", true);
+                            base.put("created_at", com.google.firebase.Timestamp.now());
+                            db.collection(FirebaseCollections.USERS).document(uid).set(base)
+                                .addOnCompleteListener(t -> {
+                                    setLoading(false);
+                                    if (!isAdded()) return;
+                                    if (getActivity() instanceof com.example.vibetix.Activities.Auth.AuthActivity) {
+                                        RegisterFragment reg = RegisterFragment.newGoogleInstance(
+                                                account.getEmail(), account.getDisplayName());
+                                        ((com.example.vibetix.Activities.Auth.AuthActivity) getActivity())
+                                                .showFragment(reg);
+                                    }
+                                });
+                        }
+                    }).addOnFailureListener(e -> {
+                        setLoading(false);
+                        showError("Lỗi kết nối: " + e.getMessage());
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    setLoading(false);
+                    showError("Xác thực Google thất bại: " + e.getMessage());
+                });
+    }
+
+    // ── Fetch user data sau khi auth thành công ────────────────────────────────
     private void fetchUserData(String uid) {
         userRepository.getUserById(uid)
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         User user = doc.toObject(User.class);
                         if (user != null) {
-                            // Set userId nếu Firestore không trả về trong object
                             if (user.getUserId() == null) user.setUserId(uid);
                             sessionManager.createLoginSession(user);
                             fetchOrganizerProfiles(user);
@@ -159,7 +250,6 @@ public class LoginFragment extends Fragment {
                             showError("Dữ liệu người dùng không hợp lệ.");
                         }
                     } else {
-                        // User đã auth nhưng chưa có document Firestore → tạo mới
                         setLoading(false);
                         showError("Tài khoản chưa có dữ liệu. Vui lòng liên hệ hỗ trợ.");
                     }
@@ -170,10 +260,6 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    /**
-     * Bước 2: Lấy danh sách Organizer profiles.
-     * Lưu active organizer = default hoặc profile đầu tiên.
-     */
     private void fetchOrganizerProfiles(User user) {
         db.collection(FirebaseCollections.ORGANIZERS)
                 .whereEqualTo("user_id", user.getUserId())
@@ -190,7 +276,6 @@ public class LoginFragment extends Fragment {
                         }
                     }
 
-                    // Xác định active organizer
                     if (!organizers.isEmpty()) {
                         Organizer activeOrg = findDefaultOrganizer(organizers, user.getDefaultOrganizerId());
                         sessionManager.setActiveOrganizer(
@@ -198,21 +283,18 @@ public class LoginFragment extends Fragment {
                                 activeOrg.getBrandName(),
                                 activeOrg.getLogoUrl()
                         );
-                        // Mặc định là owner (user sở hữu organizer này)
                         sessionManager.setStaffRole("owner", null);
                     }
 
-                    // Lưu remember me
                     boolean rememberMe = cbRememberMe != null && cbRememberMe.isChecked();
-                    SharedPreferences prefs = requireContext()
-                            .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE);
-                    prefs.edit().putBoolean(Constants.KEY_REMEMBER_ME, rememberMe).apply();
+                    requireContext()
+                            .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE)
+                            .edit().putBoolean(Constants.KEY_REMEMBER_ME, rememberMe).apply();
 
                     setLoading(false);
                     navigateToMain(user);
                 })
                 .addOnFailureListener(e -> {
-                    // Vẫn cho vào app dù không load được organizer profiles
                     setLoading(false);
                     navigateToMain(user);
                 });
@@ -224,15 +306,19 @@ public class LoginFragment extends Fragment {
                 if (defaultId.equals(org.getOrganizerId())) return org;
             }
         }
-        return organizers.get(0); // Fallback: profile đầu tiên
+        return organizers.get(0);
     }
 
-    /**
-     * Bước 3: Điều hướng.
-     * Admin → AdminMainActivity
-     * Tất cả còn lại → UserMainActivity (User tự chuyển sang Organizer mode)
-     */
     private void navigateToMain(User user) {
+        com.google.firebase.auth.FirebaseUser fbUser = mAuth.getCurrentUser();
+        if (fbUser != null && fbUser.getEmail() != null) {
+            requireContext()
+                .getSharedPreferences(Constants.PREFS_AUTH, android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putString(Constants.KEY_USER_EMAIL, fbUser.getEmail())
+                .apply();
+        }
+
         Intent intent;
         if (Constants.ROLE_ADMIN.equals(user.getRole())) {
             intent = new Intent(requireContext(), AdminMainActivity.class);

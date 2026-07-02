@@ -17,6 +17,7 @@ public class Constants {
     public static final String KEY_USER_ORG_NAME  = "user_org_name";
 
     // Extended profile info
+    public static final String KEY_USER_AVATAR       = "user_avatar_url";
     public static final String KEY_USER_DOB          = "user_dob";
     public static final String KEY_USER_GENDER       = "user_gender";      // "male"/"female"/"other"
     public static final String KEY_TICKETS_BOUGHT    = "tickets_bought";

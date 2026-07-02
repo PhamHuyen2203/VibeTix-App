@@ -63,4 +63,18 @@ public class AuthActivity extends AppCompatActivity {
     public void showLoginFragment() {
         getSupportFragmentManager().popBackStack();
     }
+
+    /** Hiển thị bất kỳ Fragment nào (dùng cho Google Sign-In mode). */
+    public void showFragment(androidx.fragment.app.Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        android.R.anim.slide_in_left,
+                        android.R.anim.slide_out_right,
+                        android.R.anim.slide_in_left,
+                        android.R.anim.slide_out_right)
+                .replace(R.id.authContainer, fragment)
+                .addToBackStack("google_register")
+                .commit();
+    }
 }

@@ -27,6 +27,15 @@ public class FirebaseCollections {
     public static final String EVENT_STARS       = "event_stars";
     public static final String USER_STAR_FOLLOWS = "user_star_follows";
 
+    // Wishlists / Interests
+    public static final String EVENT_INTERESTS = "event_interests";
+
+    // Transfers
+    public static final String TICKET_TRANSFERS = "ticket_transfers";
+
+    // Event sub-collections
+    public static final String SESSIONS       = "sessions";
+
     // Legacy (kept for Admin screens — to be migrated later)
     public static final String CATEGORIES    = "categories";
     public static final String VENUES        = "venues";

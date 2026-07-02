@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vibetix.Activities.Auth.AuthActivity;
 import com.example.vibetix.Activities.User.UserMainActivity;
+import com.example.vibetix.Firebase.FirebaseCollections;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,10 +41,9 @@ public class ProfileFragment extends Fragment {
 
     // Header
     private TextView txtProfileName, txtProfileEmail, txtMemberSince;
-    private TextView txtTicketsBought, txtEventsInterested;
+    private TextView txtEventsInterested, txtFollowingCount;
+    private LinearLayout layoutStatFavorites, layoutStatFollowing;
 
-    // Payment row (in settings)
-    private LinearLayout rowPaymentMethods;
 
     // Settings rows
     private LinearLayout rowAccountInfo, rowOrganizerProfile, rowSecurity, rowLanguage, rowHelpCenter;
@@ -77,6 +77,7 @@ public class ProfileFragment extends Fragment {
         bindViews(view);
         applyInsets(view);
         loadUserInfo();
+        loadProfileStats();
         loadOrganizerBadge();
         loadLanguageState();
         setupListeners();
@@ -86,6 +87,7 @@ public class ProfileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadUserInfo();
+        loadProfileStats();
         loadOrganizerBadge();
     }
 
@@ -94,10 +96,10 @@ public class ProfileFragment extends Fragment {
         txtProfileName      = v.findViewById(R.id.txtProfileName);
         txtProfileEmail     = v.findViewById(R.id.txtProfileEmail);
         txtMemberSince      = v.findViewById(R.id.txtMemberSince);
-        txtTicketsBought    = v.findViewById(R.id.txtTicketsBought);
         txtEventsInterested = v.findViewById(R.id.txtEventsInterested);
-
-        rowPaymentMethods = v.findViewById(R.id.rowPaymentMethods);
+        txtFollowingCount   = v.findViewById(R.id.txtFollowingCount);
+        layoutStatFavorites = v.findViewById(R.id.layoutStatFavorites);
+        layoutStatFollowing = v.findViewById(R.id.layoutStatFollowing);
 
         rowAccountInfo      = v.findViewById(R.id.rowAccountInfo);
         rowOrganizerProfile = v.findViewById(R.id.rowOrganizerProfile);
@@ -162,6 +164,34 @@ public class ProfileFragment extends Fragment {
             });
     }
 
+    private void loadProfileStats() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+        String uid = user.getUid();
+
+        // Count sự kiện yêu thích
+        FirebaseFirestore.getInstance()
+                .collection(FirebaseCollections.EVENT_INTERESTS)
+                .whereEqualTo("user_id", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (isAdded() && txtEventsInterested != null) {
+                        txtEventsInterested.setText(String.valueOf(snap.size()));
+                    }
+                });
+
+        // Count đang theo dõi (stars/organizers)
+        FirebaseFirestore.getInstance()
+                .collection(FirebaseCollections.USER_STAR_FOLLOWS)
+                .whereEqualTo("user_id", uid)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (isAdded() && txtFollowingCount != null) {
+                        txtFollowingCount.setText(String.valueOf(snap.size()));
+                    }
+                });
+    }
+
     private void loadOrganizerBadge() {
         if (txtOrgBadge == null) return;
         OrganizerProfile org = loadOrgProfile();
@@ -199,6 +229,20 @@ public class ProfileFragment extends Fragment {
     // ── Click listeners ────────────────────────────────────────────────────────
     private void setupListeners() {
 
+        // Stats card click handlers
+        if (layoutStatFavorites != null) {
+            layoutStatFavorites.setOnClickListener(v -> {
+                FavoritesFollowsBottomSheet sheet = FavoritesFollowsBottomSheet.newInstance("favorites");
+                sheet.show(getChildFragmentManager(), "favorites");
+            });
+        }
+        if (layoutStatFollowing != null) {
+            layoutStatFollowing.setOnClickListener(v -> {
+                FavoritesFollowsBottomSheet sheet = FavoritesFollowsBottomSheet.newInstance("following");
+                sheet.show(getChildFragmentManager(), "following");
+            });
+        }
+
         // Thông tin tài khoản
         if (rowAccountInfo != null)
             rowAccountInfo.setOnClickListener(v -> openSub(new AccountInfoFragment()));
@@ -220,10 +264,6 @@ public class ProfileFragment extends Fragment {
         // Trung tâm trợ giúp
         if (rowHelpCenter != null)
             rowHelpCenter.setOnClickListener(v -> openSub(new HelpCenterFragment()));
-
-        // Phương thức thanh toán (row trong settings)
-        if (rowPaymentMethods != null)
-            rowPaymentMethods.setOnClickListener(v -> openSub(new PaymentMethodsFragment()));
 
         // Đăng xuất
         if (btnLogout != null)

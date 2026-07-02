@@ -1,41 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/clr_bg_light">
 
     <!-- Top Toolbar Header -->
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layoutInfoHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/clr_bg_white"
         android:elevation="2dp"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="16dp"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/btnInfoBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:src="@drawable/ic_back" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingHorizontal="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:fontFamily="sans-serif-medium"
-            android:text="Thông tin"
-            android:textColor="@color/clr_text_black"
-            android:textSize="18sp" />
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/btnInfoBack"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:src="@drawable/ic_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="Thông tin người tham dự"
+                android:textColor="@color/clr_text_black"
+                android:textSize="18sp" />
+        </RelativeLayout>
+    </LinearLayout>
 
     <!-- Progress Step Indicator Bar -->
     <LinearLayout
@@ -45,15 +49,21 @@
         android:background="@color/clr_bg_white"
         android:gravity="center"
         android:orientation="horizontal"
+        android:paddingTop="10dp"
         android:paddingBottom="12dp"
         app:layout_constraintTop_toBottomOf="@+id/layoutInfoHeader">
 
-        <!-- Step 1 (Completed) -->
+        <!-- Step 1 (Completed — clickable to go back) -->
         <LinearLayout
+            android:id="@+id/layoutInfoStep1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true">
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -72,9 +82,9 @@
         </LinearLayout>
 
         <View
-            android:layout_width="40dp"
+            android:layout_width="32dp"
             android:layout_height="1dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="14dp"
             android:background="@color/clr_primary_blue" />
 
         <!-- Step 2 (Active) -->
@@ -82,7 +92,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="4dp">
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -102,9 +113,9 @@
         </LinearLayout>
 
         <View
-            android:layout_width="40dp"
+            android:layout_width="32dp"
             android:layout_height="1dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="14dp"
             android:background="@color/clr_divider" />
 
         <!-- Step 3 (Inactive) -->
@@ -112,7 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="4dp">
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -131,9 +143,9 @@
         </LinearLayout>
 
         <View
-            android:layout_width="40dp"
+            android:layout_width="32dp"
             android:layout_height="1dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="14dp"
             android:background="@color/clr_divider" />
 
         <!-- Step 4 (Inactive) -->
@@ -141,7 +153,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="4dp">
             <TextView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -162,6 +175,7 @@
 
     <!-- Scrollable Attendee Form -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollInfo"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -205,10 +219,10 @@
                             android:id="@+id/txtInfoEventTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:ellipsize="end"
                             android:fontFamily="sans-serif-medium"
                             android:maxLines="2"
-                            android:ellipsize="end"
-                            android:text="LUNCH &amp; LEARN: Workshop về Phỏng vấn Ứng viên"
+                            android:text="Tên sự kiện"
                             android:textColor="@color/clr_text_black"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -218,7 +232,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:text="09:00 - 12:00, 23 May, 2026"
+                            android:text="--"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="12sp" />
 
@@ -227,20 +241,20 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:maxLines="1"
                             android:ellipsize="end"
-                            android:text="WB Business Center, Quận 3, TP. Hồ Chí Minh"
+                            android:maxLines="1"
+                            android:text="--"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Information Card Section -->
+            <!-- Attendee Info Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp">
 
@@ -259,137 +273,79 @@
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
-                    <!-- Họ và Tên -->
+                    <!-- Họ và Tên (required) -->
                     <TextView
+                        android:id="@+id/lblInfoName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:text="Họ &amp; tên *"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/etInfoName"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="6dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập họ và tên đầy đủ (Ví dụ: Nguyễn Văn A)"
+                        android:completionThreshold="0"
+                        android:dropDownAnchor="@id/etInfoName"
+                        android:hint="Nguyễn Văn A"
                         android:inputType="textPersonName"
                         android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
-                    <!-- Email Công ty -->
+                    <!-- Email (required) -->
                     <TextView
+                        android:id="@+id/lblInfoEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Email *"
+                        android:layout_marginTop="14dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/etInfoEmail"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="6dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập email để nhận vé (Ví dụ: user@gmail.com)"
+                        android:completionThreshold="0"
+                        android:hint="email@example.com"
                         android:inputType="textEmailAddress"
                         android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
-                    <!-- Số Điện Thoại -->
+                    <!-- Số điện thoại (required) -->
                     <TextView
+                        android:id="@+id/lblInfoPhone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Số điện thoại *"
+                        android:layout_marginTop="14dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/etInfoPhone"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="6dp"
                         android:background="@drawable/bg_input_normal"
-                        android:hint="Nhập số điện thoại (Ví dụ: 0912345678)"
+                        android:completionThreshold="0"
+                        android:hint="0912 345 678"
                         android:inputType="phone"
                         android:paddingHorizontal="16dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
-                    <!-- Tên Công ty & Chức vụ row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginEnd="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tên công ty"
-                                android:textColor="@color/clr_text_black"
-                                android:textSize="13sp" />
-
-                            <EditText
-                                android:id="@+id/etInfoCompany"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_input_normal"
-                                android:hint="Nhập tên công ty"
-                                android:inputType="text"
-                                android:paddingHorizontal="12dp"
-                                android:textColor="@color/clr_text_black"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="6dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Chức vụ"
-                                android:textColor="@color/clr_text_black"
-                                android:textSize="13sp" />
-
-                            <EditText
-                                android:id="@+id/etInfoRole"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_input_normal"
-                                android:hint="Nhập chức vụ"
-                                android:inputType="text"
-                                android:paddingHorizontal="12dp"
-                                android:textColor="@color/clr_text_black"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Ghi Chú Thêm -->
+                    <!-- Ghi chú (optional — no label text change needed) -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Ghi chú thêm (tùy chọn)"
+                        android:layout_marginTop="14dp"
+                        android:text="Ghi chú"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
@@ -400,13 +356,14 @@
                         android:layout_marginTop="6dp"
                         android:background="@drawable/bg_input_normal"
                         android:gravity="top|start"
-                        android:hint="Nhập ghi chú nếu có (ví dụ: yêu cầu xuất hóa đơn, ăn chay...)"
+                        android:hint="Yêu cầu đặc biệt, xuất hóa đơn..."
                         android:inputType="textMultiLine"
                         android:padding="12dp"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
                     <TextView
+                        android:id="@+id/txtInfoNotesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
@@ -421,7 +378,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp">
 
@@ -439,7 +396,6 @@
                         android:textSize="13sp"
                         android:textStyle="bold" />
 
-                    <!-- Flow of Chips (using Flex-like or standard Linear rows) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -513,6 +469,11 @@
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <!-- Bottom padding -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -547,7 +508,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="400.000 đ"
+                android:text="0 đ"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="18sp"
                 android:textStyle="bold" />

@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class SearchFragment extends Fragment {
@@ -63,17 +64,24 @@ public class SearchFragment extends Fragment {
     // Suggestions
     TextView     txtSuggestionsTitle;
     RecyclerView rvCategories, rvCities, rvSuggested;
+    RecyclerView rvAutoSuggest;
 
     // ── Adapters ───────────────────────────────────────────────────────────────
     SearchCategoryAdapter categoryAdapter;
     DestinationAdapter    destinationAdapter;
     EventAdapter          suggestedAdapter;
+    com.example.vibetix.Adapters.AutoSuggestAdapter autoSuggestAdapter;
+    final java.util.List<String[]> autoSuggestItems = new java.util.ArrayList<>();
 
     // ── Data ───────────────────────────────────────────────────────────────────
     final ArrayList<SearchCategoryAdapter.SearchCategoryItem> catItems = new ArrayList<>();
-    final ArrayList<Destination> cityItems         = new ArrayList<>();
-    final ArrayList<Event>       allEvents         = new ArrayList<>();
-    final ArrayList<Event>       displayedEvents   = new ArrayList<>();
+    final ArrayList<Destination> cityItems          = new ArrayList<>();
+    final ArrayList<Event>       allEvents          = new ArrayList<>();
+    final ArrayList<Event>       filteredFullEvents = new ArrayList<>();
+    final ArrayList<Event>       displayedEvents    = new ArrayList<>();
+
+    private int currentPage = 1;
+    private static final int PAGE_SIZE = 10;
 
     // ── Filter state ───────────────────────────────────────────────────────────
     private String   filterQuery        = "";
@@ -172,6 +180,7 @@ public class SearchFragment extends Fragment {
         rvCategories           = v.findViewById(R.id.rvCategories);
         rvCities               = v.findViewById(R.id.rvCities);
         rvSuggested            = v.findViewById(R.id.rvSuggested);
+        rvAutoSuggest          = v.findViewById(R.id.rvAutoSuggest);
     }
 
     private void applyInsets(View view) {
@@ -199,6 +208,7 @@ public class SearchFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
             public void onTextChanged(CharSequence s, int a, int b, int c) {
                 filterQuery = s.toString().trim();
+                updateAutoSuggest(filterQuery);
                 applyAllFilters();
             }
             public void afterTextChanged(Editable s) {}
@@ -209,9 +219,18 @@ public class SearchFragment extends Fragment {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 String q = etSearch.getText().toString().trim();
                 if (!q.isEmpty()) { saveRecentSearch(q); loadRecentSearches(); }
+                if (rvAutoSuggest != null) rvAutoSuggest.setVisibility(View.GONE);
+                etSearch.clearFocus();
                 return true;
             }
             return false;
+        });
+
+        // Click ra ngoài search bar → ẩn dropdown + clear focus
+        etSearch.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && rvAutoSuggest != null) {
+                rvAutoSuggest.setVisibility(View.GONE);
+            }
         });
 
         // Bộ lọc ngày
@@ -277,12 +296,23 @@ public class SearchFragment extends Fragment {
             .addOnSuccessListener(snap -> {
                 if (!isAdded()) return;
                 allEvents.clear();
+                // Chỉ hiện approved + ongoing + completed; ẩn draft/pending/rejected/cancelled
+                List<Event> ongoing   = new ArrayList<>();
+                List<Event> approved  = new ArrayList<>();
+                List<Event> completed = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snap) {
                     String status = doc.getString("status");
-                    if ("draft".equals(status)) continue; // bỏ draft
+                    if (!"approved".equals(status) && !"ongoing".equals(status)
+                            && !"completed".equals(status)) continue;
                     Event e = FirestoreHelper.docToEvent(doc);
-                    if (e != null) allEvents.add(e);
+                    if (e == null) continue;
+                    if ("ongoing".equals(status))       ongoing.add(e);
+                    else if ("approved".equals(status)) approved.add(e);
+                    else                                completed.add(e);
                 }
+                allEvents.addAll(ongoing);
+                allEvents.addAll(approved);
+                allEvents.addAll(completed);
                 applyAllFilters();
             })
             .addOnFailureListener(e -> {
@@ -291,59 +321,111 @@ public class SearchFragment extends Fragment {
             });
     }
 
+    private void openEventDetail(String eventId) {
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
+                    .addToBackStack("search")
+                    .commit();
+        }
+    }
+
     // ── Áp dụng tất cả filter + cập nhật UI ───────────────────────────────────
     private void applyAllFilters() {
-        displayedEvents.clear();
+        filteredFullEvents.clear();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
+        // Bước 1: Lọc theo các bộ lọc không liên quan đến text (category, city, date, price)
+        java.util.List<Event> candidates = new java.util.ArrayList<>();
         for (Event e : allEvents) {
-            // 1. Text search (title hoặc thành phố)
-            if (!filterQuery.isEmpty()) {
-                String q = filterQuery.toLowerCase(Locale.ROOT);
-                boolean match = (e.getTitle() != null && e.getTitle().toLowerCase(Locale.ROOT).contains(q))
-                        || (e.getVenueCity() != null && e.getVenueCity().toLowerCase(Locale.ROOT).contains(q));
-                if (!match) continue;
-            }
-            // 2. Category từ chip ngang
+            // Category từ chip ngang
             if (!"all".equals(filterCategoryId)) {
                 String catKey = FirestoreHelper.CAT_MAP.getOrDefault(filterCategoryId, "");
                 if (!catKey.equals(e.getCategory())) continue;
             }
-            // 2b. Thể loại từ dialog (nếu có chọn → event phải khớp ít nhất 1 trong số được chọn)
+            // Thể loại từ dialog
             if (hasDialogCategoryFilter()) {
                 boolean matchAnyCat = false;
                 String eCat = e.getCategory() != null ? e.getCategory() : "";
-                // map eCat → index
                 String[] catKeys = {"music","arts","workshop","tour","sports","festival"};
                 for (int i = 0; i < filterDialogCategories.length; i++) {
                     if (filterDialogCategories[i] && catKeys[i].equals(eCat)) { matchAnyCat = true; break; }
                 }
                 if (!matchAnyCat) continue;
             }
-            // 3. Thành phố
+            // Thành phố
             if (!filterCity.isEmpty()) {
                 String city = e.getVenueCity() != null ? e.getVenueCity() : "";
-                if (!city.toLowerCase(Locale.ROOT).contains(filterCity.toLowerCase(Locale.ROOT))) continue;
+                if (!com.example.vibetix.Utils.VectorSearch.normalize(city)
+                        .contains(com.example.vibetix.Utils.VectorSearch.normalize(filterCity))) continue;
             }
-            // 4. Khoảng ngày
+            // Khoảng ngày
             if (filterDateStart != null && filterDateEnd != null && e.getDate() != null) {
                 try {
                     Date ed = sdf.parse(e.getDate());
                     if (ed != null && (ed.before(filterDateStart.getTime()) || ed.after(filterDateEnd.getTime()))) continue;
                 } catch (ParseException ignored) {}
             }
-            // 5. Miễn phí
+            // Miễn phí
             if (filterFreeOnly && e.getMinPrice() > 0) continue;
-            // 6. Khoảng giá
+            // Khoảng giá
             if (filterMaxPrice < Long.MAX_VALUE && e.getMinPrice() > filterMaxPrice) continue;
 
-            displayedEvents.add(e);
+            candidates.add(e);
         }
 
-        // Cập nhật UI
-        if (suggestedAdapter != null) suggestedAdapter.notifyDataSetChanged();
+        // Bước 2: Nếu có query → dùng VectorSearch xếp hạng theo mức độ liên quan
+        if (!filterQuery.isEmpty()) {
+            java.util.List<com.example.vibetix.Utils.VectorSearch.ScoredResult<Event>> scored =
+                    com.example.vibetix.Utils.VectorSearch.search(filterQuery, candidates,
+                            event -> new String[]{
+                                    event.getTitle(),
+                                    event.getVenueCity(),
+                                    event.getOrganizerName(),
+                                    event.getCategory()
+                            });
+            for (com.example.vibetix.Utils.VectorSearch.ScoredResult<Event> r : scored) {
+                filteredFullEvents.add(r.item);
+            }
+        } else {
+            filteredFullEvents.addAll(candidates);
+        }
+
+        currentPage = 1;
+        loadNextSearchPage();
         updateSearchModeUI();
         rebuildActiveFilterChips();
+    }
+
+    /** Cập nhật dropdown autocomplete top 5 gợi ý nhanh theo VectorSearch. */
+    private void updateAutoSuggest(String query) {
+        if (rvAutoSuggest == null || autoSuggestAdapter == null) return;
+        autoSuggestItems.clear();
+
+        if (query.isEmpty() || query.length() < 2) {
+            rvAutoSuggest.setVisibility(View.GONE);
+            autoSuggestAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        java.util.List<com.example.vibetix.Utils.VectorSearch.ScoredResult<Event>> scored =
+                com.example.vibetix.Utils.VectorSearch.search(query, allEvents,
+                        event -> new String[]{ event.getTitle(), event.getVenueCity() });
+
+        int limit = Math.min(5, scored.size());
+        for (int i = 0; i < limit; i++) {
+            Event e = scored.get(i).item;
+            autoSuggestItems.add(new String[]{ e.getTitle(), e.getId() });
+        }
+        autoSuggestAdapter.notifyDataSetChanged();
+        rvAutoSuggest.setVisibility(limit > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void loadNextSearchPage() {
+        int end = Math.min(currentPage * PAGE_SIZE, filteredFullEvents.size());
+        displayedEvents.clear();
+        displayedEvents.addAll(filteredFullEvents.subList(0, end));
+        if (suggestedAdapter != null) suggestedAdapter.notifyDataSetChanged();
     }
 
     /** Ẩn/hiện sections theo trạng thái search */
@@ -357,7 +439,7 @@ public class SearchFragment extends Fragment {
             sectionRecentSearch.setVisibility(View.GONE);
         if (txtSuggestionsTitle != null) {
             if (active) {
-                txtSuggestionsTitle.setText("Kết quả tìm kiếm (" + displayedEvents.size() + ")");
+                txtSuggestionsTitle.setText("Kết quả tìm kiếm (" + filteredFullEvents.size() + ")");
             } else {
                 txtSuggestionsTitle.setText("Gợi ý dành cho bạn");
                 loadRecentSearches(); // Hiện lại recent khi xóa hết filter
@@ -555,10 +637,42 @@ public class SearchFragment extends Fragment {
     // ── Suggested events ───────────────────────────────────────────────────────
     private void setupSuggestedRecycler() {
         suggestedAdapter = new EventAdapter(requireContext(), displayedEvents,
-                event -> Toast.makeText(requireContext(), event.getTitle(), Toast.LENGTH_SHORT).show(),
+                event -> openEventDetail(event.getId()),
                 R.layout.item_event_card_grid);
-        rvSuggested.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        GridLayoutManager glm = new GridLayoutManager(requireContext(), 2);
+        rvSuggested.setLayoutManager(glm);
         rvSuggested.setAdapter(suggestedAdapter);
+
+        // Autocomplete dropdown
+        if (rvAutoSuggest != null) {
+            autoSuggestAdapter = new com.example.vibetix.Adapters.AutoSuggestAdapter(autoSuggestItems, (title, eventId) -> {
+                etSearch.setText(title);
+                etSearch.setSelection(title.length());
+                rvAutoSuggest.setVisibility(View.GONE);
+                saveRecentSearch(title);
+                loadRecentSearches();
+            });
+            rvAutoSuggest.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rvAutoSuggest.setAdapter(autoSuggestAdapter);
+        }
+
+        rvSuggested.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    int visibleItemCount = glm.getChildCount();
+                    int totalItemCount = glm.getItemCount();
+                    int pastVisibleItems = glm.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount - 2) {
+                        if (displayedEvents.size() < filteredFullEvents.size()) {
+                            currentPage++;
+                            loadNextSearchPage();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // ── Recent searches ────────────────────────────────────────────────────────

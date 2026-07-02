@@ -1,6 +1,8 @@
 package com.example.vibetix.Utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
@@ -10,13 +12,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.vibetix.Activities.User.NotificationDetailActivity;
+import com.example.vibetix.Activities.User.NotificationsActivity;
 
 import com.example.vibetix.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -34,84 +37,76 @@ public class NotificationPopupHelper {
         public final String title;
         public final String message;
         public final String time;
+        public final long timestampMs;
         public boolean isUnread;
 
-        public NotifItem(String id, String title, String message, String time, boolean isUnread) {
-            this.id      = id;
-            this.title   = title;
-            this.message = message;
-            this.time    = time;
-            this.isUnread = isUnread;
+        public NotifItem(String id, String title, String message, String time, boolean isUnread, long timestampMs) {
+            this.id          = id;
+            this.title       = title;
+            this.message     = message;
+            this.time        = time;
+            this.isUnread    = isUnread;
+            this.timestampMs = timestampMs;
         }
     }
 
-    // ── Show popup — load Firestore trước, fallback mock ─────────────────────
+    // ── Show popup — load Firestore, không dùng mock khi đã login ───────────
     public static void show(Context context, View anchorView) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            // Chưa đăng nhập → dùng mock
-            showWithItems(context, anchorView, getMockNotifications());
+            showWithItems(context, anchorView, new ArrayList<>());
             return;
         }
 
-        // Load từ Firestore
+        // Không dùng orderBy để tránh cần composite index — sort trong memory
         FirebaseFirestore.getInstance()
             .collection("notifications")
             .whereEqualTo("user_id", user.getUid())
-            .orderBy("created_at", Query.Direction.DESCENDING)
-            .limit(10)
+            .limit(20)
             .get()
             .addOnSuccessListener(snapshot -> {
                 List<NotifItem> items = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : snapshot) {
-                    String id      = doc.getId();
-                    String title   = doc.getString("title");
-                    String message = doc.getString("message");
-                    Boolean unread = doc.getBoolean("is_read");
-                    boolean isUnread = unread == null || !unread;
+                    String id    = doc.getId();
+                    String title = doc.getString("title");
+                    // Firebase lưu nội dung ở field "body"
+                    String body  = doc.getString("body");
+                    if (body == null) body = doc.getString("message"); // fallback
+                    Boolean isReadField = doc.getBoolean("is_read");
+                    boolean isUnread = isReadField == null || !isReadField;
 
-                    // Format thời gian từ Timestamp
-                    String time = "Vừa xong";
-                    com.google.firebase.Timestamp ts = doc.getTimestamp("created_at");
-                    if (ts != null) {
-                        long diffMs = System.currentTimeMillis() - ts.toDate().getTime();
-                        long mins   = diffMs / 60000;
-                        if      (mins < 1)    time = "Vừa xong";
-                        else if (mins < 60)   time = mins + " phút trước";
-                        else if (mins < 1440) time = (mins/60) + " giờ trước";
-                        else                  time = (mins/1440) + " ngày trước";
+                    // Ưu tiên sent_at, fallback created_at
+                    com.google.firebase.Timestamp ts = doc.getTimestamp("sent_at");
+                    if (ts == null) ts = doc.getTimestamp("created_at");
+                    String time = formatRelativeTime(ts);
+
+                    if (title != null && !title.isEmpty()) {
+                        items.add(new NotifItem(id, title, body != null ? body : "", time, isUnread,
+                                ts != null ? ts.toDate().getTime() : 0L));
                     }
-
-                    if (title != null)
-                        items.add(new NotifItem(id, title, message != null ? message : "", time, isUnread));
                 }
 
-                // Nếu Firestore không có data → dùng mock để UI không trống
-                if (items.isEmpty()) items = getMockNotifications();
+                // Sort: unread trước, trong cùng nhóm thì mới nhất trước
+                items.sort((a, b) -> {
+                    if (a.isUnread != b.isUnread) return a.isUnread ? -1 : 1;
+                    return Long.compare(b.timestampMs, a.timestampMs);
+                });
+
+                // Giới hạn 10 hiển thị
+                if (items.size() > 10) items = items.subList(0, 10);
                 showWithItems(context, anchorView, items);
             })
-            .addOnFailureListener(e -> showWithItems(context, anchorView, getMockNotifications()));
+            .addOnFailureListener(e -> showWithItems(context, anchorView, new ArrayList<>()));
     }
 
-    // ── Mock fallback ──────────────────────────────────────────────────────────
-    private static List<NotifItem> getMockNotifications() {
-        List<NotifItem> list = new ArrayList<>();
-        list.add(new NotifItem("1", "🎉 Sự kiện mới: VinhVerse Concert",
-                "VinhVerse Concert vừa mở bán vé. Đặt ngay trước khi hết!",
-                "5 phút trước", true));
-        list.add(new NotifItem("2", "🎫 Vé đã được xác nhận",
-                "Vé của bạn cho Private Show in Fantasy đã được xác nhận thành công.",
-                "1 giờ trước", true));
-        list.add(new NotifItem("3", "💰 Ưu đãi hết hạn sau 24h",
-                "Giảm 30% vé nhóm từ 3 người. Đừng bỏ lỡ!",
-                "2 giờ trước", true));
-        list.add(new NotifItem("4", "📢 RISING FEST 2026 mở bán sớm",
-                "Vé Early Bird cho RISING FEST 2026 đã có. Số lượng có hạn.",
-                "1 ngày trước", false));
-        list.add(new NotifItem("5", "✅ Ban tổ chức đã được xác minh",
-                "VibeFest Production đã được xác minh. Bạn có thể tạo sự kiện ngay.",
-                "2 ngày trước", false));
-        return list;
+    private static String formatRelativeTime(com.google.firebase.Timestamp ts) {
+        if (ts == null) return "Vừa xong";
+        long diffMs = System.currentTimeMillis() - ts.toDate().getTime();
+        long mins = diffMs / 60000;
+        if (mins < 1)    return "Vừa xong";
+        if (mins < 60)   return mins + " phút trước";
+        if (mins < 1440) return (mins / 60) + " giờ trước";
+        return (mins / 1440) + " ngày trước";
     }
 
     // ── Build và hiển thị PopupWindow ─────────────────────────────────────────
@@ -119,9 +114,7 @@ public class NotificationPopupHelper {
         View popupView = LayoutInflater.from(context)
                 .inflate(R.layout.layout_notification_popup, null);
 
-        LinearLayout container = popupView.findViewById(R.id.containerNotifications);
-        for (NotifItem item : items) buildNotifRow(context, container, item);
-
+        // Tạo popup trước để có thể truyền vào buildNotifRow
         PopupWindow popup = new PopupWindow(
                 popupView,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -129,6 +122,20 @@ public class NotificationPopupHelper {
         popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popup.setElevation(16f);
         popup.setOutsideTouchable(true);
+
+        LinearLayout container = popupView.findViewById(R.id.containerNotifications);
+        if (items.isEmpty()) {
+            // Empty state
+            TextView empty = new TextView(context);
+            empty.setText("Bạn chưa có thông báo nào.");
+            empty.setTextColor(0xFF888888);
+            empty.setTextSize(14f);
+            empty.setPadding(48, 48, 48, 48);
+            empty.setGravity(android.view.Gravity.CENTER);
+            container.addView(empty);
+        } else {
+            for (NotifItem item : items) buildNotifRow(context, container, item, popup);
+        }
 
         int[] location = new int[2];
         anchorView.getLocationOnScreen(location);
@@ -138,40 +145,16 @@ public class NotificationPopupHelper {
         popup.showAtLocation(anchorView, Gravity.NO_GRAVITY,
                 location[0] + offsetX, location[1] + offsetY);
 
-        // Đánh dấu đã đọc tất cả
-        TextView btnMarkAll = popupView.findViewById(R.id.btnMarkAllRead);
-        if (btnMarkAll != null) {
-            btnMarkAll.setOnClickListener(v -> {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                for (int i = 0; i < container.getChildCount(); i++) {
-                    View dot = container.getChildAt(i).findViewById(R.id.dotUnread);
-                    if (dot != null) dot.setVisibility(View.INVISIBLE);
-                }
-                // Cập nhật Firestore
-                if (user != null) {
-                    for (NotifItem n : items) {
-                        if (n.isUnread) {
-                            FirebaseFirestore.getInstance()
-                                .collection("notifications")
-                                .document(n.id)
-                                .update("is_read", true);
-                        }
-                    }
-                }
-                Toast.makeText(context, "Đã đánh dấu tất cả là đã đọc", Toast.LENGTH_SHORT).show();
-            });
-        }
-
         TextView btnViewAll = popupView.findViewById(R.id.btnViewAllNotif);
         if (btnViewAll != null) {
             btnViewAll.setOnClickListener(v -> {
                 popup.dismiss();
-                Toast.makeText(context, "Tính năng đang phát triển 🔔", Toast.LENGTH_SHORT).show();
+                context.startActivity(new Intent(context, NotificationsActivity.class));
             });
         }
     }
 
-    private static void buildNotifRow(Context context, LinearLayout parent, NotifItem item) {
+    private static void buildNotifRow(Context context, LinearLayout parent, NotifItem item, PopupWindow popup) {
         View row = LayoutInflater.from(context).inflate(R.layout.item_notification, parent, false);
 
         TextView title   = row.findViewById(R.id.txtNotifTitle);
@@ -187,16 +170,30 @@ public class NotificationPopupHelper {
         if (item.isUnread) row.setBackgroundColor(0xFFF0F4FF);
 
         row.setOnClickListener(v -> {
-            item.isUnread = false;
-            if (dot != null) dot.setVisibility(View.INVISIBLE);
-            row.setBackgroundColor(Color.TRANSPARENT);
-            // Mark read trên Firestore
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null && item.id != null && !item.id.startsWith("1")) {
-                FirebaseFirestore.getInstance()
-                    .collection("notifications")
-                    .document(item.id)
-                    .update("is_read", true);
+            // Mark read
+            if (item.isUnread) {
+                item.isUnread = false;
+                if (dot != null) dot.setVisibility(View.INVISIBLE);
+                row.setBackgroundColor(Color.TRANSPARENT);
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null && item.id != null) {
+                    FirebaseFirestore.getInstance()
+                        .collection("notifications")
+                        .document(item.id)
+                        .update("is_read", true);
+                }
+            }
+            // Đóng popup và mở trang chi tiết
+            popup.dismiss();
+            Intent intent = new Intent(context, NotificationDetailActivity.class);
+            intent.putExtra("title", item.title);
+            intent.putExtra("body", item.message);
+            intent.putExtra("time", item.time);
+            if (context instanceof Activity) {
+                context.startActivity(intent);
+            } else {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
             }
         });
 

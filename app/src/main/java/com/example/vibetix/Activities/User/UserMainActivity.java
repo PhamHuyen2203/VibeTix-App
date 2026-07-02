@@ -1,9 +1,17 @@
 package com.example.vibetix.Activities.User;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -18,7 +26,9 @@ import com.example.vibetix.Fragments.User.HomeFragment;
 import com.example.vibetix.Fragments.User.MyTicketsFragment;
 import com.example.vibetix.Fragments.User.ProfileFragment;
 import com.example.vibetix.Fragments.User.SearchFragment;
+import com.example.vibetix.Fragments.User.SecurityFragment;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.Constants;
 
 public class UserMainActivity extends AppCompatActivity {
 
@@ -77,53 +87,57 @@ public class UserMainActivity extends AppCompatActivity {
     private void setupNavListeners() {
         tabHome   .setOnClickListener(v -> selectTab(R.id.tabHome));
         tabEvents .setOnClickListener(v -> selectTab(R.id.tabEvents));
-        tabCreate .setOnClickListener(v -> handleCreateTabClick());
-        tabTickets.setOnClickListener(v -> selectTab(R.id.tabTickets));
+        tabCreate .setOnClickListener(v -> openSubFragment(new OrganizerHubFragment()));
+        tabTickets.setOnClickListener(v -> handleTicketsTabClick());
         tabProfile.setOnClickListener(v -> selectTab(R.id.tabProfile));
     }
 
-    private void handleCreateTabClick() {
-        String currentUserId = null;
-        com.example.vibetix.Utils.SessionManager sessionManager = new com.example.vibetix.Utils.SessionManager(this);
-        if (sessionManager.getUserDetails() != null) {
-            currentUserId = sessionManager.getUserDetails().getUserId();
-        } else {
-            com.google.firebase.auth.FirebaseUser fbUser = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
-            currentUserId = fbUser != null ? fbUser.getUid() : null;
-        }
-
-        if (currentUserId == null) {
-            startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
-            return;
-        }
-
-        com.google.firebase.firestore.FirebaseFirestore.getInstance().collection(com.example.vibetix.Firebase.FirebaseCollections.EVENT_STAFF)
-                .whereEqualTo("user_id", currentUserId)
-                .limit(1)
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    if (snapshot != null && !snapshot.isEmpty()) {
-                        // Người dùng đã có role trong event_staff -> hiển thị danh sách các sự kiện của người dùng
-                        openSubFragment(new com.example.vibetix.Fragments.Organizer.MyEventsListFragment());
-                    } else {
-                        // Người dùng chưa có role -> hiển thị giao diện tạo sự kiện
-                        startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    // Mặc định cho phép tạo sự kiện nếu lỗi kiểm tra
-                    startActivity(new android.content.Intent(this, com.example.vibetix.Activities.Organizer.CreateEditEventActivity.class));
-                });
-    }
+    // Tag cho 4 tab chính — giữ instance để KHÔNG reload dữ liệu mỗi lần chuyển tab
+    private static final String TAG_HOME    = "tab_home";
+    private static final String TAG_EVENTS  = "tab_events";
+    private static final String TAG_TICKETS = "tab_tickets";
+    private static final String TAG_PROFILE = "tab_profile";
+    private static final String[] TAB_TAGS  = { TAG_HOME, TAG_EVENTS, TAG_TICKETS, TAG_PROFILE };
 
     public void selectTab(int tabId) {
         activeTabId = tabId;
         updateTabStyles();
 
-        if (tabId == R.id.tabHome)    openFragment(new HomeFragment());
-        else if (tabId == R.id.tabEvents)  openFragment(new EventsFragment());
-        else if (tabId == R.id.tabTickets) openFragment(new MyTicketsFragment());
-        else if (tabId == R.id.tabProfile) openFragment(new ProfileFragment());
+        // Đóng mọi màn chi tiết đang mở (back stack) trước khi chuyển tab
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+
+        if (tabId == R.id.tabHome)         showTab(TAG_HOME,    HomeFragment::new);
+        else if (tabId == R.id.tabEvents)  showTab(TAG_EVENTS,  EventsFragment::new);
+        else if (tabId == R.id.tabTickets) showTab(TAG_TICKETS, MyTicketsFragment::new);
+        else if (tabId == R.id.tabProfile) showTab(TAG_PROFILE, ProfileFragment::new);
+    }
+
+    /**
+     * Hiện tab theo tag, giữ instance cũ (show/hide) để tránh reload.
+     * Tự-phục-hồi: nếu fragment bị replace() ở luồng chi tiết xoá mất → tạo lại.
+     */
+    private void showTab(String tag, java.util.function.Supplier<Fragment> creator) {
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+        androidx.fragment.app.FragmentTransaction ft = fm.beginTransaction();
+
+        // Ẩn các tab khác đang được add
+        for (String t : TAB_TAGS) {
+            if (t.equals(tag)) continue;
+            Fragment other = fm.findFragmentByTag(t);
+            if (other != null && other.isAdded() && !other.isHidden()) ft.hide(other);
+        }
+
+        Fragment target = fm.findFragmentByTag(tag);
+        if (target == null) {
+            target = creator.get();
+            ft.add(R.id.frameContainerMain, target, tag);
+        } else {
+            ft.show(target);
+        }
+        ft.commit();
     }
 
     private void updateTabStyles() {
@@ -179,6 +193,120 @@ public class UserMainActivity extends AppCompatActivity {
 
     public void openEventsFragment() {
         selectTab(R.id.tabEvents);
+    }
+
+    public void openEventsFragmentWithFilter(String categoryKey, String cityKeyword) {
+        activeTabId = R.id.tabEvents;
+        updateTabStyles();
+        EventsFragment fragment = EventsFragment.newInstance(categoryKey, cityKeyword);
+        // Mở dạng sub (có back stack) để không phá vỡ instance tab được giữ lại
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContainerMain, fragment)
+                .addToBackStack("events_filter")
+                .commit();
+    }
+
+    // ── PIN gate cho tab Vé của tôi ──────────────────────────────────────────
+    private static final String KEY_PIN_HASH        = "user_pin_hash";
+    private static final String KEY_PIN_FOR_TICKETS = "pin_for_tickets";
+
+    private void handleTicketsTabClick() {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_PROFILE, Context.MODE_PRIVATE);
+        boolean pinEnabled = prefs.getBoolean(KEY_PIN_FOR_TICKETS, false);
+        String  pinHash    = prefs.getString(KEY_PIN_HASH, null);
+        if (pinHash == null) pinHash = prefs.getString("user_pin", null);
+
+        if (pinEnabled && pinHash != null && !pinHash.isEmpty()) {
+            showPinGateDialog(pinHash);
+        } else {
+            selectTab(R.id.tabTickets);
+        }
+    }
+
+    private void showPinGateDialog(String storedHash) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.layout_pin_dialog, null);
+
+        TextView txtTitle    = dialogView.findViewById(R.id.txtPinDialogTitle);
+        TextView txtSubtitle = dialogView.findViewById(R.id.txtPinDialogSubtitle);
+        TextView txtError    = dialogView.findViewById(R.id.txtPinError);
+        if (txtTitle    != null) txtTitle.setText("Nhập mã PIN");
+        if (txtSubtitle != null) txtSubtitle.setText("Nhập mã PIN 6 số để vào trang Vé của tôi");
+
+        EditText[] boxes = getPinBoxes(dialogView);
+        wireAutoAdvance(boxes);
+
+        // Nút "Quên mã PIN?" bên dưới dialog
+        TextView txtForgotLink = new TextView(this);
+        txtForgotLink.setText("Quên mã PIN? Vào Hồ sơ > Bảo mật để đặt lại");
+        txtForgotLink.setTextColor(0xFF2563EB);
+        txtForgotLink.setTextSize(12f);
+        txtForgotLink.setPadding(48, 0, 48, 32);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton("Xác nhận", null)
+                .setNegativeButton("Hủy", null)
+                .create();
+
+        dialog.setOnShowListener(di -> {
+            txtForgotLink.setOnClickListener(v -> {
+                dialog.dismiss();
+                // Điều hướng sang Profile → Security
+                selectTab(R.id.tabProfile);
+                Toast.makeText(this, "Vào Bảo mật & Mật khẩu để đặt lại PIN", Toast.LENGTH_LONG).show();
+            });
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String entered = collectPin(boxes);
+                if (entered.length() < 6) {
+                    if (txtError != null) { txtError.setText("Vui lòng nhập đủ 6 chữ số"); txtError.setVisibility(View.VISIBLE); }
+                    return;
+                }
+                if (SecurityFragment.sha256(entered).equals(storedHash)) {
+                    dialog.dismiss();
+                    selectTab(R.id.tabTickets);
+                } else {
+                    if (txtError != null) { txtError.setText("Mã PIN không đúng, vui lòng thử lại"); txtError.setVisibility(View.VISIBLE); }
+                    for (EditText b : boxes) if (b != null) b.setText("");
+                    if (boxes[0] != null) boxes[0].requestFocus();
+                }
+            });
+        });
+
+        dialog.show();
+        if (boxes[0] != null) boxes[0].requestFocus();
+    }
+
+    private EditText[] getPinBoxes(View v) {
+        return new EditText[]{
+            v.findViewById(R.id.pinBox1), v.findViewById(R.id.pinBox2),
+            v.findViewById(R.id.pinBox3), v.findViewById(R.id.pinBox4),
+            v.findViewById(R.id.pinBox5), v.findViewById(R.id.pinBox6)
+        };
+    }
+
+    private void wireAutoAdvance(EditText[] boxes) {
+        for (int i = 0; i < boxes.length; i++) {
+            if (boxes[i] == null) continue;
+            final int cur = i, next = i + 1;
+            boxes[i].addTextChangedListener(new android.text.TextWatcher() {
+                public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+                public void onTextChanged(CharSequence s, int a, int b, int c) {}
+                public void afterTextChanged(android.text.Editable s) {
+                    if (s.length() == 1 && next < boxes.length && boxes[next] != null)
+                        boxes[next].requestFocus();
+                    if (s.length() == 0 && cur > 0 && boxes[cur - 1] != null)
+                        boxes[cur - 1].requestFocus();
+                }
+            });
+        }
+    }
+
+    private String collectPin(EditText[] boxes) {
+        StringBuilder sb = new StringBuilder();
+        for (EditText b : boxes) if (b != null) sb.append(b.getText().toString().trim());
+        return sb.toString();
     }
 
     public void openSubFragment(Fragment fragment) {

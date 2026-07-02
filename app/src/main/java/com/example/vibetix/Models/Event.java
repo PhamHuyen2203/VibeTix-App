@@ -50,6 +50,7 @@ public class Event {
     private String organizerName;
     private int price;
     private String status;
+    private String seatmapUrl;
 
     public Event() {}
 
@@ -204,4 +205,9 @@ public class Event {
 
     @Exclude public String getUserRole() { return userRole; }
     @Exclude public void setUserRole(String role) { this.userRole = role; }
+
+    @PropertyName("seatmap_url")
+    public String getSeatmapUrl() { return seatmapUrl; }
+    @PropertyName("seatmap_url")
+    public void setSeatmapUrl(String url) { this.seatmapUrl = url; }
 }
