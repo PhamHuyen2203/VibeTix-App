@@ -164,6 +164,7 @@ public class StarDetailFragment extends Fragment {
     }
 
     private void fetchFromOrganizersCollection() {
+        isOrganizerProfile = true;
         FirebaseFirestore.getInstance().collection("organizers").document(starId).get()
                 .addOnSuccessListener(doc -> {
                     if (!isAdded() || doc == null || !doc.exists()) return;
@@ -173,17 +174,32 @@ public class StarDetailFragment extends Fragment {
                         txtStarStageName.setText(brandName);
                     }
                     String logoUrl = doc.getString("logo_url");
-                    if (logoUrl != null && !logoUrl.isEmpty() && imvStarAvatar != null) {
-                        Glide.with(requireContext()).load(logoUrl).circleCrop().into(imvStarAvatar);
-                    } else if (imvStarAvatar != null) {
-                        Glide.with(requireContext()).load(R.drawable.img_mascot_wave).circleCrop().into(imvStarAvatar);
+                    if (imvStarAvatar != null) {
+                        com.example.vibetix.Utils.ImageUtils.loadCircle(
+                                this, logoUrl, imvStarAvatar, R.drawable.img_mascot_wave);
                     }
                     String desc = doc.getString("description");
                     if (desc != null && !desc.isEmpty()) {
                         txtStarBio.setText(desc);
                     }
                     txtStarSubtitle.setText("Ban tổ chức chính thức");
+                    // Đếm follower thực từ user_star_follows
+                    loadOrganizerFollowerCount();
                     checkFollowStatus();
+                });
+    }
+
+    private void loadOrganizerFollowerCount() {
+        FirebaseFirestore.getInstance()
+                .collection(com.example.vibetix.Firebase.FirebaseCollections.USER_STAR_FOLLOWS)
+                .whereEqualTo("star_id", starId)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (!isAdded()) return;
+                    currentFollowerCount = snap != null ? snap.size() : 0;
+                    if (txtStarFollowers != null) {
+                        txtStarFollowers.setText(formatter.format(currentFollowerCount) + " người theo dõi");
+                    }
                 });
     }
 
@@ -314,17 +330,15 @@ public class StarDetailFragment extends Fragment {
     }
 
     private void openEventDetail(String eventId) {
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
-                    .addToBackStack("star_event_detail")
-                    .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(eventId));
         }
     }
 
     // ── Follow/Unfollow logic ─────────────────────────────────────────────────
 
     private int currentFollowerCount = 0;
+    private boolean isOrganizerProfile = false;
 
     /** Kiểm tra user đã follow star/organizer này chưa (gọi sau khi load profile) */
     private void checkFollowStatus() {
@@ -359,32 +373,29 @@ public class StarDetailFragment extends Fragment {
                 .collection(com.example.vibetix.Firebase.FirebaseCollections.USER_STAR_FOLLOWS)
                 .document(docId);
 
-        // Collection phù hợp: stars hoặc organizers
-        String collection = "stars";
-        // Try stars first; nếu không tồn tại thì organizers
-        com.google.firebase.firestore.DocumentReference profileDoc = FirebaseFirestore.getInstance()
-                .collection(collection).document(starId);
-
         if (isFollowing) {
-            // Tạo follow document
             java.util.Map<String, Object> data = new java.util.HashMap<>();
             data.put("user_id", user.getUid());
             data.put("star_id", starId);
             data.put("followed_at", com.google.firebase.Timestamp.now());
             followDoc.set(data);
-
-            // Increment follower_count
             currentFollowerCount++;
-            profileDoc.update("follower_count", com.google.firebase.firestore.FieldValue.increment(1));
+
+            // Chỉ increment follower_count trên stars collection (không phải organizer)
+            if (!isOrganizerProfile) {
+                FirebaseFirestore.getInstance().collection("stars").document(starId)
+                        .update("follower_count", com.google.firebase.firestore.FieldValue.increment(1));
+            }
 
             Toast.makeText(requireContext(), "Đã theo dõi!", Toast.LENGTH_SHORT).show();
         } else {
-            // Xóa follow document
             followDoc.delete();
-
-            // Decrement follower_count
             currentFollowerCount = Math.max(0, currentFollowerCount - 1);
-            profileDoc.update("follower_count", com.google.firebase.firestore.FieldValue.increment(-1));
+
+            if (!isOrganizerProfile) {
+                FirebaseFirestore.getInstance().collection("stars").document(starId)
+                        .update("follower_count", com.google.firebase.firestore.FieldValue.increment(-1));
+            }
         }
 
         // Cập nhật UI số follow

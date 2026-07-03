@@ -80,9 +80,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:ellipsize="end"
-                    android:maxLines="1"
+                    android:maxLines="2"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="12sp"
+                    tools:text="Đơn vị tổ chức sự kiện hàng đầu" />
+
+                <TextView
+                    android:id="@+id/tvOrgWebsiteSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/clr_primary_blue"
+                    android:textSize="11sp"
+                    android:visibility="gone"
                     tools:text="vibetix.vn" />
             </LinearLayout>
 
@@ -194,6 +206,47 @@
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
+        </LinearLayout>
+
+        <!-- Action buttons: Edit + Delete -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="12dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditOrg"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:insetBottom="0dp"
+                android:insetTop="0dp"
+                android:text="Chỉnh sửa"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/clr_primary_blue"
+                app:strokeWidth="1.5dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteOrg"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:insetBottom="0dp"
+                android:insetTop="0dp"
+                android:text="Xóa"
+                android:textAllCaps="false"
+                android:textColor="@color/clr_error"
+                android:textSize="13sp"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/clr_error"
+                app:strokeWidth="1.5dp" />
         </LinearLayout>
 
         <!-- Accent bar (bottom) -->

@@ -73,10 +73,8 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
             
             tvTicketType.setText(t.getTicketTypeName() != null ? t.getTicketTypeName() : "Vé mặc định");
             
-            String displayCode;
-            if (t.getTicketCode() != null && !t.getTicketCode().isEmpty()) {
-                displayCode = t.getTicketCode();
-            } else {
+            String displayCode = t.getDisplayCode();
+            if (displayCode == null || displayCode.isEmpty()) {
                 String id = t.getUserTicketId();
                 displayCode = (id != null && id.length() > 8) ? id.substring(0, 8).toUpperCase() : id;
             }

@@ -185,7 +185,7 @@ public class FirestoreHelper {
             else if (pMax instanceof Double) maxPrice = ((Double) pMax).longValue();
             
             e.setMaxPrice((double) maxPrice);
-            
+
             // Description
             e.setDescription(doc.getString("description"));
 
@@ -194,6 +194,26 @@ public class FirestoreHelper {
 
             Long interest = doc.getLong("interest_count");
             if (interest != null) e.setInterestCount(interest.intValue());
+
+            // start_time / end_time as Timestamp object (getStartTime() sẽ format ra String)
+            com.google.firebase.Timestamp startTs = doc.getTimestamp("start_time");
+            if (startTs != null) e.setStartTimeObject(startTs);
+            com.google.firebase.Timestamp endTsObj = doc.getTimestamp("end_time");
+            if (endTsObj != null) e.setEndTimeObject(endTsObj);
+
+            // Venue details
+            e.setVenueName(doc.getString("venue_name"));
+            e.setVenueAddress(doc.getString("venue_address"));
+            String venueCity2 = doc.getString("venue_city");
+            if (venueCity2 != null && !venueCity2.isEmpty()) e.setVenueCity(venueCity2);
+
+            // Hình thức tổ chức, link online, giới hạn độ tuổi
+            e.setEventType(doc.getString("event_type"));
+            e.setOnlineLink(doc.getString("online_link"));
+            e.setAgeRestriction(doc.getString("age_restriction"));
+
+            // Organizer
+            e.setOrganizerId(doc.getString("organizer_id"));
 
             return e;
         } catch (Exception ex) { return null; }

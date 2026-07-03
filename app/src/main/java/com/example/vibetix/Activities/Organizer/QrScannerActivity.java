@@ -170,8 +170,8 @@ public class QrScannerActivity extends AppCompatActivity {
                         com.example.vibetix.Models.UserTicket ticket = doc.toObject(com.example.vibetix.Models.UserTicket.class);
                         if (ticket != null) {
                             if (ticket.getUserTicketId() == null) ticket.setUserTicketId(doc.getId());
-                            // Dùng ticket_code làm key để tra cứu khi quét QR
-                            String key = ticket.getTicketCode();
+                            // Dùng display_code làm key để thống nhất với nhập thủ công
+                            String key = ticket.getDisplayCode();
                             if (key != null && !key.isEmpty()) {
                                 ticketsMap.put(key, ticket);
                             }
@@ -236,9 +236,9 @@ public class QrScannerActivity extends AppCompatActivity {
         isScanning = false;
         AlertDialog.Builder builder = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this);
         builder.setTitle("Nhập mã vé thủ công");
-        
+
         final EditText input = new EditText(this);
-        input.setHint("Nhập mã vé (VD: VTX-1234)");
+        input.setHint("Nhập mã hiển thị vé (display_code, VD: VTX-1234)");
         builder.setView(input);
         
         builder.setPositiveButton("Kiểm tra", (dialog, which) -> {
@@ -350,9 +350,9 @@ public class QrScannerActivity extends AppCompatActivity {
 
         tvInstruction.setText("Đang kiểm tra...");
         
-        // Dùng ticket_code thay vì document ID để an toàn hơn
+        // Dùng display_code để thống nhất với màn hình nhập thủ công
         db.collection("user_tickets")
-                .whereEqualTo("ticket_code", code)
+                .whereEqualTo("display_code", code)
                 .limit(1)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -434,6 +434,8 @@ public class QrScannerActivity extends AppCompatActivity {
         tvResultMessage.setText(msg);
         tvResultMessage.setTextColor(ContextCompat.getColor(this, R.color.clr_success));
         showResultPanel();
+        // D1: tự động tiếp tục quét sau 1.5 giây (không cần bấm nút)
+        new Handler(Looper.getMainLooper()).postDelayed(this::resumeScanning, 1500);
     }
     
     private void showScanError(String msg) {

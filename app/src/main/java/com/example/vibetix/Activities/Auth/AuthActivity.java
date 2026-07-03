@@ -11,8 +11,10 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import android.content.Context;
 import com.example.vibetix.Fragments.Auth.LoginFragment;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.LocaleHelper;
 
 /**
  * AuthActivity — container for LoginFragment and RegisterFragment.
@@ -25,6 +27,11 @@ import com.example.vibetix.R;
  *   UserMainActivity → [Đăng xuất]      → AuthActivity (clear back stack)
  */
 public class AuthActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

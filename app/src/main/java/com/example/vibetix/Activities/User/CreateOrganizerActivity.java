@@ -1,8 +1,8 @@
 package com.example.vibetix.Activities.User;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -14,29 +14,31 @@ import com.example.vibetix.Firebase.FirebaseCollections;
 import com.example.vibetix.Models.Organizer;
 import com.example.vibetix.R;
 import com.example.vibetix.databinding.ActivityCreateOrganizerBinding;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class CreateOrganizerActivity extends AppCompatActivity {
 
+    public static final String EXTRA_ORGANIZER_JSON = "extra_organizer_json";
+
     private ActivityCreateOrganizerBinding binding;
     private FirebaseFirestore db;
-    private FirebaseStorage storage;
     private String userId;
 
     private Uri logoUri = null;
-    private Uri licenseUri = null;
+    private byte[] logoBytes = null;
+    private boolean editMode = false;
+    private Organizer editOrganizer = null;
+    private String existingLogoUrl = null;
 
     private ActivityResultLauncher<String> logoPicker;
-    private ActivityResultLauncher<String> licensePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,15 +47,27 @@ public class CreateOrganizerActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         db = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
         userId = FirebaseAuth.getInstance().getUid();
 
+        String orgJson = getIntent().getStringExtra(EXTRA_ORGANIZER_JSON);
+        if (orgJson != null) {
+            editOrganizer = new Gson().fromJson(orgJson, Organizer.class);
+            editMode = true;
+        }
+
         setupToolbar();
-        setupPickers();
+        setupLogoPicker();
+        if (editMode) prefillFields();
 
         binding.btnSubmit.setOnClickListener(v -> validateAndSubmit());
         binding.ivLogo.setOnClickListener(v -> logoPicker.launch("image/*"));
-        binding.cardLicense.setOnClickListener(v -> licensePicker.launch("image/*"));
+        binding.btnRemoveLogo.setOnClickListener(v -> {
+            logoUri = null;
+            logoBytes = null;
+            existingLogoUrl = null;
+            binding.ivLogo.setImageResource(R.drawable.ic_organizer_placeholder);
+            binding.btnRemoveLogo.setVisibility(View.GONE);
+        });
     }
 
     private void setupToolbar() {
@@ -61,27 +75,42 @@ public class CreateOrganizerActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle(editMode ? "Chỉnh sửa hồ sơ BTC" : "Hồ sơ Ban tổ chức");
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
+        if (editMode) binding.btnSubmit.setText("Lưu thay đổi");
     }
 
-    private void setupPickers() {
+    private void prefillFields() {
+        Organizer org = editOrganizer;
+        binding.etBrandName.setText(org.getBrandName());
+        binding.etWebsite.setText(org.getWebsiteUrl());
+        binding.etDescription.setText(org.getDescription());
+        binding.cbIsDefault.setChecked(org.isDefault());
+
+        existingLogoUrl = org.getLogoUrl();
+        if (existingLogoUrl != null && !existingLogoUrl.isEmpty()) {
+            com.example.vibetix.Utils.ImageUtils.loadCircle(this, existingLogoUrl, binding.ivLogo,
+                    R.drawable.ic_organizer_placeholder);
+            binding.btnRemoveLogo.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setupLogoPicker() {
         logoPicker = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
                         logoUri = uri;
-                        Glide.with(this).load(uri).circleCrop().into(binding.ivLogo);
-                    }
-                }
-        );
-
-        licensePicker = registerForActivityResult(
-                new ActivityResultContracts.GetContent(),
-                uri -> {
-                    if (uri != null) {
-                        licenseUri = uri;
-                        Glide.with(this).load(uri).centerCrop().into(binding.ivLicense);
+                        // Compress ngay khi chọn: max 400×400, max 150 KB
+                        logoBytes = com.example.vibetix.Utils.ImageUtils.compressToJpeg(this, uri, 400, 150);
+                        // Preview từ bytes đã compress (hoặc URI nếu compress thất bại)
+                        if (logoBytes != null) {
+                            Glide.with(this).load(logoBytes).circleCrop().into(binding.ivLogo);
+                        } else {
+                            Glide.with(this).load(uri).circleCrop().into(binding.ivLogo);
+                        }
+                        binding.btnRemoveLogo.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -89,13 +118,12 @@ public class CreateOrganizerActivity extends AppCompatActivity {
 
     private void validateAndSubmit() {
         String brandName = binding.etBrandName.getText().toString().trim();
-        String email = binding.etContactEmail.getText().toString().trim();
-        String phone = binding.etContactPhone.getText().toString().trim();
         String website = binding.etWebsite.getText().toString().trim();
         String desc = binding.etDescription.getText().toString().trim();
 
-        if (brandName.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền các thông tin bắt buộc (*)", Toast.LENGTH_SHORT).show();
+        if (brandName.isEmpty()) {
+            binding.etBrandName.setError("Tên thương hiệu không được trống");
+            binding.etBrandName.requestFocus();
             return;
         }
 
@@ -105,49 +133,63 @@ public class CreateOrganizerActivity extends AppCompatActivity {
         }
 
         binding.btnSubmit.setEnabled(false);
-        binding.btnSubmit.setText("Đang tải lên...");
+        binding.btnSubmit.setText("Đang lưu...");
 
-        uploadImagesAndSave(brandName, email, phone, website, desc);
+        if (editMode) {
+            uploadLogoAndEdit(brandName, website, desc);
+        } else {
+            uploadLogoAndSave(brandName, website, desc);
+        }
     }
 
-    private void uploadImagesAndSave(String brandName, String email, String phone, String website, String desc) {
-        String organizerId = UUID.randomUUID().toString();
-        Organizer organizer = new Organizer(
-                organizerId, userId, brandName, "", desc, website, email, phone
-        );
-        organizer.setCreatedAt(String.valueOf(System.currentTimeMillis()));
-        organizer.setVerified(true);
-        organizer.setDefault(binding.cbIsDefault.isChecked());
+    private void uploadLogoAndEdit(String brandName, String website, String desc) {
+        // Logo: dùng Base64 mới nếu có, không thì giữ URL cũ
+        String finalLogoUrl = (logoBytes != null && logoBytes.length > 0)
+                ? com.example.vibetix.Utils.ImageUtils.toBase64(logoBytes)
+                : (existingLogoUrl != null ? existingLogoUrl : "");
 
-        Task<Uri> logoTask = (logoUri != null) ? uploadFile(logoUri, "logos") : Tasks.forResult(null);
-        Task<Uri> licenseTask = (licenseUri != null) ? uploadFile(licenseUri, "licenses") : Tasks.forResult(null);
+        Map<String, Object> data = new HashMap<>();
+        data.put("brand_name", brandName);
+        data.put("website_url", website);
+        data.put("description", desc);
+        data.put("logo_url", finalLogoUrl);
+        data.put("is_default", binding.cbIsDefault.isChecked());
 
-        Tasks.whenAllSuccess(logoTask, licenseTask)
-                .addOnSuccessListener(results -> {
-                    Uri logoUploadUri = (Uri) results.get(0);
-                    Uri licenseUploadUri = (Uri) results.get(1);
-
-                    if (logoUploadUri != null) organizer.setLogoUrl(logoUploadUri.toString());
-                    if (licenseUploadUri != null) organizer.setBusinessLicenseUrl(licenseUploadUri.toString());
-
-                    saveOrganizerToFirestore(organizer);
+        db.collection(FirebaseCollections.ORGANIZERS)
+                .document(editOrganizer.getOrganizerId())
+                .update(data)
+                .addOnSuccessListener(v -> {
+                    Toast.makeText(this, "Đã cập nhật hồ sơ BTC thành công.", Toast.LENGTH_LONG).show();
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     binding.btnSubmit.setEnabled(true);
-                    binding.btnSubmit.setText("Lưu Hồ Sơ");
-                    Toast.makeText(this, "Lỗi upload: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    binding.btnSubmit.setText("Lưu thay đổi");
+                    Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private Task<Uri> uploadFile(Uri fileUri, String folder) {
-        StorageReference ref = storage.getReference()
-                .child("organizers/" + userId + "/" + folder + "/" + UUID.randomUUID() + ".jpg");
-        return ref.putFile(fileUri).continueWithTask(task -> ref.getDownloadUrl());
+    private void uploadLogoAndSave(String brandName, String website, String desc) {
+        String logoBase64 = (logoBytes != null && logoBytes.length > 0)
+                ? com.example.vibetix.Utils.ImageUtils.toBase64(logoBytes) : "";
+
+        String organizerId = UUID.randomUUID().toString();
+        Map<String, Object> data = new HashMap<>();
+        data.put("organizer_id", organizerId);
+        data.put("user_id", userId);
+        data.put("brand_name", brandName);
+        data.put("website_url", website);
+        data.put("description", desc);
+        data.put("logo_url", logoBase64);
+        data.put("is_default", binding.cbIsDefault.isChecked());
+        data.put("is_verified", false);
+        data.put("created_at", com.google.firebase.firestore.FieldValue.serverTimestamp());
+
+        saveToFirestore(organizerId, data, binding.cbIsDefault.isChecked());
     }
 
-    private void saveOrganizerToFirestore(Organizer organizer) {
-        if (organizer.isDefault()) {
-            // Need to remove default flag from other organizers of this user
+    private void saveToFirestore(String organizerId, Map<String, Object> data, boolean isDefault) {
+        if (isDefault) {
             db.collection(FirebaseCollections.ORGANIZERS)
                     .whereEqualTo("user_id", userId)
                     .whereEqualTo("is_default", true)
@@ -157,25 +199,25 @@ public class CreateOrganizerActivity extends AppCompatActivity {
                         for (DocumentSnapshot doc : snapshot.getDocuments()) {
                             batch.update(doc.getReference(), "is_default", false);
                         }
-                        batch.set(db.collection(FirebaseCollections.ORGANIZERS).document(organizer.getOrganizerId()), organizer);
-                        batch.commit().addOnCompleteListener(task -> finishSuccess(task));
+                        batch.set(db.collection(FirebaseCollections.ORGANIZERS).document(organizerId), data);
+                        batch.commit().addOnCompleteListener(task -> finishSuccess(task.isSuccessful(), task.getException()));
                     });
         } else {
             db.collection(FirebaseCollections.ORGANIZERS)
-                    .document(organizer.getOrganizerId())
-                    .set(organizer)
-                    .addOnCompleteListener(task -> finishSuccess(task));
+                    .document(organizerId)
+                    .set(data)
+                    .addOnCompleteListener(task -> finishSuccess(task.isSuccessful(), task.getException()));
         }
     }
 
-    private void finishSuccess(Task<Void> task) {
-        if (task.isSuccessful()) {
+    private void finishSuccess(boolean success, Exception e) {
+        if (success) {
             Toast.makeText(this, "Lưu hồ sơ Ban tổ chức thành công.", Toast.LENGTH_LONG).show();
             finish();
         } else {
             binding.btnSubmit.setEnabled(true);
             binding.btnSubmit.setText("Lưu Hồ Sơ");
-            Toast.makeText(this, "Lỗi lưu dữ liệu: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi lưu dữ liệu: " + (e != null ? e.getMessage() : ""), Toast.LENGTH_SHORT).show();
         }
     }
 }

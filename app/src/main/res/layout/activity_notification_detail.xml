@@ -83,7 +83,24 @@
                     android:layout_marginTop="16dp"
                     android:textColor="#AAAAAA"
                     android:textSize="12sp" />
+
             </LinearLayout>
+
+            <!-- Nút hành động — chỉ hiện với loại thông báo có điều hướng -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNotifAction"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:text="Xem vé của tôi"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
+                app:backgroundTint="@color/clr_primary_blue"
+                app:cornerRadius="12dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto"/>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

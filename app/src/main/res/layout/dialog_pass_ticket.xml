@@ -72,51 +72,32 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Set Resale Price block -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Giá bạn muốn bán (VND) *"
-            android:textColor="@color/clr_text_black"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <RelativeLayout
+        <!-- Type selector — only shown when card has multiple distinct ticket types (B2) -->
+        <LinearLayout
+            android:id="@+id/layoutTypeSelector"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/bg_input_normal"
-            android:paddingHorizontal="16dp">
-
-            <EditText
-                android:id="@+id/etPassResalePrice"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:hint="Ví dụ: 350000"
-                android:inputType="number"
-                android:textColor="@color/clr_text_black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:text="VNĐ"
-                android:textColor="@color/clr_grey_1"
-                android:textSize="14sp" />
-        </RelativeLayout>
+                android:text="Chọn loại vé muốn bán *"
+                android:textColor="@color/clr_text_black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="💡 Gợi ý: Giá thấp hơn 10-20% sẽ giúp bán nhanh hơn."
-            android:textColor="@color/clr_primary_blue"
-            android:textSize="12sp" />
+            <LinearLayout
+                android:id="@+id/containerTypeRows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <!-- Giá bán được đặt theo từng loại vé trong type selector phía trên -->
 
         <!-- Message block (optional) -->
         <TextView

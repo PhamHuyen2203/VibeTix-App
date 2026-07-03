@@ -20,13 +20,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView rvNotifications;
     private TextView txtEmpty;
     private final List<NotificationPopupHelper.NotifItem> items = new ArrayList<>();
+    private final Map<String, String> notifTypeMap  = new HashMap<>(); // id → type
+    private final Map<String, String> notifRefIdMap = new HashMap<>(); // id → refId
     private NotifListAdapter adapter;
 
     @Override
@@ -58,6 +62,8 @@ public class NotificationsActivity extends AppCompatActivity {
             .get()
             .addOnSuccessListener(snap -> {
                 items.clear();
+                notifTypeMap.clear();
+                notifRefIdMap.clear();
                 for (QueryDocumentSnapshot doc : snap) {
                     String id    = doc.getId();
                     String title = doc.getString("title");
@@ -69,9 +75,14 @@ public class NotificationsActivity extends AppCompatActivity {
                     if (ts == null) ts = doc.getTimestamp("created_at");
                     String time = formatRelativeTime(ts);
                     long ms = ts != null ? ts.toDate().getTime() : 0L;
-                    if (title != null && !title.isEmpty())
+                    String type  = doc.getString("type");
+                    String refId = doc.getString("ref_id");
+                    if (title != null && !title.isEmpty()) {
                         items.add(new NotificationPopupHelper.NotifItem(id, title,
                                 body != null ? body : "", time, isUnread, ms));
+                        if (type  != null) notifTypeMap.put(id, type);
+                        if (refId != null) notifRefIdMap.put(id, refId);
+                    }
                 }
                 // Sort: unread first → mới nhất trước
                 items.sort((a, b) -> {
@@ -85,6 +96,7 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void onItemClick(NotificationPopupHelper.NotifItem item, int position) {
+        // C4: mark as read khi click
         if (item.isUnread) {
             item.isUnread = false;
             FirebaseFirestore.getInstance()
@@ -92,10 +104,14 @@ public class NotificationsActivity extends AppCompatActivity {
                 .update("is_read", true);
             adapter.notifyItemChanged(position);
         }
+
+        // Luôn mở trang chi tiết — nút điều hướng nằm trong detail page
         Intent intent = new Intent(this, NotificationDetailActivity.class);
         intent.putExtra("title", item.title);
         intent.putExtra("body", item.message);
         intent.putExtra("time", item.time);
+        intent.putExtra("type",  notifTypeMap.get(item.id));
+        intent.putExtra("refId", notifRefIdMap.get(item.id));
         startActivity(intent);
     }
 

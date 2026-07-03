@@ -47,7 +47,8 @@ public class ResaleTicketListAdapter extends RecyclerView.Adapter<ResaleTicketLi
     public void onBindViewHolder(@NonNull ListingVH h, int position) {
         TicketTransfer t = listings.get(position);
 
-        h.txtType.setText(t.getEventTitle() != null ? "Vé: " + t.getEventTitle() : "Vé bán lại");
+        String typeName = t.getTicketTypeName();
+        h.txtType.setText(typeName != null && !typeName.isEmpty() ? typeName : "Vé bán lại");
         h.txtMessage.setText(t.getMessage() != null && !t.getMessage().isEmpty()
                 ? t.getMessage() : "Không có lời nhắn");
         h.txtPrice.setText(t.getPrice() > 0 ? formatter.format(t.getPrice()) + " đ" : "Thương lượng");

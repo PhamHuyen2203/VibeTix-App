@@ -455,10 +455,9 @@ public class FillAttendeeInfoFragment extends Fragment {
             }
         }
 
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, paymentFrag)
-                .addToBackStack("booking")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(paymentFrag);
+        }
     }
 
     private void setFieldError(TextView et) {

@@ -14,6 +14,7 @@ import com.example.vibetix.Adapters.Organizer.StaffAdapter;
 import com.example.vibetix.Models.EventStaff;
 import com.example.vibetix.Models.User;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.NotificationTriggerManager;
 import com.example.vibetix.Utils.SessionManager;
 import com.example.vibetix.databinding.ActivityStaffManagementBinding;
 import com.example.vibetix.databinding.BottomSheetAddStaffBinding;
@@ -42,6 +43,7 @@ public class StaffManagementActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private SessionManager sessionManager;
     private String eventId;
+    private String eventTitle = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +113,8 @@ public class StaffManagementActivity extends AppCompatActivity {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         String name = doc.getString("title");
-                        binding.tvEventName.setText(name != null ? name : "Sự kiện");
+                        eventTitle = name != null ? name : "Sự kiện";
+                        binding.tvEventName.setText(eventTitle);
                     }
                 });
     }
@@ -257,7 +260,12 @@ public class StaffManagementActivity extends AppCompatActivity {
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(this, "Đã thêm nhân sự thành công", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
-                                    loadStaffList(); // Reload
+                                    loadStaffList();
+                                    // C2: Gửi notification cho nhân sự vừa được thêm
+                                    String roleName = role == EventStaff.Role.MANAGER
+                                            ? "Quản lý (Manager)" : "Soát vé (Check-in Staff)";
+                                    NotificationTriggerManager.triggerStaffAssigned(
+                                            targetUserId, eventId, eventTitle, roleName);
                                 })
                                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm nhân sự", Toast.LENGTH_SHORT).show());
 

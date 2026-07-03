@@ -29,8 +29,14 @@ import com.example.vibetix.Fragments.User.SearchFragment;
 import com.example.vibetix.Fragments.User.SecurityFragment;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.Constants;
+import com.example.vibetix.Utils.LocaleHelper;
 
 public class UserMainActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
 
     // Custom nav tabs
     private LinearLayout tabHome, tabEvents, tabCreate, tabTickets, tabProfile;
@@ -50,11 +56,42 @@ public class UserMainActivity extends AppCompatActivity {
         setupNavListeners();
 
         if (savedInstanceState == null) {
-            selectTab(R.id.tabHome);
+            // C1: Nếu được mở từ notification order_confirmed → mở thẳng tab Vé
+            String openTab = getIntent().getStringExtra("openTab");
+            if ("tickets".equals(openTab)) {
+                selectTab(R.id.tabTickets);
+            } else {
+                selectTab(R.id.tabHome);
+            }
+        }
+
+        // Cập nhật tabCurrentTop khi user nhấn Back để pop sub-fragment
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (currentTabTag == null) return;
+            androidx.fragment.app.FragmentManager fm2 = getSupportFragmentManager();
+            // Tìm fragment visible đầu tiên (topmost) thuộc tab hiện tại
+            String newTop = currentTabTag; // fallback = root
+            for (Fragment f : fm2.getFragments()) {
+                if (f != null && f.isAdded() && !f.isHidden()) {
+                    String t = f.getTag();
+                    if (t != null && t.startsWith(currentTabTag)) newTop = t;
+                }
+            }
+            tabCurrentTop.put(currentTabTag, newTop);
+        });
+    }
+
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String openTab = intent.getStringExtra("openTab");
+        if ("tickets".equals(openTab)) {
+            selectTab(R.id.tabTickets);
         }
     }
 
-    /** Chß+ë apply navigation bar bottom inset GÇö KH+öNG apply status bar top inset */
+    /** apply navigation bar bottom inset — KHÔNG apply status bar top inset */
     private void applyNavBarInset() {
         LinearLayout nav = findViewById(R.id.customBottomNav);
         if (nav == null) return;
@@ -99,45 +136,80 @@ public class UserMainActivity extends AppCompatActivity {
     private static final String TAG_PROFILE = "tab_profile";
     private static final String[] TAB_TAGS  = { TAG_HOME, TAG_EVENTS, TAG_TICKETS, TAG_PROFILE };
 
+    // Track fragment đang hiển thị (topmost) cho mỗi tab
+    private final java.util.Map<String, String> tabCurrentTop = new java.util.HashMap<>();
+    private String currentTabTag = null;
+
+    private String getActiveTabTag() {
+        if (activeTabId == R.id.tabHome)    return TAG_HOME;
+        if (activeTabId == R.id.tabEvents)  return TAG_EVENTS;
+        if (activeTabId == R.id.tabTickets) return TAG_TICKETS;
+        if (activeTabId == R.id.tabProfile) return TAG_PROFILE;
+        return TAG_HOME;
+    }
+
     public void selectTab(int tabId) {
         activeTabId = tabId;
         updateTabStyles();
-
-        // Đóng mọi màn chi tiết đang mở (back stack) trước khi chuyển tab
-        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
-
-        if (tabId == R.id.tabHome)         showTab(TAG_HOME,    HomeFragment::new);
-        else if (tabId == R.id.tabEvents)  showTab(TAG_EVENTS,  EventsFragment::new);
-        else if (tabId == R.id.tabTickets) showTab(TAG_TICKETS, MyTicketsFragment::new);
-        else if (tabId == R.id.tabProfile) showTab(TAG_PROFILE, ProfileFragment::new);
+        String newTabTag = getActiveTabTag();
+        if (newTabTag.equals(currentTabTag)) return;
+        switchToTab(newTabTag);
     }
 
-    /**
-     * Hiện tab theo tag, giữ instance cũ (show/hide) để tránh reload.
-     * Tự-phục-hồi: nếu fragment bị replace() ở luồng chi tiết xoá mất → tạo lại.
-     */
-    private void showTab(String tag, java.util.function.Supplier<Fragment> creator) {
+    /** Chuyển sang tab mới: ẩn tất cả fragment đang visible, hiện topmost của tab đích */
+    private void switchToTab(String newTabTag) {
         androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
         androidx.fragment.app.FragmentTransaction ft = fm.beginTransaction();
 
-        // Ẩn các tab khác đang được add
-        for (String t : TAB_TAGS) {
-            if (t.equals(tag)) continue;
-            Fragment other = fm.findFragmentByTag(t);
-            if (other != null && other.isAdded() && !other.isHidden()) ft.hide(other);
+        // Ẩn TẤT CẢ fragment đang hiển thị (bao gồm sub-fragment của tab cũ)
+        for (Fragment f : fm.getFragments()) {
+            if (f != null && f.isAdded() && !f.isHidden()) ft.hide(f);
         }
 
-        Fragment target = fm.findFragmentByTag(tag);
-        if (target == null) {
-            target = creator.get();
-            ft.add(R.id.frameContainerMain, target, tag);
+        // Hiện hoặc tạo mới topmost fragment của tab đích
+        String topTag = tabCurrentTop.get(newTabTag);
+        Fragment top  = topTag != null ? fm.findFragmentByTag(topTag) : null;
+        if (top == null || !top.isAdded()) {
+            Fragment root = createRootForTab(newTabTag);
+            ft.add(R.id.frameContainerMain, root, newTabTag);
+            tabCurrentTop.put(newTabTag, newTabTag);
         } else {
-            ft.show(target);
+            ft.show(top);
         }
-        ft.commit();
+
+        currentTabTag = newTabTag;
+        ft.commitAllowingStateLoss();
+    }
+
+    private Fragment createRootForTab(String tabTag) {
+        switch (tabTag) {
+            case TAG_EVENTS:  return new EventsFragment();
+            case TAG_TICKETS: return new MyTicketsFragment();
+            case TAG_PROFILE: return new ProfileFragment();
+            default:          return new HomeFragment();
+        }
+    }
+
+    // Legacy — no longer called but kept for compatibility with external callers
+    @Deprecated
+    private void showTab(String tag, java.util.function.Supplier<Fragment> creator) {
+        switchToTab(tag);
+    }
+
+    @Override
+    public void onBackPressed() {
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+        // Nếu có back stack entry cho tab hiện tại → pop để về sub-fragment trước đó
+        if (currentTabTag != null && fm.getBackStackEntryCount() > 0) {
+            androidx.fragment.app.FragmentManager.BackStackEntry top =
+                    fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1);
+            if (currentTabTag.equals(top.getName())) {
+                fm.popBackStack();
+                // tabCurrentTop được cập nhật qua BackStackChangedListener bên dưới
+                return;
+            }
+        }
+        super.onBackPressed();
     }
 
     private void updateTabStyles() {
@@ -177,18 +249,11 @@ public class UserMainActivity extends AppCompatActivity {
     // GöÇGöÇ Fragment navigation GöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇGöÇ
 
     private void openFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameContainerMain, fragment)
-                .commit();
+        openSubFragment(fragment);
     }
 
     public void openSearchFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameContainerMain, new SearchFragment())
-                .addToBackStack("search")
-                .commit();
+        openSubFragment(new SearchFragment());
     }
 
     public void openEventsFragment() {
@@ -198,13 +263,10 @@ public class UserMainActivity extends AppCompatActivity {
     public void openEventsFragmentWithFilter(String categoryKey, String cityKeyword) {
         activeTabId = R.id.tabEvents;
         updateTabStyles();
-        EventsFragment fragment = EventsFragment.newInstance(categoryKey, cityKeyword);
-        // Mở dạng sub (có back stack) để không phá vỡ instance tab được giữ lại
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameContainerMain, fragment)
-                .addToBackStack("events_filter")
-                .commit();
+        if (!TAG_EVENTS.equals(currentTabTag)) {
+            switchToTab(TAG_EVENTS);
+        }
+        openSubFragment(EventsFragment.newInstance(categoryKey, cityKeyword));
     }
 
     // ── PIN gate cho tab Vé của tôi ──────────────────────────────────────────
@@ -309,11 +371,25 @@ public class UserMainActivity extends AppCompatActivity {
         return sb.toString();
     }
 
+    /**
+     * Mở sub-fragment trong tab hiện tại: hide fragment đang visible, add fragment mới.
+     * Back stack dùng tên tab → pop đúng về fragment trước trong cùng tab.
+     */
     public void openSubFragment(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameContainerMain, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (currentTabTag == null) currentTabTag = TAG_HOME;
+        String newTag = currentTabTag + "_sub_" + System.currentTimeMillis();
+
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+        androidx.fragment.app.FragmentTransaction ft = fm.beginTransaction();
+
+        // Ẩn fragment đang hiển thị của tab này
+        String prevTopTag = tabCurrentTop.get(currentTabTag);
+        Fragment prevTop  = prevTopTag != null ? fm.findFragmentByTag(prevTopTag) : null;
+        if (prevTop != null && prevTop.isAdded() && !prevTop.isHidden()) ft.hide(prevTop);
+
+        ft.add(R.id.frameContainerMain, fragment, newTag);
+        ft.addToBackStack(currentTabTag); // tên = tabTag để onBackPressed biết tab nào
+        tabCurrentTop.put(currentTabTag, newTag);
+        ft.commitAllowingStateLoss();
     }
 }

@@ -10,12 +10,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,243 +42,343 @@ public class TicketRepository {
         eventsRef = db.collection(FirebaseCollections.EVENTS);
     }
 
-    /**
-     * Get active (upcoming) tickets for user — queries real schema:
-     * user_tickets WHERE user_id == userId AND status == "valid"
-     * Then joins with events collection to populate display fields.
-     */
+    // ── Public API ──────────────────────────────────────────────────────────────
+
+    /** Upcoming tab: valid + used-but-event-not-yet-ended */
     public void getActiveTickets(String userId, OnTicketsLoadedListener listener) {
         ticketsRef.whereEqualTo("user_id", userId)
-                .whereEqualTo("status", "valid")
+                .whereIn("status", Arrays.asList("valid", "used"))
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<RawUserTicket> rawTickets = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snap) {
-                        rawTickets.add(parseRawTicket(doc));
-                    }
-                    joinWithEvents(rawTickets, "ACTIVE", listener);
+                    for (QueryDocumentSnapshot doc : snap) rawTickets.add(parseRawTicket(doc));
+                    joinAndBuild(rawTickets, true, listener);
                 })
                 .addOnFailureListener(listener::onFailure);
     }
 
-    /**
-     * Get ended (used/expired) tickets for user — queries real schema:
-     * user_tickets WHERE user_id == userId AND status IN ["used", "expired"]
-     */
+    /** Ended tab: used (event ended) + expired */
     public void getEndedTickets(String userId, OnTicketsLoadedListener listener) {
         ticketsRef.whereEqualTo("user_id", userId)
-                .whereIn("status", List.of("used", "expired"))
+                .whereIn("status", Arrays.asList("used", "expired"))
                 .get()
                 .addOnSuccessListener(snap -> {
                     List<RawUserTicket> rawTickets = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snap) {
-                        rawTickets.add(parseRawTicket(doc));
-                    }
-                    joinWithEvents(rawTickets, null, listener);
+                    for (QueryDocumentSnapshot doc : snap) rawTickets.add(parseRawTicket(doc));
+                    joinAndBuild(rawTickets, false, listener);
                 })
                 .addOnFailureListener(listener::onFailure);
     }
 
-    /**
-     * Add a purchased ticket to Firestore (legacy — used by SimulatedPaymentFragment).
-     */
     public void saveTicket(Ticket ticket, OnTicketActionListener listener) {
         ticketsRef.document(ticket.getId())
                 .set(ticket)
-                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnSuccessListener(v -> listener.onSuccess())
                 .addOnFailureListener(listener::onFailure);
     }
 
-    // ── Internal helpers ────────────────────────────────────────────────────────
+    // ── Data model ──────────────────────────────────────────────────────────────
 
-    /** Lightweight struct for raw user_ticket doc fields */
     private static class RawUserTicket {
         String userTicketId;
         String eventId;
-        String orderItemId;
+        String orderItemId;   // null for legacy tickets
         String ticketCode;
         String displayCode;
         String status;
-        boolean isUsed;
         Timestamp issuedAt;
+        // Legacy fields (SimulatedPaymentFragment schema — Ticket model saved directly)
+        String legacyTypeName;
+        long   legacyPrice;
+        String legacyOrderId;
+        String legacyEventTitle;
+        String legacyEventDate;
+        String legacyEventLocation;
+        String legacyEventImageUrl;
     }
 
     private RawUserTicket parseRawTicket(QueryDocumentSnapshot doc) {
-        RawUserTicket raw = new RawUserTicket();
-        raw.userTicketId = doc.getString("user_ticket_id");
-        if (raw.userTicketId == null) raw.userTicketId = doc.getId();
-        raw.eventId = doc.getString("event_id");
-        raw.orderItemId = doc.getString("order_item_id");
-        raw.ticketCode = doc.getString("ticket_code");
-        raw.displayCode = doc.getString("display_code");
-        raw.status = doc.getString("status");
-        Boolean used = doc.getBoolean("is_used");
-        raw.isUsed = used != null && used;
-        raw.issuedAt = doc.getTimestamp("issued_at");
-        return raw;
+        RawUserTicket r = new RawUserTicket();
+        r.userTicketId = doc.getString("user_ticket_id");
+        if (r.userTicketId == null || r.userTicketId.isEmpty()) r.userTicketId = doc.getId();
+        r.eventId       = doc.getString("event_id");
+        r.orderItemId   = doc.getString("order_item_id");
+        r.ticketCode    = doc.getString("ticket_code");
+        r.displayCode   = doc.getString("display_code");
+        r.status        = doc.getString("status");
+        r.issuedAt      = doc.getTimestamp("issued_at");
+        // Legacy fields (present when SimulatedPaymentFragment saved a Ticket object)
+        r.legacyTypeName      = doc.getString("ticketTypeName");
+        Long lp = doc.getLong("purchasePrice");
+        r.legacyPrice         = lp != null ? lp : 0;
+        r.legacyOrderId       = doc.getString("orderId");
+        r.legacyEventTitle    = doc.getString("eventTitle");
+        r.legacyEventDate     = doc.getString("eventDate");
+        r.legacyEventLocation = doc.getString("eventLocation");
+        r.legacyEventImageUrl = doc.getString("eventImageUrl");
+        return r;
     }
 
-    /**
-     * Join raw user_tickets with events collection to build display Ticket objects.
-     * @param displayStatus override status for adapter (e.g. "ACTIVE"), or null to map from raw status.
-     */
-    private void joinWithEvents(List<RawUserTicket> rawTickets, String displayStatus, OnTicketsLoadedListener listener) {
-        if (rawTickets.isEmpty()) {
-            listener.onSuccess(new ArrayList<>());
-            return;
-        }
+    // ── Core join + build ───────────────────────────────────────────────────────
 
-        // Collect unique event_ids
-        Set<String> eventIds = new HashSet<>();
-        for (RawUserTicket raw : rawTickets) {
-            if (raw.eventId != null) eventIds.add(raw.eventId);
-        }
+    private void joinAndBuild(List<RawUserTicket> rawTickets, boolean isActiveTab,
+                               OnTicketsLoadedListener listener) {
+        if (rawTickets.isEmpty()) { listener.onSuccess(new ArrayList<>()); return; }
 
-        if (eventIds.isEmpty()) {
-            // No event_ids — return tickets without event info
-            List<Ticket> result = new ArrayList<>();
-            for (RawUserTicket raw : rawTickets) {
-                result.add(buildTicket(raw, null, displayStatus));
+        // Separate legacy (no order_item_id) vs new tickets
+        List<RawUserTicket> legacyList = new ArrayList<>();
+        List<RawUserTicket> newList    = new ArrayList<>();
+        Set<String> orderItemIds       = new HashSet<>();
+
+        for (RawUserTicket r : rawTickets) {
+            if (r.orderItemId == null || r.orderItemId.isEmpty()) {
+                legacyList.add(r);
+            } else {
+                newList.add(r);
+                orderItemIds.add(r.orderItemId);
             }
-            listener.onSuccess(result);
-            return;
         }
 
-        // Group tickets by event_id → 1 card per sự kiện (gộp mọi loại vé cùng event)
-        java.util.LinkedHashMap<String, List<RawUserTicket>> grouped = new java.util.LinkedHashMap<>();
-        for (RawUserTicket raw : rawTickets) {
-            String key = raw.eventId != null ? raw.eventId : raw.userTicketId;
-            grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(raw);
-        }
+        // Fetch order_items for new tickets to get order_id, type, price
+        fetchOrderItems(new ArrayList<>(orderItemIds), 0, new ArrayList<>(), allOi -> {
 
-        // Collect order_item_ids to fetch price + ticket_type info
-        Set<String> orderItemIds = new HashSet<>();
-        for (RawUserTicket raw : rawTickets) {
-            if (raw.orderItemId != null) orderItemIds.add(raw.orderItemId);
-        }
+            Map<String, String> oiToOrderId   = new HashMap<>();
+            Map<String, long[]> oiToPriceQty  = new HashMap<>();
+            Map<String, String> oiToTypeId    = new HashMap<>();
 
-        // Batch fetch events
-        List<String> eventIdList = new ArrayList<>(eventIds);
-        fetchEvents(eventIdList, 0, new HashMap<>(), eventMap -> {
-            // Fetch order_items for price + quantity per type
-            fetchOrderItems(new ArrayList<>(orderItemIds), 0, new ArrayList<>(), allOrderItems -> {
-                // Build order_item_id → {price, quantity, ticket_type_id, order_id} map
-                Map<String, long[]> oiMap = new HashMap<>(); // order_item_id → [price, qty]
-                Map<String, String> oiTypeMap = new HashMap<>(); // order_item_id → ticket_type_id
-                Map<String, String> oiOrderMap = new HashMap<>(); // order_item_id → order_id
-                for (Map<String, Object> oi : allOrderItems) {
-                    String oiId = (String) oi.get("order_item_id");
-                    Long price = (Long) oi.get("price_per_ticket");
-                    Long qty = (Long) oi.get("quantity");
-                    String typeId = (String) oi.get("ticket_type_id");
-                    String orderId = (String) oi.get("order_id");
-                    if (oiId != null) {
-                        oiMap.put(oiId, new long[]{price != null ? price : 0, qty != null ? qty : 1});
-                        if (typeId != null) oiTypeMap.put(oiId, typeId);
-                        if (orderId != null) oiOrderMap.put(oiId, orderId);
-                    }
-                }
+            for (Map<String, Object> oi : allOi) {
+                String oiId   = str(oi, "order_item_id");
+                String oId    = str(oi, "order_id");
+                Long price    = (Long) oi.get("price_per_ticket");
+                Long qty      = (Long) oi.get("quantity");
+                String typeId = str(oi, "ticket_type_id");
+                if (oiId == null || oiId.isEmpty()) continue;
+                if (oId != null && !oId.isEmpty()) oiToOrderId.put(oiId, oId);
+                oiToPriceQty.put(oiId, new long[]{price != null ? price : 0, qty != null ? qty : 1});
+                if (typeId != null && !typeId.isEmpty()) oiToTypeId.put(oiId, typeId);
+            }
 
-                // Fetch ticket_type names
-                Set<String> typeIds = new HashSet<>(oiTypeMap.values());
-                typeIds.remove("");
-                typeIds.remove(null);
-                fetchTicketTypeNames(new ArrayList<>(typeIds), 0, new HashMap<>(), typeNameMap -> {
-                    List<Ticket> result = new ArrayList<>();
-                    for (Map.Entry<String, List<RawUserTicket>> entry : grouped.entrySet()) {
-                        List<RawUserTicket> group = entry.getValue();
-                        RawUserTicket first = group.get(0);
-                        Event ev = first.eventId != null ? eventMap.get(first.eventId) : null;
+            // Group new tickets by (event_id + order_id)
+            LinkedHashMap<String, List<RawUserTicket>> grouped = new LinkedHashMap<>();
+            for (RawUserTicket r : newList) {
+                String orderId = oiToOrderId.get(r.orderItemId);
+                String key = (r.eventId != null ? r.eventId : "")
+                           + "_" + (orderId != null ? orderId : r.orderItemId);
+                grouped.computeIfAbsent(key, k -> new ArrayList<>()).add(r);
+            }
 
-                        Ticket ticket = buildTicket(first, ev, displayStatus);
+            // Collect all event IDs + ticket type IDs needed
+            Set<String> eventIds = new HashSet<>();
+            for (RawUserTicket r : rawTickets) if (r.eventId != null && !r.eventId.isEmpty()) eventIds.add(r.eventId);
+            Set<String> typeIds = new HashSet<>(oiToTypeId.values());
 
-                        // Build type name + total price từ order_items
-                        Set<String> seenOi = new HashSet<>();
-                        StringBuilder typeBuilder = new StringBuilder();
-                        StringBuilder breakdownBuilder = new StringBuilder();
-                        long totalPrice = 0;
-                        String realOrderId = null;
-                        for (RawUserTicket raw : group) {
-                            if (raw.orderItemId != null && !seenOi.contains(raw.orderItemId)) {
-                                seenOi.add(raw.orderItemId);
-                                long[] pq = oiMap.getOrDefault(raw.orderItemId, new long[]{0, 1});
-                                long price = pq[0];
-                                long qty = pq[1];
-                                totalPrice += price * qty;
+            // Collect all individual IDs for pending transfer check
+            List<String> allIds = new ArrayList<>();
+            for (RawUserTicket r : rawTickets) if (r.userTicketId != null) allIds.add(r.userTicketId);
 
-                                // Tên loại vé
-                                String typeId = oiTypeMap.get(raw.orderItemId);
-                                String tName = typeId != null ? typeNameMap.get(typeId) : null;
-                                if (tName == null) tName = "Vé";
-                                if (typeBuilder.length() > 0) typeBuilder.append(", ");
-                                typeBuilder.append(qty + "x ").append(tName);
+            fetchEvents(new ArrayList<>(eventIds), 0, new HashMap<>(), eventMap ->
+                fetchTicketTypeNames(new ArrayList<>(typeIds), 0, new HashMap<>(), new HashMap<>(),
+                        (typeNameMap, typeTransferMap) ->
+                    checkPendingTransfers(allIds, pendingIds -> {
 
-                                // Breakdown "qty:name:price"
-                                if (breakdownBuilder.length() > 0) breakdownBuilder.append("|");
-                                breakdownBuilder.append(qty).append(":").append(tName).append(":").append(price);
+                        Date now = new Date();
+                        List<Ticket> result = new ArrayList<>();
 
-                                // Lấy orderId thật từ order_item
-                                if (realOrderId == null) realOrderId = oiOrderMap.get(raw.orderItemId);
+                        // ── Process new (grouped) tickets ─────────────────────
+                        for (Map.Entry<String, List<RawUserTicket>> entry : grouped.entrySet()) {
+                            List<RawUserTicket> group = entry.getValue();
+                            RawUserTicket first = group.get(0);
+                            Event ev = first.eventId != null ? eventMap.get(first.eventId) : null;
+                            boolean eventEnded = isEventEnded(ev, now);
+                            String rawStatus   = first.status != null ? first.status.toLowerCase() : "valid";
+
+                            // A1: filter by tab + event endtime
+                            if (isActiveTab  && "used".equals(rawStatus) && eventEnded)  continue;
+                            if (!isActiveTab && "used".equals(rawStatus) && !eventEnded) continue;
+
+                            // Split by reselling status
+                            List<RawUserTicket> resellingGrp = new ArrayList<>();
+                            List<RawUserTicket> activeGrp    = new ArrayList<>();
+                            for (RawUserTicket r : group) {
+                                if (pendingIds.contains(r.userTicketId)) resellingGrp.add(r);
+                                else                                      activeGrp.add(r);
+                            }
+
+                            if (!resellingGrp.isEmpty()) {
+                                Ticket c = buildGroupCard(resellingGrp, ev, "RESELLING",
+                                        oiToOrderId, oiToPriceQty, oiToTypeId, typeNameMap, typeTransferMap);
+                                if (c != null) result.add(c);
+                            }
+                            if (!activeGrp.isEmpty()) {
+                                Ticket c = buildGroupCard(activeGrp, ev, mapRawStatus(rawStatus),
+                                        oiToOrderId, oiToPriceQty, oiToTypeId, typeNameMap, typeTransferMap);
+                                if (c != null) result.add(c);
                             }
                         }
-                        if (typeBuilder.length() == 0) typeBuilder.append("Vé");
-                        ticket.setTicketTypeName(typeBuilder.toString());
-                        ticket.setPurchasePrice(totalPrice); // tạm — sẽ override bằng order.total_amount
-                        ticket.setItemBreakdown(breakdownBuilder.toString());
-                        if (realOrderId != null) ticket.setOrderId(realOrderId);
 
-                        result.add(ticket);
-                    }
+                        // ── Process legacy tickets (1 ticket = 1 card) ────────
+                        for (RawUserTicket r : legacyList) {
+                            Event ev = r.eventId != null ? eventMap.get(r.eventId) : null;
+                            boolean eventEnded = isEventEnded(ev, now);
+                            String rawStatus = r.status != null ? r.status.toLowerCase() : "valid";
 
-                    // Fetch orders để lấy total_amount (đã trừ discount) → giá đúng trên card
-                    Set<String> orderIds = new HashSet<>();
-                    for (Ticket t : result) {
-                        if (t.getOrderId() != null) orderIds.add(t.getOrderId());
-                    }
-                    if (orderIds.isEmpty()) {
-                        finishSort(result, listener);
-                        return;
-                    }
-                    fetchOrderTotals(new ArrayList<>(orderIds), 0, new HashMap<>(), orderTotalMap -> {
-                        for (Ticket t : result) {
-                            Long paidAmount = orderTotalMap.get(t.getOrderId());
-                            if (paidAmount != null && paidAmount > 0) {
-                                t.setPurchasePrice(paidAmount);
-                            }
+                            if (isActiveTab  && "used".equals(rawStatus) && eventEnded)  continue;
+                            if (!isActiveTab && "used".equals(rawStatus) && !eventEnded) continue;
+
+                            boolean reselling  = pendingIds.contains(r.userTicketId);
+                            String displayStatus = reselling ? "RESELLING" : mapRawStatus(rawStatus);
+
+                            Ticket t = buildLegacyCard(r, ev, displayStatus);
+                            result.add(t);
                         }
+
                         finishSort(result, listener);
-                    });
-                });
-            });
+                    })
+                )
+            );
         });
     }
 
-    private Ticket buildTicket(RawUserTicket raw, Event ev, String displayStatus) {
-        Ticket ticket = new Ticket();
-        ticket.setId(raw.userTicketId);
-        ticket.setOrderId(raw.orderItemId);
-        ticket.setEventId(raw.eventId);
-        ticket.setTicketCode(raw.ticketCode);
-        ticket.setDisplayCode(raw.displayCode);
-        ticket.setIssuedAt(raw.issuedAt);
+    // ── Card builders ───────────────────────────────────────────────────────────
 
-        if (displayStatus != null) {
-            ticket.setStatus(displayStatus);
-        } else {
-            ticket.setStatus(mapRawStatus(raw.status));
-        }
+    /** Build a card from a group of new tickets (all from same order, same split bucket) */
+    private Ticket buildGroupCard(List<RawUserTicket> group, Event ev, String displayStatus,
+                                   Map<String, String> oiToOrderId,
+                                   Map<String, long[]> oiToPriceQty,
+                                   Map<String, String> oiToTypeId,
+                                   Map<String, String> typeNameMap,
+                                   Map<String, Boolean> typeTransferMap) {
+        if (group.isEmpty()) return null;
+        RawUserTicket first = group.get(0);
+
+        Ticket ticket = new Ticket();
+        ticket.setId(first.userTicketId);
+        ticket.setEventId(first.eventId);
+        ticket.setTicketCode(first.ticketCode);
+        ticket.setDisplayCode(first.displayCode);
+        ticket.setIssuedAt(first.issuedAt);
+        ticket.setStatus(displayStatus);
 
         if (ev != null) {
             ticket.setEventTitle(ev.getTitle());
             ticket.setEventDate(ev.getDate());
             ticket.setEventLocation(ev.getLocation() != null ? ev.getLocation() : ev.getVenueCity());
-            String imageUrl = ev.getPosterUrl() != null ? ev.getPosterUrl() : ev.getImageUrl();
-            ticket.setEventImageUrl(imageUrl);
-            ticket.setPurchasePrice(ev.getPrice());
+            ticket.setEventImageUrl(ev.getPosterUrl() != null ? ev.getPosterUrl() : ev.getImageUrl());
             ticket.setEventStatus(ev.getStatus());
+            Object et = ev.getEndTimeObject();
+            if (et instanceof Timestamp) ticket.setEventEndTime((Timestamp) et);
         }
 
+        // Build ticket type info and price from order_items
+        // Count per order_item_id within this sub-group
+        LinkedHashMap<String, Integer> oiCountMap = new LinkedHashMap<>();
+        for (RawUserTicket r : group) {
+            if (r.orderItemId != null && !r.orderItemId.isEmpty())
+                oiCountMap.merge(r.orderItemId, 1, Integer::sum);
+        }
+
+        StringBuilder typeBuilder      = new StringBuilder();
+        StringBuilder breakdownBuilder = new StringBuilder();
+        long totalPrice = 0;
+        String orderId  = null;
+
+        for (Map.Entry<String, Integer> e : oiCountMap.entrySet()) {
+            String oiId  = e.getKey();
+            int    count = e.getValue();
+            long[] pq    = oiToPriceQty.getOrDefault(oiId, new long[]{0, 1});
+            long   price = pq[0];
+            String typeId = oiToTypeId.get(oiId);
+            String tName  = typeId != null ? typeNameMap.get(typeId) : null;
+            if (tName == null || tName.isEmpty()) tName = "Vé";
+            totalPrice += price * count;
+            if (typeBuilder.length()      > 0) typeBuilder.append(", ");
+            if (breakdownBuilder.length() > 0) breakdownBuilder.append("|");
+            typeBuilder.append(count).append("x ").append(tName);
+            breakdownBuilder.append(count).append(":").append(tName).append(":").append(price);
+            if (orderId == null) orderId = oiToOrderId.get(oiId);
+        }
+
+        if (typeBuilder.length() == 0) typeBuilder.append("Vé");
+        ticket.setTicketTypeName(typeBuilder.toString());
+        ticket.setPurchasePrice(totalPrice);
+        // RESELLING card in "Vé đã mua" shows original purchase price of the tickets being sold
+        if ("RESELLING".equals(displayStatus)) ticket.setResalePrice(totalPrice);
+        ticket.setItemBreakdown(breakdownBuilder.toString());
+        if (orderId != null) ticket.setOrderId(orderId);
+
+        // Build parallel lists for ticket type selection (B2) — only transferable tickets
+        List<String> ids             = new ArrayList<>();
+        List<String> typeNames       = new ArrayList<>();
+        boolean anyTransferable      = false;
+        for (RawUserTicket r : group) {
+            String oiId   = r.orderItemId;
+            String typeId = oiId != null ? oiToTypeId.get(oiId) : null;
+            String tName  = typeId != null ? typeNameMap.get(typeId) : null;
+            if (tName == null || tName.isEmpty()) tName = "Vé";
+            Boolean isTransferable = typeId != null ? typeTransferMap.get(typeId) : null;
+            boolean canTransfer    = isTransferable == null || isTransferable; // default true if field missing
+            if (canTransfer) {
+                ids.add(r.userTicketId);
+                typeNames.add(tName);
+                anyTransferable = true;
+            }
+        }
+        ticket.setIndividualTicketIds(ids);
+        ticket.setIndividualTicketTypeNames(typeNames);
+        ticket.setTransferable(anyTransferable);
+
         return ticket;
+    }
+
+    /** Build a card from a single legacy ticket */
+    private Ticket buildLegacyCard(RawUserTicket r, Event ev, String displayStatus) {
+        Ticket ticket = new Ticket();
+        ticket.setId(r.userTicketId);
+        ticket.setEventId(r.eventId);
+        ticket.setOrderId(r.legacyOrderId);
+        ticket.setTicketCode(r.ticketCode);
+        ticket.setDisplayCode(r.displayCode);
+        ticket.setIssuedAt(r.issuedAt);
+        ticket.setStatus(displayStatus);
+
+        // Prefer Firebase event data; fall back to legacy denormalized fields
+        if (ev != null) {
+            ticket.setEventTitle(ev.getTitle());
+            ticket.setEventDate(ev.getDate());
+            ticket.setEventLocation(ev.getLocation() != null ? ev.getLocation() : ev.getVenueCity());
+            ticket.setEventImageUrl(ev.getPosterUrl() != null ? ev.getPosterUrl() : ev.getImageUrl());
+            ticket.setEventStatus(ev.getStatus());
+            Object et = ev.getEndTimeObject();
+            if (et instanceof Timestamp) ticket.setEventEndTime((Timestamp) et);
+        } else {
+            ticket.setEventTitle(r.legacyEventTitle);
+            ticket.setEventDate(r.legacyEventDate);
+            ticket.setEventLocation(r.legacyEventLocation);
+            ticket.setEventImageUrl(r.legacyEventImageUrl);
+        }
+
+        String typeName = r.legacyTypeName != null && !r.legacyTypeName.isEmpty() ? r.legacyTypeName : "Vé";
+        ticket.setTicketTypeName(typeName);
+        ticket.setPurchasePrice(r.legacyPrice);
+
+        List<String> ids       = new ArrayList<>();
+        List<String> typeNames = new ArrayList<>();
+        ids.add(r.userTicketId);
+        typeNames.add(typeName);
+        ticket.setIndividualTicketIds(ids);
+        ticket.setIndividualTicketTypeNames(typeNames);
+
+        return ticket;
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────────
+
+    private boolean isEventEnded(Event ev, Date now) {
+        if (ev == null) return false;
+        Object et = ev.getEndTimeObject();
+        if (et instanceof Timestamp) return ((Timestamp) et).toDate().before(now);
+        String st = ev.getStatus();
+        return "completed".equalsIgnoreCase(st) || "cancelled".equalsIgnoreCase(st);
     }
 
     private String mapRawStatus(String rawStatus) {
@@ -292,74 +393,9 @@ public class TicketRepository {
         }
     }
 
-    /** Fetch events by doc IDs using individual get() calls, batched 10 at a time */
-    private void fetchEvents(List<String> ids, int offset,
-                             Map<String, Event> accumulator,
-                             OnMapReady callback) {
-        if (offset >= ids.size()) {
-            callback.onReady(accumulator);
-            return;
-        }
-        int end = Math.min(offset + 10, ids.size());
-        List<String> batch = ids.subList(offset, end);
-
-        List<com.google.android.gms.tasks.Task<DocumentSnapshot>> tasks = new ArrayList<>();
-        for (String id : batch) {
-            tasks.add(eventsRef.document(id).get());
-        }
-
-        com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks)
-                .addOnSuccessListener(results -> {
-                    for (Object obj : results) {
-                        DocumentSnapshot doc = (DocumentSnapshot) obj;
-                        if (doc.exists()) {
-                            Event ev = FirestoreHelper.docToEvent(doc);
-                            if (ev != null) {
-                                if (ev.getEventId() == null) ev.setEventId(doc.getId());
-                                accumulator.put(doc.getId(), ev);
-                            }
-                        }
-                    }
-                    fetchEvents(ids, end, accumulator, callback);
-                })
-                .addOnFailureListener(e -> callback.onReady(accumulator));
-    }
-
-    private interface OnMapReady {
-        void onReady(Map<String, Event> map);
-    }
-
-    private interface OnOrderItemsReady {
-        void onReady(List<Map<String, Object>> items);
-    }
-
-    /** Fetch full order_items by order_item_id (batch 30) */
-    private void fetchOrderItems(List<String> ids, int offset,
-                                 List<Map<String, Object>> acc, OnOrderItemsReady callback) {
-        if (ids.isEmpty() || offset >= ids.size()) { callback.onReady(acc); return; }
-        int end = Math.min(offset + 30, ids.size());
-        List<String> batch = ids.subList(offset, end);
-
-        db.collection(FirebaseCollections.ORDER_ITEMS)
-                .whereIn("order_item_id", batch)
-                .get()
-                .addOnSuccessListener(snap -> {
-                    for (DocumentSnapshot doc : snap.getDocuments()) {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("order_item_id", doc.getString("order_item_id"));
-                        item.put("order_id", doc.getString("order_id"));
-                        item.put("price_per_ticket", doc.getLong("price_per_ticket"));
-                        item.put("quantity", doc.getLong("quantity"));
-                        item.put("ticket_type_id", doc.getString("ticket_type_id"));
-                        acc.add(item);
-                    }
-                    fetchOrderItems(ids, end, acc, callback);
-                })
-                .addOnFailureListener(e -> callback.onReady(acc));
-    }
-
-    private interface OnNameMapReady {
-        void onReady(Map<String, String> map);
+    private static String str(Map<String, Object> map, String key) {
+        Object v = map.get(key);
+        return v instanceof String ? (String) v : null;
     }
 
     private void finishSort(List<Ticket> result, OnTicketsLoadedListener listener) {
@@ -372,47 +408,75 @@ public class TicketRepository {
         listener.onSuccess(result);
     }
 
-    private interface OnLongMapReady {
-        void onReady(Map<String, Long> map);
+    // ── Firebase fetchers ────────────────────────────────────────────────────────
+
+    private interface OnOrderItemsReady { void onReady(List<Map<String, Object>> items); }
+    private interface OnMapReady        { void onReady(Map<String, Event> map); }
+    private interface OnNameMapReady    { void onReady(Map<String, String> nameMap, Map<String, Boolean> transferMap); }
+    private interface OnSetReady        { void onReady(Set<String> set); }
+
+    private void fetchOrderItems(List<String> ids, int offset,
+                                  List<Map<String, Object>> acc, OnOrderItemsReady cb) {
+        if (ids.isEmpty() || offset >= ids.size()) { cb.onReady(acc); return; }
+        int end = Math.min(offset + 30, ids.size());
+        List<String> batch = new ArrayList<>();
+        for (String id : ids.subList(offset, end)) if (id != null && !id.isEmpty()) batch.add(id);
+        if (batch.isEmpty()) { fetchOrderItems(ids, end, acc, cb); return; }
+
+        db.collection(FirebaseCollections.ORDER_ITEMS)
+                .whereIn("order_item_id", batch)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("order_item_id",   doc.getString("order_item_id"));
+                        item.put("order_id",        doc.getString("order_id"));
+                        item.put("price_per_ticket",doc.getLong("price_per_ticket"));
+                        item.put("quantity",        doc.getLong("quantity"));
+                        item.put("ticket_type_id",  doc.getString("ticket_type_id"));
+                        acc.add(item);
+                    }
+                    fetchOrderItems(ids, end, acc, cb);
+                })
+                .addOnFailureListener(e -> cb.onReady(acc));
     }
 
-    /** Fetch orders by order_id (batch 10) → map order_id → total_amount */
-    private void fetchOrderTotals(List<String> ids, int offset,
-                                  Map<String, Long> acc, OnLongMapReady callback) {
-        if (ids.isEmpty() || offset >= ids.size()) { callback.onReady(acc); return; }
+    private void fetchEvents(List<String> ids, int offset,
+                              Map<String, Event> acc, OnMapReady cb) {
+        if (ids.isEmpty() || offset >= ids.size()) { cb.onReady(acc); return; }
         int end = Math.min(offset + 10, ids.size());
-        List<String> batch = ids.subList(offset, end);
-
         List<com.google.android.gms.tasks.Task<DocumentSnapshot>> tasks = new ArrayList<>();
-        for (String id : batch) {
-            tasks.add(db.collection(FirebaseCollections.ORDERS).document(id).get());
-        }
+        for (String id : ids.subList(offset, end))
+            if (id != null && !id.isEmpty()) tasks.add(eventsRef.document(id).get());
+        if (tasks.isEmpty()) { fetchEvents(ids, end, acc, cb); return; }
 
         com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks)
                 .addOnSuccessListener(results -> {
                     for (Object obj : results) {
                         DocumentSnapshot doc = (DocumentSnapshot) obj;
                         if (doc.exists()) {
-                            Long total = doc.getLong("total_amount");
-                            if (total != null) acc.put(doc.getId(), total);
+                            Event ev = FirestoreHelper.docToEvent(doc);
+                            if (ev != null) {
+                                if (ev.getEventId() == null) ev.setEventId(doc.getId());
+                                acc.put(doc.getId(), ev);
+                            }
                         }
                     }
-                    fetchOrderTotals(ids, end, acc, callback);
+                    fetchEvents(ids, end, acc, cb);
                 })
-                .addOnFailureListener(e -> callback.onReady(acc));
+                .addOnFailureListener(e -> cb.onReady(acc));
     }
 
-    /** Fetch ticket type names by ticket_type_id (batch 10) */
     private void fetchTicketTypeNames(List<String> ids, int offset,
-                                      Map<String, String> acc, OnNameMapReady callback) {
-        if (ids.isEmpty() || offset >= ids.size()) { callback.onReady(acc); return; }
+                                       Map<String, String> nameAcc, Map<String, Boolean> transferAcc,
+                                       OnNameMapReady cb) {
+        if (ids.isEmpty() || offset >= ids.size()) { cb.onReady(nameAcc, transferAcc); return; }
         int end = Math.min(offset + 10, ids.size());
-        List<String> batch = ids.subList(offset, end);
-
         List<com.google.android.gms.tasks.Task<DocumentSnapshot>> tasks = new ArrayList<>();
-        for (String id : batch) {
-            tasks.add(db.collection(FirebaseCollections.TICKET_TYPES).document(id).get());
-        }
+        for (String id : ids.subList(offset, end))
+            if (id != null && !id.isEmpty())
+                tasks.add(db.collection(FirebaseCollections.TICKET_TYPES).document(id).get());
+        if (tasks.isEmpty()) { fetchTicketTypeNames(ids, end, nameAcc, transferAcc, cb); return; }
 
         com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks)
                 .addOnSuccessListener(results -> {
@@ -420,11 +484,45 @@ public class TicketRepository {
                         DocumentSnapshot doc = (DocumentSnapshot) obj;
                         if (doc.exists()) {
                             String name = doc.getString("name");
-                            if (name != null) acc.put(doc.getId(), name);
+                            if (name != null) nameAcc.put(doc.getId(), name);
+                            Boolean isTransferable = doc.getBoolean("is_transferable");
+                            transferAcc.put(doc.getId(), isTransferable != null && isTransferable);
                         }
                     }
-                    fetchTicketTypeNames(ids, end, acc, callback);
+                    fetchTicketTypeNames(ids, end, nameAcc, transferAcc, cb);
                 })
-                .addOnFailureListener(e -> callback.onReady(acc));
+                .addOnFailureListener(e -> cb.onReady(nameAcc, transferAcc));
+    }
+
+    private void checkPendingTransfers(List<String> ticketIds, OnSetReady cb) {
+        if (ticketIds.isEmpty()) { cb.onReady(new HashSet<>()); return; }
+        String currentUid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null
+                ? com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+        checkPendingBatch(ticketIds, 0, new HashSet<>(), currentUid, cb);
+    }
+
+    private void checkPendingBatch(List<String> ids, int offset, Set<String> acc,
+                                    String senderUid, OnSetReady cb) {
+        if (offset >= ids.size()) { cb.onReady(acc); return; }
+        int end = Math.min(offset + 30, ids.size());
+        List<String> batch = new ArrayList<>();
+        for (String id : ids.subList(offset, end)) if (id != null && !id.isEmpty()) batch.add(id);
+        if (batch.isEmpty()) { checkPendingBatch(ids, end, acc, senderUid, cb); return; }
+
+        com.google.firebase.firestore.Query q = db.collection(FirebaseCollections.TICKET_TRANSFERS)
+                .whereIn("user_ticket_id", batch)
+                .whereEqualTo("status", "pending");
+        // Filter by sender to avoid false positives from other users' transfers
+        if (senderUid != null && !senderUid.isEmpty()) q = q.whereEqualTo("sender_id", senderUid);
+
+        q.get()
+                .addOnSuccessListener(snap -> {
+                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                        String utId = doc.getString("user_ticket_id");
+                        if (utId != null) acc.add(utId);
+                    }
+                    checkPendingBatch(ids, end, acc, senderUid, cb);
+                })
+                .addOnFailureListener(e -> cb.onReady(acc));
     }
 }

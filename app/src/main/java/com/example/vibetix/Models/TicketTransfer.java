@@ -32,7 +32,8 @@ public class TicketTransfer implements Serializable {
     private String eventImageUrl;
     private String eventLocation;
     private String eventId;
-    private String eventStatus; // transient — set sau khi join, không lưu Firestore
+    private String eventStatus;    // transient — set sau khi join, không lưu Firestore
+    private String ticketTypeName; // transient — tên loại vé, join từ ticket_types
 
     public TicketTransfer() {}
 
@@ -134,4 +135,9 @@ public class TicketTransfer implements Serializable {
     public String getEventStatus() { return eventStatus; }
     @com.google.firebase.firestore.Exclude
     public void setEventStatus(String eventStatus) { this.eventStatus = eventStatus; }
+
+    @com.google.firebase.firestore.Exclude
+    public String getTicketTypeName() { return ticketTypeName; }
+    @com.google.firebase.firestore.Exclude
+    public void setTicketTypeName(String ticketTypeName) { this.ticketTypeName = ticketTypeName; }
 }

@@ -3,7 +3,10 @@ package com.example.vibetix.Fragments.User;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +43,7 @@ import java.util.List;
 public class ProfileFragment extends Fragment {
 
     // Header
+    private android.widget.ImageView imgAvatar;
     private TextView txtProfileName, txtProfileEmail, txtMemberSince;
     private TextView txtEventsInterested, txtFollowingCount;
     private LinearLayout layoutStatFavorites, layoutStatFollowing;
@@ -89,10 +93,12 @@ public class ProfileFragment extends Fragment {
         loadUserInfo();
         loadProfileStats();
         loadOrganizerBadge();
+        syncNotificationSwitch(); // C3: cập nhật lại sau khi về từ Settings
     }
 
     // ── View binding ───────────────────────────────────────────────────────────
     private void bindViews(View v) {
+        imgAvatar           = v.findViewById(R.id.imgAvatar);
         txtProfileName      = v.findViewById(R.id.txtProfileName);
         txtProfileEmail     = v.findViewById(R.id.txtProfileEmail);
         txtMemberSince      = v.findViewById(R.id.txtMemberSince);
@@ -129,11 +135,17 @@ public class ProfileFragment extends Fragment {
     // ── Data loading ───────────────────────────────────────────────────────────
     private void loadUserInfo() {
         // Hiển thị cache trước (UI phản hồi ngay)
-        String cachedName  = authPrefs.getString(Constants.KEY_USER_NAME,  "");
-        String cachedEmail = authPrefs.getString(Constants.KEY_USER_EMAIL, "");
+        String cachedName   = authPrefs.getString(Constants.KEY_USER_NAME,   "");
+        String cachedEmail  = authPrefs.getString(Constants.KEY_USER_EMAIL,  "");
+        String cachedAvatar = authPrefs.getString(Constants.KEY_USER_AVATAR, "");
         if (txtProfileName  != null) txtProfileName.setText(cachedName.isEmpty() ? "Người dùng VibeTix" : cachedName);
         if (txtProfileEmail != null && !cachedEmail.isEmpty()) txtProfileEmail.setText(cachedEmail);
         if (txtMemberSince  != null) txtMemberSince.setText("Thành viên từ 2024");
+        // Avatar từ cache
+        if (imgAvatar != null) {
+            com.example.vibetix.Utils.ImageUtils.loadCircle(
+                    this, cachedAvatar, imgAvatar, R.drawable.img_mascot_normal);
+        }
 
         // Đồng thời fetch từ Firestore để cập nhật dữ liệu mới nhất
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -145,26 +157,33 @@ public class ProfileFragment extends Fragment {
             .get()
             .addOnSuccessListener(doc -> {
                 if (!isAdded() || doc == null) return;
-                String name  = doc.getString("full_name");
-                String email = doc.getString("email");
+                String name   = doc.getString("full_name");
+                String email  = doc.getString("email");
+                String avatar = doc.getString("avatar_url");
                 if (name  == null) name  = "";
                 if (email == null) email = user.getEmail() != null ? user.getEmail() : "";
 
                 // Cập nhật cache
                 authPrefs.edit()
-                    .putString(Constants.KEY_USER_NAME,  name)
-                    .putString(Constants.KEY_USER_EMAIL, email)
+                    .putString(Constants.KEY_USER_NAME,   name)
+                    .putString(Constants.KEY_USER_EMAIL,  email)
+                    .putString(Constants.KEY_USER_AVATAR, avatar != null ? avatar : "")
                     .apply();
 
                 // Cập nhật UI
-                final String finalName  = name;
-                final String finalEmail = email;
+                final String finalName   = name;
+                final String finalEmail  = email;
+                final String finalAvatar = avatar;
                 if (txtProfileName  != null) txtProfileName.setText(finalName.isEmpty() ? "Người dùng VibeTix" : finalName);
                 if (txtProfileEmail != null) txtProfileEmail.setText(finalEmail);
+                if (imgAvatar != null) {
+                    com.example.vibetix.Utils.ImageUtils.loadCircle(
+                            this, finalAvatar, imgAvatar, R.drawable.img_mascot_normal);
+                }
             });
     }
 
-    private void loadProfileStats() {
+    void loadProfileStats() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
         String uid = user.getUid();
@@ -201,10 +220,7 @@ public class ProfileFragment extends Fragment {
             txtOrgBadge.setTextColor(0xFFE6B93E);
             txtOrgBadge.setBackgroundResource(R.drawable.bg_status_pending);
         } else if (org.isApproved()) {
-            txtOrgBadge.setVisibility(View.VISIBLE);
-            txtOrgBadge.setText("✓ Xác minh");
-            txtOrgBadge.setTextColor(0xFF27AE60);
-            txtOrgBadge.setBackgroundResource(R.drawable.bg_status_approved);
+            txtOrgBadge.setVisibility(View.GONE); // F4: không hiển thị badge "xác minh" khi chọn BTC
         } else {
             txtOrgBadge.setVisibility(View.GONE);
         }
@@ -268,16 +284,61 @@ public class ProfileFragment extends Fragment {
         // Đăng xuất
         if (btnLogout != null)
             btnLogout.setOnClickListener(v -> performLogout());
+
+        // C3: Toggle thông báo — sync với quyền thông báo của thiết bị
+        if (switchNotifications != null) {
+            syncNotificationSwitch();
+            switchNotifications.setOnCheckedChangeListener((btn, isChecked) -> {
+                // Mở cài đặt thông báo của app để user tự bật/tắt
+                Intent intent = new Intent();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+                } else {
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
+                }
+                startActivity(intent);
+                // Revert switch — sẽ sync lại khi onResume
+                btn.setOnCheckedChangeListener(null);
+                btn.setChecked(!isChecked);
+                btn.setOnCheckedChangeListener((b2, checked) -> {
+                    Intent i2 = new Intent();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        i2.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                        i2.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+                    } else {
+                        i2.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        i2.setData(Uri.parse("package:" + requireContext().getPackageName()));
+                    }
+                    startActivity(i2);
+                    b2.setChecked(!checked);
+                });
+            });
+        }
+    }
+
+    private void syncNotificationSwitch() {
+        if (switchNotifications == null) return;
+        boolean enabled;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            androidx.core.app.NotificationManagerCompat mgr =
+                    androidx.core.app.NotificationManagerCompat.from(requireContext());
+            enabled = mgr.areNotificationsEnabled();
+        } else {
+            enabled = true;
+        }
+        // Tạm bỏ listener để set value không trigger callback
+        switchNotifications.setOnCheckedChangeListener(null);
+        switchNotifications.setChecked(enabled);
     }
 
     private void toggleLanguage() {
         currentLang = "en".equals(currentLang) ? "vi" : "en";
         profilePrefs.edit().putString("app_language", currentLang).apply();
         updateLangChip();
-        String msg = "en".equals(currentLang)
-                ? "Switched to English. Restart app to apply fully."
-                : "Đã chuyển sang Tiếng Việt.";
-        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+        com.example.vibetix.Utils.LocaleHelper.applyLocale(requireContext(), currentLang);
+        requireActivity().recreate();
     }
 
     private void openSub(Fragment fragment) {

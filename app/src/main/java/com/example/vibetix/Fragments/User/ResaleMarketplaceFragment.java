@@ -116,10 +116,9 @@ public class ResaleMarketplaceFragment extends Fragment {
 
     private void openEventDetail(ResaleEventGroupAdapter.ResaleGroup group) {
         ResaleEventDetailFragment frag = ResaleEventDetailFragment.newInstance(group.eventId);
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, frag)
-                .addToBackStack("resale_event_detail")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(frag);
+        }
     }
 
     private int dp(int v) {

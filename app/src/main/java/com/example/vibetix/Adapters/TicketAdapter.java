@@ -83,9 +83,10 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getPurchasePrice()) + " đ");
 
-            // Cho bán lại nếu sự kiện còn approved hoặc ongoing (chưa completed/cancelled)
+            // Cho bán lại nếu sự kiện còn hoạt động VÀ loại vé có is_transferable=true (B5)
             String evStatus = ticket.getEventStatus() != null ? ticket.getEventStatus().toLowerCase() : "";
-            boolean canResell = evStatus.isEmpty() || "approved".equals(evStatus) || "ongoing".equals(evStatus);
+            boolean eventActive = evStatus.isEmpty() || "approved".equals(evStatus) || "ongoing".equals(evStatus);
+            boolean canResell = eventActive && ticket.isTransferable();
             if (canResell) {
                 holder.btnTicketResellAction.setText("Bán lại vé");
                 holder.btnTicketResellAction.setEnabled(true);

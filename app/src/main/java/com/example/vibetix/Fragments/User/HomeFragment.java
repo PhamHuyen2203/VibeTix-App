@@ -2,6 +2,7 @@ package com.example.vibetix.Fragments.User;
 
 import android.os.Bundle;
 import android.os.Handler;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     // UI Views
+    private android.widget.TextView badgeNotificationCount;
     LinearLayout layoutSearchBar;
     LinearLayout layoutBannerDots;
     LinearLayout layoutResaleBanner;
@@ -248,9 +250,13 @@ public class HomeFragment extends Fragment {
         // Bell (notification) click → show notification popup
         View imgBell = view.findViewById(R.id.imgBtnNotification);
         if (imgBell != null) {
-            imgBell.setOnClickListener(v ->
-                    NotificationPopupHelper.show(requireContext(), v));
+            imgBell.setOnClickListener(v -> {
+                NotificationPopupHelper.show(requireContext(), v);
+                // Reload badge sau 1.5s để phản ánh trạng thái đã đọc
+                new Handler(Looper.getMainLooper()).postDelayed(this::loadUnreadBadge, 1500);
+            });
         }
+        badgeNotificationCount = view.findViewById(R.id.badgeNotificationCount);
 
         // Promo banner click → show popup chi tiết
         imvPromoBanner.setOnClickListener(v -> showPromoDialog());
@@ -433,12 +439,9 @@ public class HomeFragment extends Fragment {
         // Featured Stars
         featuredStarAdapter = new FeaturedStarAdapter(requireContext(), danhSachStar,
                 star -> {
-                    if (getActivity() != null) {
+                    if (getActivity() instanceof UserMainActivity) {
                         StarDetailFragment frag = StarDetailFragment.newInstance(star.getId(), star.getName());
-                        getActivity().getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frameContainerMain, frag)
-                                .addToBackStack("star_detail")
-                                .commit();
+                        ((UserMainActivity) getActivity()).openSubFragment(frag);
                     }
                 });
         rvFeaturedStars.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -542,11 +545,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void onEventClick(Event event) {
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(event.getId()))
-                    .addToBackStack("home")
-                    .commit();
+        if (getActivity() instanceof UserMainActivity) {
+            ((UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(event.getId()));
         }
     }
 
@@ -618,19 +618,13 @@ public class HomeFragment extends Fragment {
 
     // ── Navigation tới marketplace bán lại ───────────────────────────────────
     private void openResaleMarketplace() {
-        if (getActivity() == null) return;
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, new ResaleMarketplaceFragment())
-                .addToBackStack("resale_marketplace")
-                .commit();
+        if (!(getActivity() instanceof UserMainActivity)) return;
+        ((UserMainActivity) getActivity()).openSubFragment(new ResaleMarketplaceFragment());
     }
 
     private void openResaleEventDetail(String eventId) {
-        if (getActivity() == null) return;
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, ResaleEventDetailFragment.newInstance(eventId))
-                .addToBackStack("resale_event_detail")
-                .commit();
+        if (!(getActivity() instanceof UserMainActivity)) return;
+        ((UserMainActivity) getActivity()).openSubFragment(ResaleEventDetailFragment.newInstance(eventId));
     }
 
     private void fetchLiveResaleTickets() {
@@ -678,6 +672,33 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         startBannerAutoScroll();
+        loadUnreadBadge();
+    }
+
+    private void loadUnreadBadge() {
+        com.google.firebase.auth.FirebaseUser user =
+                com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || badgeNotificationCount == null) return;
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("notifications")
+                .whereEqualTo("user_id", user.getUid())
+                .whereEqualTo("is_read", false)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (!isAdded() || badgeNotificationCount == null) return;
+                    int count = snap != null ? snap.size() : 0;
+                    if (count > 0) {
+                        badgeNotificationCount.setVisibility(android.view.View.VISIBLE);
+                        badgeNotificationCount.setText(count > 99 ? "99+" : String.valueOf(count));
+                    } else {
+                        badgeNotificationCount.setVisibility(android.view.View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (isAdded() && badgeNotificationCount != null)
+                        badgeNotificationCount.setVisibility(android.view.View.GONE);
+                });
     }
 
     @Override

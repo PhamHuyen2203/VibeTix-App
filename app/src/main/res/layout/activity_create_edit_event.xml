@@ -166,6 +166,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Tiêu đề sự kiện *"
@@ -217,6 +218,7 @@
                     android:layout_marginBottom="16dp">
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilCategory"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -377,6 +379,7 @@
                             android:layout_marginBottom="16dp" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilStartTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Thời gian Bắt đầu *"
@@ -398,6 +401,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
                         
                         <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEndTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Thời gian Kết thúc"
@@ -444,6 +448,7 @@
                             android:layout_marginBottom="16dp" />
 
                         <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilVenueName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Tên địa điểm (Vd: Sân vận động Mỹ Đình)"
@@ -484,20 +489,23 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilVenueCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Thành phố / Tỉnh"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:textColorHint="#757575"
-                    app:hintTextColor="@color/clr_primary_blue"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:textColorHint="#757575"
+                            app:hintTextColor="@color/clr_primary_blue"
                             app:boxCornerRadiusTopStart="12dp"
                             app:boxCornerRadiusTopEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
                             app:boxCornerRadiusBottomEnd="12dp">
-                            <com.google.android.material.textfield.TextInputEditText
+                            <AutoCompleteTextView
                                 android:id="@+id/etVenueCity"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:completionThreshold="1"
+                                android:inputType="textCapWords"
                                 android:textColor="@color/clr_text_black"
                                 android:textSize="16sp" />
                         </com.google.android.material.textfield.TextInputLayout>
@@ -636,6 +644,7 @@
                             android:visibility="gone">
 
                             <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/tilNewOrgName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Tên Ban tổ chức *"
@@ -656,6 +665,7 @@
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/tilNewOrgEmail"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Email liên hệ *"
@@ -677,6 +687,7 @@
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/tilNewOrgPhone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:hint="Số điện thoại *"

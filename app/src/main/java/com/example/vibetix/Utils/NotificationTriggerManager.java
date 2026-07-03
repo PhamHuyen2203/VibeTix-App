@@ -22,21 +22,34 @@ public class NotificationTriggerManager {
     private static final String TAG = "NotifTriggerMgr";
 
     /**
-     * Trigger 1: ORDER confirmed
-     * Creates a pending notification for the user who placed the order.
+     * Trigger 1: Đặt vé thành công — gửi thông báo cho người mua.
+     * @param eventTitle  Tên sự kiện
+     * @param eventDate   Ngày diễn ra (hiển thị)
+     * @param onlineLink  Link online nếu có (null nếu offline)
      */
-    public static void triggerOrderConfirmed(String userId, String orderId) {
+    public static void triggerOrderConfirmed(String userId, String orderId,
+                                             String eventTitle, String eventDate,
+                                             String onlineLink) {
         if (userId == null || userId.isEmpty()) return;
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String notifId = UUID.randomUUID().toString();
+        String shortId = orderId.substring(0, Math.min(8, orderId.length())).toUpperCase();
+
+        StringBuilder body = new StringBuilder();
+        body.append("Bạn đã đặt vé thành công cho sự kiện \"").append(eventTitle).append("\"");
+        if (eventDate != null && !eventDate.isEmpty()) body.append(" vào ").append(eventDate);
+        body.append(". Mã đơn: #").append(shortId).append(".");
+        if (onlineLink != null && !onlineLink.isEmpty()) {
+            body.append("\nLink tham gia: ").append(onlineLink);
+        }
 
         Notification notif = new Notification();
         notif.setNotificationId(notifId);
         notif.setUserId(userId);
         notif.setType("order_confirmed");
-        notif.setTitle("Đơn hàng đã được xác nhận!");
-        notif.setBody("Đơn hàng #" + orderId.substring(0, Math.min(8, orderId.length())) + " của bạn đã được duyệt thành công. Bạn có thể kiểm tra vé ngay lúc này.");
+        notif.setTitle("🎉 Đặt vé thành công!");
+        notif.setBody(body.toString());
         notif.setRefType("order");
         notif.setRefId(orderId);
         notif.setChannel("push_email");
@@ -48,6 +61,40 @@ public class NotificationTriggerManager {
                 .set(notif)
                 .addOnSuccessListener(unused -> Log.d(TAG, "Order confirmed notification created: " + notifId))
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to create order notif", e));
+    }
+
+    /** Overload tương thích ngược (không có event info). */
+    public static void triggerOrderConfirmed(String userId, String orderId) {
+        triggerOrderConfirmed(userId, orderId, "sự kiện", "", null);
+    }
+
+    /**
+     * Trigger 2: Nhân sự được thêm vào sự kiện.
+     */
+    public static void triggerStaffAssigned(String targetUserId, String eventId,
+                                             String eventTitle, String roleName) {
+        if (targetUserId == null || targetUserId.isEmpty()) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String notifId = UUID.randomUUID().toString();
+
+        Notification notif = new Notification();
+        notif.setNotificationId(notifId);
+        notif.setUserId(targetUserId);
+        notif.setType("staff_assigned");
+        notif.setTitle("Bạn được phân công làm nhân sự!");
+        notif.setBody("Bạn vừa được thêm vào sự kiện \"" + eventTitle + "\" với vai trò " + roleName + ". Kiểm tra phần Tổ chức để biết thêm chi tiết.");
+        notif.setRefType("event");
+        notif.setRefId(eventId);
+        notif.setChannel("push_email");
+        notif.setStatus("pending");
+        notif.setRead(false);
+        notif.setCreatedAt(Timestamp.now());
+
+        db.collection(FirebaseCollections.NOTIFICATIONS).document(notifId)
+                .set(notif)
+                .addOnSuccessListener(unused -> Log.d(TAG, "Staff assigned notification sent to: " + targetUserId))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to send staff notif", e));
     }
 
     /**

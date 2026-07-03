@@ -39,6 +39,8 @@ public class NotificationPopupHelper {
         public final String time;
         public final long timestampMs;
         public boolean isUnread;
+        public String type;  // notification type để điều hướng
+        public String refId; // ref_id (orderId / eventId) để điều hướng sâu hơn
 
         public NotifItem(String id, String title, String message, String time, boolean isUnread, long timestampMs) {
             this.id          = id;
@@ -81,8 +83,11 @@ public class NotificationPopupHelper {
                     String time = formatRelativeTime(ts);
 
                     if (title != null && !title.isEmpty()) {
-                        items.add(new NotifItem(id, title, body != null ? body : "", time, isUnread,
-                                ts != null ? ts.toDate().getTime() : 0L));
+                        NotifItem item = new NotifItem(id, title, body != null ? body : "", time, isUnread,
+                                ts != null ? ts.toDate().getTime() : 0L);
+                        item.type  = doc.getString("type");
+                        item.refId = doc.getString("ref_id");
+                        items.add(item);
                     }
                 }
 
@@ -189,6 +194,8 @@ public class NotificationPopupHelper {
             intent.putExtra("title", item.title);
             intent.putExtra("body", item.message);
             intent.putExtra("time", item.time);
+            intent.putExtra("type", item.type);
+            intent.putExtra("refId", item.refId);
             if (context instanceof Activity) {
                 context.startActivity(intent);
             } else {

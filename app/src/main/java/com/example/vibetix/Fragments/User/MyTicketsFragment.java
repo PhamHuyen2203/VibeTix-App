@@ -43,7 +43,7 @@ public class MyTicketsFragment extends Fragment {
     // Tab state enums
     private enum MainTab { BOUGHT, RESELLING }
     private enum SubTabBought { UPCOMING, ENDED }
-    private enum SubTabResale { PENDING, ACTIVE, SOLD, CANCELLED, REJECTED, EXPIRED }
+    private enum SubTabResale { PENDING, SOLD, CANCELLED, EXPIRED }
 
     private MainTab currentMainTab = MainTab.BOUGHT;
     private SubTabBought currentSubTabBought = SubTabBought.UPCOMING;
@@ -69,13 +69,13 @@ public class MyTicketsFragment extends Fragment {
     private TextView txtSubUpcoming, txtSubEnded;
     private View indicatorSubUpcoming, indicatorSubEnded;
 
-    // Sub-tabs for Resale (6 tabs)
-    private LinearLayout tabResalePending, tabResaleActive, tabResaleSold,
-            tabResaleCancelled, tabResaleRejected, tabResaleExpired;
-    private TextView txtResalePending, txtResaleActive, txtResaleSold,
-            txtResaleCancelled, txtResaleRejected, txtResaleExpired;
-    private View indicatorResalePending, indicatorResaleActive, indicatorResaleSold,
-            indicatorResaleCancelled, indicatorResaleRejected, indicatorResaleExpired;
+    // Sub-tabs for Resale (4 tabs — ACTIVE and REJECTED removed)
+    private LinearLayout tabResalePending, tabResaleSold,
+            tabResaleCancelled, tabResaleExpired;
+    private TextView txtResalePending, txtResaleSold,
+            txtResaleCancelled, txtResaleExpired;
+    private View indicatorResalePending, indicatorResaleSold,
+            indicatorResaleCancelled, indicatorResaleExpired;
 
     // Resale extra info row
     private RelativeLayout layoutResaleInfoRow;
@@ -128,27 +128,27 @@ public class MyTicketsFragment extends Fragment {
         indicatorSubUpcoming = view.findViewById(R.id.indicatorSubUpcoming);
         indicatorSubEnded = view.findViewById(R.id.indicatorSubEnded);
 
-        // Resale sub tabs (6)
+        // Resale sub tabs (4 — ACTIVE and REJECTED hidden)
         tabResalePending = view.findViewById(R.id.tabResalePending);
-        tabResaleActive = view.findViewById(R.id.tabResaleActive);
         tabResaleSold = view.findViewById(R.id.tabResaleSold);
         tabResaleCancelled = view.findViewById(R.id.tabResaleCancelled);
-        tabResaleRejected = view.findViewById(R.id.tabResaleRejected);
         tabResaleExpired = view.findViewById(R.id.tabResaleExpired);
 
         txtResalePending = view.findViewById(R.id.txtResalePending);
-        txtResaleActive = view.findViewById(R.id.txtResaleActive);
         txtResaleSold = view.findViewById(R.id.txtResaleSold);
         txtResaleCancelled = view.findViewById(R.id.txtResaleCancelled);
-        txtResaleRejected = view.findViewById(R.id.txtResaleRejected);
         txtResaleExpired = view.findViewById(R.id.txtResaleExpired);
 
         indicatorResalePending = view.findViewById(R.id.indicatorResalePending);
-        indicatorResaleActive = view.findViewById(R.id.indicatorResaleActive);
         indicatorResaleSold = view.findViewById(R.id.indicatorResaleSold);
         indicatorResaleCancelled = view.findViewById(R.id.indicatorResaleCancelled);
-        indicatorResaleRejected = view.findViewById(R.id.indicatorResaleRejected);
         indicatorResaleExpired = view.findViewById(R.id.indicatorResaleExpired);
+
+        // Hide removed tabs
+        View tabActive = view.findViewById(R.id.tabResaleActive);
+        View tabRejected = view.findViewById(R.id.tabResaleRejected);
+        if (tabActive != null) tabActive.setVisibility(View.GONE);
+        if (tabRejected != null) tabRejected.setVisibility(View.GONE);
 
         // Resale extra info
         layoutResaleInfoRow = view.findViewById(R.id.layoutResaleInfoRow);
@@ -201,21 +201,17 @@ public class MyTicketsFragment extends Fragment {
             loadTickets();
         });
 
-        // Resale sub tabs (6)
+        // Resale sub tabs (4)
         tabResalePending.setOnClickListener(v -> { selectSubTabResale(SubTabResale.PENDING); loadTickets(); });
-        tabResaleActive.setOnClickListener(v -> { selectSubTabResale(SubTabResale.ACTIVE); loadTickets(); });
         tabResaleSold.setOnClickListener(v -> { selectSubTabResale(SubTabResale.SOLD); loadTickets(); });
         tabResaleCancelled.setOnClickListener(v -> { selectSubTabResale(SubTabResale.CANCELLED); loadTickets(); });
-        tabResaleRejected.setOnClickListener(v -> { selectSubTabResale(SubTabResale.REJECTED); loadTickets(); });
         tabResaleExpired.setOnClickListener(v -> { selectSubTabResale(SubTabResale.EXPIRED); loadTickets(); });
 
         // Empty state action
         btnEmptyStateAction.setOnClickListener(v -> {
             if (currentMainTab == MainTab.BOUGHT) {
                 if (getActivity() instanceof UserMainActivity) {
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.frameContainerMain, new HomeFragment())
-                            .commit();
+                    ((UserMainActivity) getActivity()).selectTab(com.example.vibetix.R.id.tabHome);
                 }
             } else if (currentMainTab == MainTab.RESELLING && currentSubTabResale == SubTabResale.PENDING) {
                 Toast.makeText(requireContext(), "Chọn vé bạn đã mua ở tab 'Vé đã mua' rồi bấm 'Bán lại vé' để đăng bán!", Toast.LENGTH_LONG).show();
@@ -291,11 +287,9 @@ public class MyTicketsFragment extends Fragment {
     private void selectSubTabResale(SubTabResale sub) {
         currentSubTabResale = sub;
 
-        // All 6 resale sub tabs
-        TextView[] textViews = {txtResalePending, txtResaleActive, txtResaleSold,
-                txtResaleCancelled, txtResaleRejected, txtResaleExpired};
-        View[] indicators = {indicatorResalePending, indicatorResaleActive, indicatorResaleSold,
-                indicatorResaleCancelled, indicatorResaleRejected, indicatorResaleExpired};
+        // Reset all 4 active tabs
+        TextView[] textViews = {txtResalePending, txtResaleSold, txtResaleCancelled, txtResaleExpired};
+        View[] indicators = {indicatorResalePending, indicatorResaleSold, indicatorResaleCancelled, indicatorResaleExpired};
 
         for (int i = 0; i < textViews.length; i++) {
             textViews[i].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_text_secondary));
@@ -303,10 +297,17 @@ public class MyTicketsFragment extends Fragment {
             indicators[i].setBackgroundResource(android.R.color.transparent);
         }
 
-        int activeIndex = sub.ordinal();
-        textViews[activeIndex].setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
-        textViews[activeIndex].setTypeface(null, android.graphics.Typeface.BOLD);
-        indicators[activeIndex].setBackgroundResource(R.color.clr_primary_blue);
+        TextView activeText;
+        View activeIndicator;
+        switch (sub) {
+            case SOLD:      activeText = txtResaleSold;      activeIndicator = indicatorResaleSold;      break;
+            case CANCELLED: activeText = txtResaleCancelled; activeIndicator = indicatorResaleCancelled; break;
+            case EXPIRED:   activeText = txtResaleExpired;   activeIndicator = indicatorResaleExpired;   break;
+            default:        activeText = txtResalePending;   activeIndicator = indicatorResalePending;   break;
+        }
+        activeText.setTextColor(ContextCompat.getColor(requireContext(), R.color.clr_primary_blue));
+        activeText.setTypeface(null, android.graphics.Typeface.BOLD);
+        activeIndicator.setBackgroundResource(R.color.clr_primary_blue);
 
         toggleResaleInfoRow();
     }
@@ -403,6 +404,7 @@ public class MyTicketsFragment extends Fragment {
                     ticket.setStatus(mapTransferStatus(t.getStatus()));
                     ticket.setResalePrice(t.getPrice());
                     ticket.setPurchasePrice(t.getOriginalPrice());
+                    ticket.setTicketTypeName(t.getTicketTypeName());
                     displayTickets.add(ticket);
                 }
                 ticketAdapter.notifyDataSetChanged();
@@ -418,60 +420,22 @@ public class MyTicketsFragment extends Fragment {
 
         switch (currentSubTabResale) {
             case PENDING:
-                // "Đang rao bán" — vé đang được đăng bán công khai, chờ người mua
                 ticketTransferRepository.getPendingTransfersBySender(currentUserId, transferCallback);
                 break;
-            case ACTIVE:
-                // "Đang bán" — accepted but not completed (no buyer yet)
-                ticketTransferRepository.getAcceptedTransfersBySender(currentUserId, new TicketTransferRepository.OnTransfersLoadedListener() {
-                    @Override
-                    public void onSuccess(List<TicketTransfer> transfers) {
-                        // Filter: accepted + no completed_at = still selling
-                        List<TicketTransfer> activeSelling = new ArrayList<>();
-                        for (TicketTransfer t : transfers) {
-                            if (t.getCompletedAt() == null) {
-                                activeSelling.add(t);
-                            }
-                        }
-                        transferCallback.onSuccess(activeSelling);
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        transferCallback.onFailure(e);
-                    }
-                });
-                break;
             case SOLD:
-                // "Đã bán" — accepted + has completed_at (buyer paid)
                 ticketTransferRepository.getAcceptedTransfersBySender(currentUserId, new TicketTransferRepository.OnTransfersLoadedListener() {
                     @Override
                     public void onSuccess(List<TicketTransfer> transfers) {
-                        List<TicketTransfer> sold = new ArrayList<>();
-                        for (TicketTransfer t : transfers) {
-                            if (t.getCompletedAt() != null) {
-                                sold.add(t);
-                            }
-                        }
-                        transferCallback.onSuccess(sold);
+                        transferCallback.onSuccess(transfers);
                     }
-
                     @Override
-                    public void onFailure(Exception e) {
-                        transferCallback.onFailure(e);
-                    }
+                    public void onFailure(Exception e) { transferCallback.onFailure(e); }
                 });
                 break;
             case CANCELLED:
-                // "Đã hủy" — cancelled only
                 transferCallback_forStatus("cancelled", transferCallback);
                 break;
-            case REJECTED:
-                // "Bị từ chối" — rejected only
-                transferCallback_forStatus("rejected", transferCallback);
-                break;
             case EXPIRED:
-                // "Hết hạn" — expired only
                 transferCallback_forStatus("expired", transferCallback);
                 break;
         }
@@ -542,10 +506,6 @@ public class MyTicketsFragment extends Fragment {
                         btnEmptyStateAction.setText("Bán lại vé");
                         btnEmptyStateAction.setVisibility(View.VISIBLE);
                         break;
-                    case ACTIVE:
-                        txtEmptyStateTitle.setText("Không có vé nào đang bán");
-                        txtEmptyStateSubtitle.setText("Các vé được duyệt và đang chờ người mua sẽ hiển thị ở đây.");
-                        break;
                     case SOLD:
                         txtEmptyStateTitle.setText("Không có vé nào đã bán");
                         txtEmptyStateSubtitle.setText("Bạn chưa có vé nào đã được bán thành công.");
@@ -553,10 +513,6 @@ public class MyTicketsFragment extends Fragment {
                     case CANCELLED:
                         txtEmptyStateTitle.setText("Không có vé nào đã hủy");
                         txtEmptyStateSubtitle.setText("Bạn chưa có vé nào đã hủy đăng bán.");
-                        break;
-                    case REJECTED:
-                        txtEmptyStateTitle.setText("Không có vé nào bị từ chối");
-                        txtEmptyStateSubtitle.setText("Các vé bị từ chối duyệt sẽ hiển thị ở đây.");
                         break;
                     case EXPIRED:
                         txtEmptyStateTitle.setText("Không có vé nào hết hạn");
@@ -582,10 +538,9 @@ public class MyTicketsFragment extends Fragment {
         suggestions.add(s2);
 
         FeaturedEventAdapter suggestionsAdapter = new FeaturedEventAdapter(requireContext(), suggestions, event -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(event.getId()))
-                    .addToBackStack("home")
-                    .commit();
+            if (getActivity() instanceof UserMainActivity) {
+                ((UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(event.getId()));
+            }
         });
 
         rvEmptyRecommendationsList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));

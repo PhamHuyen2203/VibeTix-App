@@ -149,10 +149,9 @@ public class ResaleEventDetailFragment extends Fragment {
         FillAttendeeInfoFragment frag = FillAttendeeInfoFragment.newInstanceResale(
                 t.getEventId(), typeName, t.getPrice(), t.getEventImageUrl(), t.getTransferId());
 
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, frag)
-                .addToBackStack("resale_buy")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(frag);
+        }
     }
 
     private int dp(int v) {

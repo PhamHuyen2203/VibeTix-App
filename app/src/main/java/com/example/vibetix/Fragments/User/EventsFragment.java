@@ -2,6 +2,7 @@ package com.example.vibetix.Fragments.User;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import com.example.vibetix.Activities.User.UserMainActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -394,11 +395,8 @@ public class EventsFragment extends Fragment {
     }
 
     private void openEventDetail(String eventId) {
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
-                    .addToBackStack("events")
-                    .commit();
+        if (getActivity() instanceof UserMainActivity) {
+            ((UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(eventId));
         }
     }
 

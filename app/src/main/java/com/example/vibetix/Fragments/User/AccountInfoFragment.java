@@ -25,17 +25,13 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.Constants;
+import com.example.vibetix.Utils.ImageUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -185,17 +181,10 @@ public class AccountInfoFragment extends Fragment {
             .apply();
     }
 
-    // ── Hiển thị avatar tròn với Glide ───────────────────────────────────────
-    private void loadAvatarImage(@Nullable String url) {
+    // ── Hiển thị avatar tròn — hỗ trợ cả HTTP URL lẫn Base64 ────────────────
+    private void loadAvatarImage(@Nullable String urlOrBase64) {
         if (imgAccountAvatar == null || !isAdded()) return;
-        Glide.with(this)
-            .load((url != null && !url.isEmpty()) ? url : R.drawable.img_mascot_normal)
-            .apply(new RequestOptions()
-                .circleCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.img_mascot_normal)
-                .error(R.drawable.img_mascot_normal))
-            .into(imgAccountAvatar);
+        ImageUtils.loadCircle(this, urlOrBase64, imgAccountAvatar, R.drawable.img_mascot_normal);
     }
 
     private void applyGender(String gender) {
@@ -236,78 +225,45 @@ public class AccountInfoFragment extends Fragment {
         }
     }
 
-    // ── Upload avatar lên Firebase Storage ───────────────────────────────────
+    // ── Upload avatar → compress → Base64 → Firestore (không cần Firebase Storage) ──
     private void uploadAvatar(Uri uri) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
-
-        // Preview ngay trước khi upload
-        if (imgAccountAvatar != null) {
-            Glide.with(this)
-                .load(uri)
-                .apply(new RequestOptions().circleCrop())
-                .into(imgAccountAvatar);
-        }
-
         if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(false);
-        Toast.makeText(requireContext(), "Đang tải ảnh lên...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Đang xử lý ảnh...", Toast.LENGTH_SHORT).show();
 
-        // Đọc bytes qua ContentResolver — tránh lỗi permission với content:// URI trên Android 10+
-        byte[] imageBytes;
-        try {
-            java.io.InputStream stream =
-                requireContext().getContentResolver().openInputStream(uri);
-            if (stream == null) throw new Exception("Cannot open stream");
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[1024 * 64];
-            int len;
-            while ((len = stream.read(buf)) != -1) baos.write(buf, 0, len);
-            stream.close();
-            imageBytes = baos.toByteArray();
-        } catch (Exception e) {
-            if (!isAdded()) return;
+        // Compress: max 400×400, max 150 KB
+        byte[] compressed = ImageUtils.compressToJpeg(requireContext(), uri, 400, 150);
+        if (compressed == null) {
             if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
-            loadAvatarImage(authPrefs.getString(Constants.KEY_USER_AVATAR, null));
             Toast.makeText(requireContext(), "Không đọc được ảnh, thử lại", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        StorageReference ref = FirebaseStorage.getInstance()
-            .getReference("avatars/" + user.getUid() + ".jpg");
+        // Preview ngay từ bytes đã compress
+        if (imgAccountAvatar != null) {
+            Glide.with(this).load(compressed)
+                .apply(new com.bumptech.glide.request.RequestOptions().circleCrop())
+                .into(imgAccountAvatar);
+        }
 
-        StorageMetadata metadata = new com.google.firebase.storage.StorageMetadata.Builder()
-            .setContentType("image/jpeg")
-            .build();
+        String base64 = ImageUtils.toBase64(compressed);
+        pendingAvatarUrl = base64;
 
-        ref.putBytes(imageBytes, metadata)
-            .addOnSuccessListener(taskSnapshot ->
-                ref.getDownloadUrl().addOnSuccessListener(downloadUri -> {
-                    if (!isAdded()) return;
-                    String newUrl = downloadUri.toString();
-                    pendingAvatarUrl = newUrl;
-
-                    FirebaseFirestore.getInstance()
-                        .collection("users").document(user.getUid())
-                        .update("avatar_url", newUrl)
-                        .addOnSuccessListener(v2 -> {
-                            if (!isAdded()) return;
-                            authPrefs.edit()
-                                .putString(Constants.KEY_USER_AVATAR, newUrl)
-                                .apply();
-                            Glide.get(requireContext()).clearMemory();
-                            loadAvatarImage(newUrl);
-                            Toast.makeText(requireContext(), "✓ Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show();
-                        });
-
-                    if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
-                })
-            )
+        // Lưu thẳng vào Firestore — không dùng Storage
+        FirebaseFirestore.getInstance()
+            .collection("users").document(user.getUid())
+            .update("avatar_url", base64)
+            .addOnSuccessListener(v -> {
+                if (!isAdded()) return;
+                if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
+                authPrefs.edit().putString(Constants.KEY_USER_AVATAR, base64).apply();
+                Toast.makeText(requireContext(), "✓ Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show();
+            })
             .addOnFailureListener(e -> {
                 if (!isAdded()) return;
                 if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
-                loadAvatarImage(authPrefs.getString(Constants.KEY_USER_AVATAR, null));
-                Toast.makeText(requireContext(),
-                    "Tải ảnh thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(requireContext(), "Lưu ảnh thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
     }
 
@@ -377,9 +333,10 @@ public class AccountInfoFragment extends Fragment {
             FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(user.getUid())
-                .update(updates)
+                .set(updates, com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener(v -> {
                     if (!isAdded()) return;
+                    if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText("Lưu thay đổi"); }
                     Toast.makeText(requireContext(), "✓ Đã lưu thông tin", Toast.LENGTH_SHORT).show();
                     if (getParentFragmentManager().getBackStackEntryCount() > 0)
                         getParentFragmentManager().popBackStack();
@@ -387,7 +344,7 @@ public class AccountInfoFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     if (!isAdded()) return;
                     if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText("Lưu thay đổi"); }
-                    Toast.makeText(requireContext(), "Lưu thất bại, thử lại sau", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Lưu thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
         } else {
             Toast.makeText(requireContext(), "✓ Đã lưu thông tin", Toast.LENGTH_SHORT).show();

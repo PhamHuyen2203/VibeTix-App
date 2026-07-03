@@ -68,12 +68,10 @@
                 android:tint="@color/clr_text_white" />
         </LinearLayout>
 
-        <!-- Notification icon button -->
-        <LinearLayout
+        <!-- Notification icon button + badge -->
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
             android:padding="@dimen/spacing_sm">
 
             <ImageView
@@ -83,7 +81,22 @@
                 android:contentDescription="@string/str_cd_notification"
                 android:src="@drawable/ic_notification"
                 android:tint="@color/clr_text_white" />
-        </LinearLayout>
+
+            <!-- Badge số thông báo chưa đọc -->
+            <TextView
+                android:id="@+id/badgeNotificationCount"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-2dp"
+                android:layout_marginEnd="-2dp"
+                android:background="@drawable/bg_badge_red"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
     </LinearLayout>
 
     <!-- ── EXPANDED SEARCH ROW: close + EditText (GONE by default) ── -->

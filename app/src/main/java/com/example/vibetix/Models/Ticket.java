@@ -28,6 +28,13 @@ public class Ticket {
     // Format: "qty:typeName:unitPrice" entries joined by "|"
     // e.g. "1:Vé VIP:150000|2:Vé Thường:200000"
     private String itemBreakdown;
+    // Danh sách user_ticket_id của từng vé lẻ trong card (dùng cho multi-ticket selection khi bán lại)
+    private java.util.List<String> individualTicketIds = new java.util.ArrayList<>();
+    private boolean transferable = true; // false if no ticket type has is_transferable=true
+    // Parallel list: type name for each individualTicketId (same index)
+    private java.util.List<String> individualTicketTypeNames = new java.util.ArrayList<>();
+    // endTime của event (Timestamp) để so sánh trạng thái
+    private com.google.firebase.Timestamp eventEndTime;
 
     public Ticket() {}
 
@@ -104,4 +111,16 @@ public class Ticket {
 
     public String getEventStatus() { return eventStatus; }
     public void setEventStatus(String eventStatus) { this.eventStatus = eventStatus; }
+
+    public java.util.List<String> getIndividualTicketIds() { return individualTicketIds; }
+    public void setIndividualTicketIds(java.util.List<String> ids) { this.individualTicketIds = ids; }
+
+    public java.util.List<String> getIndividualTicketTypeNames() { return individualTicketTypeNames; }
+    public void setIndividualTicketTypeNames(java.util.List<String> names) { this.individualTicketTypeNames = names; }
+
+    public boolean isTransferable() { return transferable; }
+    public void setTransferable(boolean transferable) { this.transferable = transferable; }
+
+    public com.google.firebase.Timestamp getEventEndTime() { return eventEndTime; }
+    public void setEventEndTime(com.google.firebase.Timestamp t) { this.eventEndTime = t; }
 }

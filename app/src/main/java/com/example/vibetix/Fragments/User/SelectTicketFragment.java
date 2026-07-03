@@ -415,10 +415,9 @@ public class SelectTicketFragment extends Fragment {
             fillFrag.getArguments().putString("ticketItemsJson", ticketItemsJson.toString());
         }
 
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, fillFrag)
-                .addToBackStack("fill_info")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(fillFrag);
+        }
     }
 
     private int dp(int dpVal) {

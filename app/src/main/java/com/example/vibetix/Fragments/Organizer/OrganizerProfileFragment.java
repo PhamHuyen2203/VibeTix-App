@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,15 +19,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.vibetix.Activities.Auth.AuthActivity;
 import com.example.vibetix.Activities.Organizer.OrganizerRevenueActivity;
+import com.example.vibetix.Activities.User.CreateOrganizerActivity;
 import com.example.vibetix.Models.Organizer;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.android.gms.tasks.Tasks;
+import com.google.gson.Gson;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -72,6 +76,10 @@ public class OrganizerProfileFragment extends Fragment {
         btnAddOrgProfile = view.findViewById(R.id.btnAddOrgProfile);
 
         adapter = new OrgProfileAdapter(orgList, this::openOrgDetail);
+        adapter.actionListener = new OnOrgActionListener() {
+            @Override public void onEdit(OrgCardData card) { showEditDialog(card); }
+            @Override public void onDelete(OrgCardData card) { confirmDelete(card); }
+        };
         rvOrganizerProfiles.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvOrganizerProfiles.setAdapter(adapter);
         rvOrganizerProfiles.setNestedScrollingEnabled(false);
@@ -86,6 +94,13 @@ public class OrganizerProfileFragment extends Fragment {
             } catch (ClassNotFoundException ignored) { }
         });
 
+        loadData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload khi quay lại từ CreateOrganizerActivity
         loadData();
     }
 
@@ -234,9 +249,9 @@ public class OrganizerProfileFragment extends Fragment {
                             if (snap == null) return;
                             for (DocumentSnapshot d : snap.getDocuments()) {
                                 String status = d.getString("status");
-                                boolean cancelled = status != null &&
-                                        (status.equalsIgnoreCase("cancelled") || status.equalsIgnoreCase("refunded"));
-                                if (!cancelled) {
+                                boolean isPaid = status != null &&
+                                        (status.equalsIgnoreCase("paid") || status.equalsIgnoreCase("completed") || status.equalsIgnoreCase("confirmed"));
+                                if (isPaid) {
                                     long[] totals = orderTotals.get(d.getId());
                                     if (totals != null) {
                                         tickets[0] += totals[0];
@@ -292,6 +307,35 @@ public class OrganizerProfileFragment extends Fragment {
         startActivity(intent);
     }
 
+    private void showEditDialog(OrgCardData card) {
+        String orgJson = new Gson().toJson(card.organizer);
+        Intent intent = new Intent(requireContext(), CreateOrganizerActivity.class);
+        intent.putExtra(CreateOrganizerActivity.EXTRA_ORGANIZER_JSON, orgJson);
+        startActivity(intent);
+    }
+
+    private void confirmDelete(OrgCardData card) {
+        new MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Xóa hồ sơ BTC")
+            .setMessage("Bạn có chắc muốn xóa \"" + card.organizer.getBrandName() + "\"?\nThao tác này không thể hoàn tác.")
+            .setPositiveButton("Xóa", (d, w) -> {
+                db.collection("organizers").document(card.organizer.getOrganizerId()).delete()
+                    .addOnSuccessListener(v2 -> {
+                        if (isAdded()) {
+                            int idx = orgList.indexOf(card);
+                            if (idx >= 0) {
+                                orgList.remove(idx);
+                                adapter.notifyItemRemoved(idx);
+                            }
+                            if (orgList.isEmpty()) showEmpty(true);
+                            Toast.makeText(requireContext(), "Đã xóa hồ sơ BTC", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
+    }
+
     private void showLoading(boolean show) {
         pbProfileLoading.setVisibility(show ? View.VISIBLE : View.GONE);
     }
@@ -328,10 +372,16 @@ public class OrganizerProfileFragment extends Fragment {
         void onOrgClick(OrgCardData card);
     }
 
+    interface OnOrgActionListener {
+        void onEdit(OrgCardData card);
+        void onDelete(OrgCardData card);
+    }
+
     static class OrgProfileAdapter extends RecyclerView.Adapter<OrgProfileAdapter.VH> {
 
         private final List<OrgCardData> items;
         private final OnOrgClickListener listener;
+        OnOrgActionListener actionListener;
 
         OrgProfileAdapter(List<OrgCardData> items, OnOrgClickListener listener) {
             this.items = items;
@@ -353,11 +403,25 @@ public class OrganizerProfileFragment extends Fragment {
 
             h.tvBrandName.setText(org.getBrandName() != null ? org.getBrandName() : "Ban tổ chức");
 
-            // Description line: website or description fallback
-            String desc = org.getWebsite();
-            if (desc == null || desc.isEmpty()) desc = org.getDescription();
-            if (desc == null || desc.isEmpty()) desc = "Đơn vị tổ chức sự kiện";
-            h.tvDescription.setText(desc);
+            // Description (F5)
+            String desc = org.getDescription();
+            if (desc != null && !desc.isEmpty()) {
+                h.tvDescription.setText(desc);
+                h.tvDescription.setVisibility(View.VISIBLE);
+            } else {
+                h.tvDescription.setText("Đơn vị tổ chức sự kiện");
+                h.tvDescription.setVisibility(View.VISIBLE);
+            }
+            // Website small line
+            if (h.tvWebsiteSmall != null) {
+                String website = org.getWebsiteUrl();
+                if (website != null && !website.isEmpty()) {
+                    h.tvWebsiteSmall.setText(website);
+                    h.tvWebsiteSmall.setVisibility(View.VISIBLE);
+                } else {
+                    h.tvWebsiteSmall.setVisibility(View.GONE);
+                }
+            }
 
             // Verified badge — solid pill
             boolean verified = org.isVerified();
@@ -384,19 +448,20 @@ public class OrganizerProfileFragment extends Fragment {
             h.tvStatTickets.setText(formatCompact(card.totalTickets));
             h.tvStatRevenue.setText(formatRevenue(card.totalRevenue));
 
-            // Logo
-            if (org.getLogoUrl() != null && !org.getLogoUrl().isEmpty()) {
-                Glide.with(h.ivOrgLogo.getContext())
-                        .load(org.getLogoUrl())
-                        .circleCrop()
-                        .placeholder(R.drawable.bg_avatar_circle)
-                        .into(h.ivOrgLogo);
-            } else {
-                h.ivOrgLogo.setImageResource(R.drawable.ic_role_building);
-            }
+            // Logo — hỗ trợ cả HTTP URL lẫn Base64
+            com.example.vibetix.Utils.ImageUtils.loadCircle(
+                    h.ivOrgLogo.getContext(), org.getLogoUrl(),
+                    h.ivOrgLogo, R.drawable.ic_role_building);
 
             h.itemView.setOnClickListener(v -> {
                 if (listener != null) listener.onOrgClick(card);
+            });
+
+            if (h.btnEdit != null) h.btnEdit.setOnClickListener(v -> {
+                if (actionListener != null) actionListener.onEdit(card);
+            });
+            if (h.btnDelete != null) h.btnDelete.setOnClickListener(v -> {
+                if (actionListener != null) actionListener.onDelete(card);
             });
         }
 
@@ -419,9 +484,10 @@ public class OrganizerProfileFragment extends Fragment {
 
         static class VH extends RecyclerView.ViewHolder {
             android.widget.ImageView ivOrgLogo;
-            TextView tvBrandName, tvVerifiedChip, tvDescription;
+            TextView tvBrandName, tvVerifiedChip, tvDescription, tvWebsiteSmall;
             TextView tvStatEvents, tvStatTickets, tvStatRevenue;
             View viewAccentBar;
+            com.google.android.material.button.MaterialButton btnEdit, btnDelete;
 
             VH(@NonNull View v) {
                 super(v);
@@ -429,10 +495,13 @@ public class OrganizerProfileFragment extends Fragment {
                 tvBrandName = v.findViewById(R.id.tvOrgBrandName);
                 tvVerifiedChip = v.findViewById(R.id.tvVerifiedChip);
                 tvDescription = v.findViewById(R.id.tvOrgDescription);
+                tvWebsiteSmall = v.findViewById(R.id.tvOrgWebsiteSmall);
                 tvStatEvents = v.findViewById(R.id.tvStatEvents);
                 tvStatTickets = v.findViewById(R.id.tvStatTickets);
                 tvStatRevenue = v.findViewById(R.id.tvStatRevenue);
                 viewAccentBar = v.findViewById(R.id.viewAccentBar);
+                btnEdit = v.findViewById(R.id.btnEditOrg);
+                btnDelete = v.findViewById(R.id.btnDeleteOrg);
             }
         }
     }

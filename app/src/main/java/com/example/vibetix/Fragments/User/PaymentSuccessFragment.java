@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vibetix.Activities.User.UserMainActivity;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.NotificationTriggerManager;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DecimalFormat;
 
@@ -126,7 +128,7 @@ public class PaymentSuccessFragment extends Fragment {
                 txtSuccessEventTitle.setText(event.getTitle());
                 txtSuccessEventDate.setText(event.getDate());
                 txtSuccessEventLocation.setText(event.getLocation());
-                
+
                 if (event.getImageUrl() != null && !event.getImageUrl().isEmpty()) {
                     com.bumptech.glide.Glide.with(requireContext())
                             .load(event.getImageUrl())
@@ -137,6 +139,18 @@ public class PaymentSuccessFragment extends Fragment {
                             ? R.drawable.event_live_non_song
                             : R.drawable.event_arts_private_fantasy;
                     imvSuccessEventThumb.setImageResource(coverRes);
+                }
+
+                // C1: Gửi notification sau khi có đủ thông tin sự kiện
+                String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                        ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "";
+                if (!uid.isEmpty() && !orderId.isEmpty()) {
+                    NotificationTriggerManager.triggerOrderConfirmed(
+                            uid, orderId,
+                            event.getTitle() != null ? event.getTitle() : "",
+                            event.getDate() != null ? event.getDate() : "",
+                            event.getOnlineLink()
+                    );
                 }
             }
 

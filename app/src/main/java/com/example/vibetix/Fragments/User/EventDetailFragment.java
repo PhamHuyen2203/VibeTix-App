@@ -76,6 +76,9 @@ public class EventDetailFragment extends Fragment {
     private TextView txtOrganizerCardName;
     private ImageView imvOrganizerVerified;
     private Button btnBookTickets;
+    // Extra info rows
+    private LinearLayout rowEventType, rowAgeRestriction;
+    private TextView txtDetailEventType, txtDetailAgeRestriction;
 
     private boolean isDescriptionExpanded = false;
     private boolean isFavorited = false;
@@ -141,6 +144,10 @@ public class EventDetailFragment extends Fragment {
         imvOrganizerVerified = view.findViewById(R.id.imvOrganizerVerified);
         txtDetailMinPrice = view.findViewById(R.id.txtDetailMinPrice);
         btnBookTickets = view.findViewById(R.id.btnBookTickets);
+        rowEventType            = view.findViewById(R.id.rowEventType);
+        rowAgeRestriction       = view.findViewById(R.id.rowAgeRestriction);
+        txtDetailEventType      = view.findViewById(R.id.txtDetailEventType);
+        txtDetailAgeRestriction = view.findViewById(R.id.txtDetailAgeRestriction);
 
         layoutRelatedEvents = view.findViewById(R.id.layoutRelatedEvents);
         rvRelatedEvents = view.findViewById(R.id.rvRelatedEvents);
@@ -243,15 +250,37 @@ public class EventDetailFragment extends Fragment {
         }
         txtDetailEventDate.setText(fullDate);
 
-        // ── Location — ưu tiên full location, fallback về venueCity/city ─
-        String displayLocation = event.getLocation();
-        if (displayLocation == null || displayLocation.isEmpty()) {
-            displayLocation = event.getVenueCity();
+        // ── Event type (Offline / Online) ─────────────────────────────
+        String evType = event.getEventType();
+        boolean isOnline = evType != null && (evType.toLowerCase().contains("online")
+                || evType.toLowerCase().contains("tuyến"));
+        if (evType != null && !evType.isEmpty()) {
+            if (rowEventType != null) rowEventType.setVisibility(View.VISIBLE);
+            if (txtDetailEventType != null) txtDetailEventType.setText("Hình thức: " + evType);
         }
-        if (displayLocation == null || displayLocation.isEmpty()) {
-            displayLocation = "Việt Nam";
+        // ── Location — online event → hiện "Sự kiện trực tuyến" ────────
+        String displayLocation;
+        if (isOnline) {
+            displayLocation = "Sự kiện trực tuyến";
+        } else {
+            displayLocation = event.getLocation();
+            if (displayLocation == null || displayLocation.isEmpty()) {
+                displayLocation = event.getVenueCity();
+            }
+            if (displayLocation == null || displayLocation.isEmpty()) {
+                displayLocation = "Việt Nam";
+            }
         }
         txtDetailEventLocation.setText(displayLocation);
+
+        // ── Age restriction ────────────────────────────────────────────
+        String ageRestriction = event.getAgeRestriction();
+        if (ageRestriction != null && !ageRestriction.isEmpty()
+                && !ageRestriction.equalsIgnoreCase("Không giới hạn")) {
+            if (rowAgeRestriction != null) rowAgeRestriction.setVisibility(View.VISIBLE);
+            if (txtDetailAgeRestriction != null)
+                txtDetailAgeRestriction.setText("Giới hạn độ tuổi: " + ageRestriction);
+        }
 
         // ── Description (render HTML in WebView) ────────────────────────
         if (webDetailDescription != null && event.getDescription() != null && !event.getDescription().isEmpty()) {
@@ -301,6 +330,11 @@ public class EventDetailFragment extends Fragment {
             btnBookTickets.setEnabled(false);
             btnBookTickets.setText("Đã hết vé");
             btnBookTickets.setAlpha(0.5f);
+        } else if ("approved".equals(evStatus) && isEventNotStartedYet(event.getStartTime())) {
+            // E4: đã approved nhưng chưa tới giờ mở bán → Coming Soon
+            btnBookTickets.setEnabled(false);
+            btnBookTickets.setText("Sắp ra mắt");
+            btnBookTickets.setAlpha(0.7f);
         } else if ("approved".equals(evStatus) || "ongoing".equals(evStatus)) {
             btnBookTickets.setEnabled(true);
             btnBookTickets.setText("Đặt vé ngay");
@@ -410,16 +444,11 @@ public class EventDetailFragment extends Fragment {
                                         txtDetailOrganizer.setText(brandName);
                                         if (txtOrganizerCardName != null) txtOrganizerCardName.setText(brandName);
                                     }
-                                    // Avatar
+                                    // Avatar — hỗ trợ Base64
                                     String logoUrl = orgDoc.getString("logo_url");
                                     if (imvOrganizerAvatar != null) {
-                                        if (logoUrl != null && !logoUrl.isEmpty()) {
-                                            Glide.with(requireContext()).load(logoUrl)
-                                                    .circleCrop()
-                                                    .placeholder(R.drawable.img_mascot_wave)
-                                                    .error(R.drawable.img_mascot_wave)
-                                                    .into(imvOrganizerAvatar);
-                                        }
+                                        com.example.vibetix.Utils.ImageUtils.loadCircle(
+                                                this, logoUrl, imvOrganizerAvatar, R.drawable.img_mascot_wave);
                                     }
                                     // Verified badge
                                     Boolean verified = orgDoc.getBoolean("is_verified");
@@ -732,10 +761,9 @@ public class EventDetailFragment extends Fragment {
             SliderCaptchaDialogFragment captcha = SliderCaptchaDialogFragment.newInstance();
             captcha.setOnVerifiedListener(() -> {
                 SelectTicketFragment selectFrag = SelectTicketFragment.newInstance(eventId);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.frameContainerMain, selectFrag)
-                        .addToBackStack("booking")
-                        .commit();
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(selectFrag);
+                }
             });
             captcha.show(getChildFragmentManager(), "captcha");
         });
@@ -746,10 +774,9 @@ public class EventDetailFragment extends Fragment {
                 if (organizerId.isEmpty()) return;
                 String orgName = txtOrganizerCardName != null ? txtOrganizerCardName.getText().toString() : "";
                 StarDetailFragment frag = StarDetailFragment.newInstance(organizerId, orgName);
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.frameContainerMain, frag)
-                        .addToBackStack("organizer_detail")
-                        .commit();
+                if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(frag);
+                }
             });
         }
 
@@ -855,9 +882,21 @@ public class EventDetailFragment extends Fragment {
     private void openRelatedEvent(Event event) {
         if (event == null || event.getId() == null) return;
         EventDetailFragment frag = EventDetailFragment.newInstance(event.getId());
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.frameContainerMain, frag)
-                .addToBackStack("event_detail_related")
-                .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(frag);
+        }
+    }
+
+    /** E4: true nếu startTime (string "dd/MM/yyyy HH:mm") vẫn còn trong tương lai */
+    private boolean isEventNotStartedYet(String startTimeStr) {
+        if (startTimeStr == null || startTimeStr.trim().isEmpty()) return false;
+        try {
+            java.text.SimpleDateFormat sdf =
+                    new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+            java.util.Date start = sdf.parse(startTimeStr);
+            return start != null && start.after(new java.util.Date());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

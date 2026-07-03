@@ -322,11 +322,8 @@ public class SearchFragment extends Fragment {
     }
 
     private void openEventDetail(String eventId) {
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
-                    .addToBackStack("search")
-                    .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(eventId));
         }
     }
 

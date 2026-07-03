@@ -142,9 +142,9 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                         if (layoutOrgPhone != null) layoutOrgPhone.setVisibility(View.VISIBLE);
                     }
 
-                    if (ivOrgLogo != null && logoUrl != null && !logoUrl.isEmpty()) {
-                        Glide.with(this).load(logoUrl).circleCrop()
-                                .placeholder(R.drawable.bg_avatar_circle).into(ivOrgLogo);
+                    if (ivOrgLogo != null) {
+                        com.example.vibetix.Utils.ImageUtils.loadCircle(
+                                this, logoUrl, ivOrgLogo, R.drawable.bg_avatar_circle);
                     }
                 });
     }
@@ -384,7 +384,7 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                     Set<String> ids = new HashSet<>();
                     for (OrderItem oi : entry.getValue()) {
                         String st = orderStatus.get(oi.getOrderId());
-                        boolean isPaid = st != null && (st.equals("completed") || st.equals("confirmed") || st.equals("paid"));
+                        boolean isPaid = st != null && (st.equalsIgnoreCase("paid") || st.equalsIgnoreCase("completed") || st.equalsIgnoreCase("confirmed"));
                         if (isPaid && oi.getOrderId() != null) {
                             ids.add(oi.getOrderId());
                         }
@@ -401,7 +401,7 @@ public class OrganizerRevenueActivity extends AppCompatActivity {
                     for (OrderItem oi : items) {
                         String st = orderStatus.get(oi.getOrderId());
                         // Chỉ tính đơn thành công (paid, completed, confirmed)
-                        boolean isPaid = st != null && (st.equals("completed") || st.equals("confirmed") || st.equals("paid"));
+                        boolean isPaid = st != null && (st.equalsIgnoreCase("paid") || st.equalsIgnoreCase("completed") || st.equalsIgnoreCase("confirmed"));
                         if (isPaid) {
                             tickets += oi.getQuantity();
                             rev += oi.getQuantity() * oi.getPricePerTicket();

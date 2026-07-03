@@ -1,5 +1,6 @@
 package com.example.vibetix.Fragments.User;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -235,23 +238,27 @@ public class FavoritesFollowsBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
+    @Override
+    public void onDismiss(@androidx.annotation.NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        // Refresh ProfileFragment stats khi BottomSheet đóng (có thể đã follow/unfollow bên trong)
+        Fragment parent = getParentFragment();
+        if (parent instanceof ProfileFragment) {
+            ((ProfileFragment) parent).loadProfileStats();
+        }
+    }
+
     private void navigateToEventDetail(String eventId) {
         dismiss();
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, EventDetailFragment.newInstance(eventId))
-                    .addToBackStack("fav_event_detail")
-                    .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(EventDetailFragment.newInstance(eventId));
         }
     }
 
     private void navigateToStarDetail(String starId, String name) {
         dismiss();
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameContainerMain, StarDetailFragment.newInstance(starId, name))
-                    .addToBackStack("fav_star_detail")
-                    .commit();
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            ((com.example.vibetix.Activities.User.UserMainActivity) getActivity()).openSubFragment(StarDetailFragment.newInstance(starId, name));
         }
     }
 
@@ -433,15 +440,8 @@ public class FavoritesFollowsBottomSheet extends BottomSheetDialogFragment {
                 txtName.setText(item.name);
                 txtType.setText("star".equals(item.type) ? "Nghệ sĩ" : "Ban tổ chức");
 
-                if (item.avatarUrl != null && !item.avatarUrl.isEmpty()) {
-                    Glide.with(img.getContext()).load(item.avatarUrl)
-                            .circleCrop()
-                            .placeholder(R.drawable.img_mascot_wave)
-                            .into(img);
-                } else {
-                    Glide.with(img.getContext()).load(R.drawable.img_mascot_wave)
-                            .circleCrop().into(img);
-                }
+                com.example.vibetix.Utils.ImageUtils.loadCircle(
+                        img.getContext(), item.avatarUrl, img, R.drawable.img_mascot_wave);
 
                 itemView.setOnClickListener(v -> navigateToStarDetail(item.id, item.name));
             }

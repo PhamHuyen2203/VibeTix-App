@@ -75,21 +75,44 @@ public class EventStarStatsActivity extends AppCompatActivity {
         statItems.clear();
         buyerSet.clear();
 
-        // 1. Fetch Buyers
-        db.collection(FirebaseCollections.ORDERS)
+        // G2 fix: orders không có event_id → phải query order_items trước để lấy order_id
+        db.collection(FirebaseCollections.ORDER_ITEMS)
                 .whereEqualTo("event_id", eventId)
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    for (DocumentSnapshot doc : querySnapshot) {
-                        Order order = doc.toObject(Order.class);
-                        if (order != null && order.getUserId() != null) {
-                            String status = order.getStatusStr() != null ? order.getStatusStr().toLowerCase() : "";
-                            if (status.equals("completed") || status.equals("confirmed") || status.equals("paid")) {
-                                buyerSet.add(order.getUserId());
+                .addOnSuccessListener(itemSnap -> {
+                    Set<String> orderIds = new HashSet<>();
+                    for (DocumentSnapshot doc : itemSnap) {
+                        String oid = doc.getString("order_id");
+                        if (oid != null) orderIds.add(oid);
+                    }
+                    if (orderIds.isEmpty()) {
+                        fetchEventStars();
+                        return;
+                    }
+                    // Chunk by 10 for whereIn
+                    List<String> orderIdList = new ArrayList<>(orderIds);
+                    List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+                    for (int i = 0; i < orderIdList.size(); i += 10) {
+                        List<String> chunk = orderIdList.subList(i, Math.min(i + 10, orderIdList.size()));
+                        tasks.add(db.collection(FirebaseCollections.ORDERS)
+                                .whereIn(com.google.firebase.firestore.FieldPath.documentId(), chunk)
+                                .get());
+                    }
+                    Tasks.whenAllSuccess(tasks).addOnSuccessListener(results -> {
+                        for (Object r : results) {
+                            QuerySnapshot snap = (QuerySnapshot) r;
+                            for (DocumentSnapshot doc : snap) {
+                                String status = doc.getString("status");
+                                boolean isPaid = status != null &&
+                                        (status.equalsIgnoreCase("paid") || status.equalsIgnoreCase("completed") || status.equalsIgnoreCase("confirmed"));
+                                if (isPaid) {
+                                    String uid = doc.getString("user_id");
+                                    if (uid != null) buyerSet.add(uid);
+                                }
                             }
                         }
-                    }
-                    fetchEventStars();
+                        fetchEventStars();
+                    }).addOnFailureListener(e -> fetchEventStars());
                 })
                 .addOnFailureListener(e -> showFailureAlert(e));
     }
@@ -173,7 +196,8 @@ public class EventStarStatsActivity extends AppCompatActivity {
                 Set<String> convertedUsers = new HashSet<>(followerSet);
                 convertedUsers.retainAll(buyerSet);
                 
-                item.totalFollowers = item.star.getFollowerCount();
+                // G1 fix: dùng số đếm thực từ query user_star_follows thay vì cached field
+                item.totalFollowers = followerSet.size();
                 item.convertedFollowers = convertedUsers.size();
             }
 

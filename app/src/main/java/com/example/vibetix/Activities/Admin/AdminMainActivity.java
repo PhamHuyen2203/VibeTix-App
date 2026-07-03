@@ -1,5 +1,6 @@
 package com.example.vibetix.Activities.Admin;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
@@ -17,11 +18,17 @@ import com.example.vibetix.Fragments.Admin.GlobalDiscountFragment;
 import com.example.vibetix.Fragments.Admin.MasterDataFragment;
 import com.example.vibetix.Fragments.Admin.OrganizerApprovalFragment;
 import com.example.vibetix.R;
+import com.example.vibetix.Utils.LocaleHelper;
 import com.google.android.material.navigation.NavigationView;
 
 public class AdminMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

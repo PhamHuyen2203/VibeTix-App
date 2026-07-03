@@ -1,5 +1,6 @@
 package com.example.vibetix.Activities.Organizer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import com.example.vibetix.Firebase.FirebaseCollections;
 import com.example.vibetix.Models.Event;
 import com.example.vibetix.R;
 import com.example.vibetix.Utils.NotificationTriggerManager;
+import com.example.vibetix.Utils.LocaleHelper;
 import com.example.vibetix.Utils.SessionManager;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -44,6 +46,11 @@ import java.util.Locale;
  *   - Feature Grid 2 cột qua RecyclerView + FeatureAdapter
  */
 public class EventHubActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
 
     public static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
     public static final String EXTRA_ROLE     = "EXTRA_ROLE";

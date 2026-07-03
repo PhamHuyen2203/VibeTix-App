@@ -187,122 +187,106 @@ public class TicketTransferRepository {
     // ── Join logic: ticket_transfers → user_tickets → events ────────────────────
 
     /**
-     * Enrich transfers với event data bằng cách:
-     * 1. Lấy tất cả user_ticket_id unique → query user_tickets để lấy event_id
-     * 2. Lấy tất cả event_id unique → query events để lấy title, image, date, location
-     * 3. Map ngược lại vào từng TicketTransfer
+     * Enrich transfers: luôn join user_tickets → order_items → ticket_types để lấy tên loại vé.
+     * Với transfers đã có event data denormalized: giữ event data, chỉ bổ sung ticketTypeName + eventStatus.
+     * Với transfers chưa có: join đầy đủ qua user_tickets → events.
      */
     private void enrichWithEventData(List<TicketTransfer> transfers, OnTransfersLoadedListener listener) {
-        if (transfers.isEmpty()) {
-            listener.onSuccess(transfers);
-            return;
-        }
+        if (transfers.isEmpty()) { listener.onSuccess(transfers); return; }
 
-        // Tách: transfers có event_id denormalized sẵn (chỉ cần lấy status event)
-        //       vs transfers thiếu data (cần join qua user_tickets → events)
-        List<TicketTransfer> needEnrich = new ArrayList<>();
+        // Collect ALL user_ticket_ids để join ticket type name cho tất cả
+        Set<String> allTicketIds = new HashSet<>();
         Set<String> knownEventIds = new HashSet<>();
+        List<TicketTransfer> needEventEnrich = new ArrayList<>();
+
         for (TicketTransfer t : transfers) {
+            if (t.getUserTicketId() != null) allTicketIds.add(t.getUserTicketId());
             boolean hasDenormalized = t.getEventTitle() != null && !t.getEventTitle().isEmpty()
                     && t.getEventId() != null && !t.getEventId().isEmpty();
-            if (hasDenormalized) {
-                knownEventIds.add(t.getEventId());
-            } else if (t.getUserTicketId() != null) {
-                needEnrich.add(t);
-            }
+            if (hasDenormalized) knownEventIds.add(t.getEventId());
+            else if (t.getUserTicketId() != null) needEventEnrich.add(t);
         }
 
-        // Nếu tất cả đều đã có event_id → chỉ cần fetch status cho filter
-        if (needEnrich.isEmpty()) {
-            if (knownEventIds.isEmpty()) {
-                listener.onSuccess(transfers);
-                return;
-            }
-            fetchEvents(new ArrayList<>(knownEventIds), 0, new HashMap<>(), (eventDataMap) -> {
-                for (TicketTransfer t : transfers) {
-                    if (t.getEventId() == null) continue;
-                    Event ev = eventDataMap.get(t.getEventId());
-                    if (ev != null) t.setEventStatus(ev.getStatus());
-                }
-                listener.onSuccess(transfers);
-            });
-            return;
-        }
+        if (allTicketIds.isEmpty()) { listener.onSuccess(transfers); return; }
 
-        // Collect unique user_ticket_ids (chỉ những cái cần enrich)
-        Set<String> ticketIds = new HashSet<>();
-        for (TicketTransfer t : needEnrich) {
-            if (t.getUserTicketId() != null) ticketIds.add(t.getUserTicketId());
-        }
+        // Bước 1: Fetch TẤT CẢ user_tickets → order_item_id, event_id, legacy ticketTypeName
+        Map<String, String> ticketToOrderItem      = new HashMap<>();
+        Map<String, String> ticketToLegacyTypeName = new HashMap<>();
+        fetchUserTickets(new ArrayList<>(allTicketIds), 0, new HashMap<>(),
+                ticketToOrderItem, ticketToLegacyTypeName, (ticketToEventMap) -> {
 
-        if (ticketIds.isEmpty()) {
-            listener.onSuccess(transfers);
-            return;
-        }
-
-        // Bước 1: Fetch user_tickets docs → map user_ticket_id → event_id VÀ → order_item_id
-        List<String> ticketIdList = new ArrayList<>(ticketIds);
-        Map<String, String> ticketToOrderItem = new HashMap<>();
-        // Firestore whereIn limit is 30; batch if needed
-        fetchUserTickets(ticketIdList, 0, new HashMap<>(), ticketToOrderItem, (ticketToEventMap) -> {
-            // ticketToEventMap: user_ticket_id → event_id
-            Set<String> eventIds = new HashSet<>(ticketToEventMap.values());
-            if (eventIds.isEmpty()) {
-                listener.onSuccess(transfers);
-                return;
-            }
-
-            // Bước 2: Fetch giá vé từ order_items (price_per_ticket) theo order_item_id
+            // Bước 2: Fetch order_items → ticket_type_id + price
             List<String> orderItemIds = new ArrayList<>(new HashSet<>(ticketToOrderItem.values()));
-            fetchOrderItemPrices(orderItemIds, 0, new HashMap<>(), (priceMap) -> {
-                // priceMap: order_item_id → price_per_ticket
+            Map<String, String> orderItemToTypeId = new HashMap<>();
+            fetchOrderItemPrices(orderItemIds, 0, new HashMap<>(), orderItemToTypeId, (priceMap) -> {
 
-                // Bước 3: Fetch events docs (bao gồm cả event_id từ transfers đã denormalized)
-                Set<String> allEventIds = new HashSet<>(eventIds);
-                allEventIds.addAll(knownEventIds);
-                List<String> eventIdList = new ArrayList<>(allEventIds);
-                fetchEvents(eventIdList, 0, new HashMap<>(), (eventDataMap) -> {
-                    // Set eventStatus cho transfers đã denormalized
-                    for (TicketTransfer t : transfers) {
-                        if (t.getEventId() != null && !t.getEventId().isEmpty()
-                                && t.getEventTitle() != null && !t.getEventTitle().isEmpty()) {
-                            Event ev = eventDataMap.get(t.getEventId());
-                            if (ev != null) t.setEventStatus(ev.getStatus());
-                        }
-                    }
-                    for (TicketTransfer t : transfers) {
-                        String eventId = ticketToEventMap.get(t.getUserTicketId());
-                        if (eventId == null) continue;
-                        t.setEventId(eventId);
+                // Bước 3: Fetch ticket_types → name
+                List<String> typeIds = new ArrayList<>(new HashSet<>(orderItemToTypeId.values()));
+                fetchTicketTypeNames(typeIds, 0, new HashMap<>(), (typeNameMap) -> {
 
-                        // Giá bán lại: nếu transfer chưa có giá riêng → lấy giá vé gốc (price_per_ticket)
-                        if (t.getPrice() <= 0) {
-                            String orderItemId = ticketToOrderItem.get(t.getUserTicketId());
-                            Long price = orderItemId != null ? priceMap.get(orderItemId) : null;
-                            if (price != null) {
-                                t.setPrice(price);
-                                if (t.getOriginalPrice() <= 0) t.setOriginalPrice(price);
+                    // Bước 4: Fetch events
+                    Set<String> allEventIds = new HashSet<>(knownEventIds);
+                    allEventIds.addAll(ticketToEventMap.values());
+                    fetchEvents(new ArrayList<>(allEventIds), 0, new HashMap<>(), (eventDataMap) -> {
+
+                        for (TicketTransfer t : transfers) {
+                            String utId        = t.getUserTicketId();
+                            String orderItemId = utId != null ? ticketToOrderItem.get(utId) : null;
+
+                            // Ticket type name: join chain ưu tiên, fallback legacy field
+                            if (t.getTicketTypeName() == null || t.getTicketTypeName().isEmpty()) {
+                                String typeName = null;
+                                if (orderItemId != null) {
+                                    String typeId = orderItemToTypeId.get(orderItemId);
+                                    typeName = typeId != null ? typeNameMap.get(typeId) : null;
+                                }
+                                if (typeName == null && utId != null)
+                                    typeName = ticketToLegacyTypeName.get(utId);
+                                if (typeName != null) t.setTicketTypeName(typeName);
+                            }
+
+                            boolean hasDenormalized = t.getEventTitle() != null && !t.getEventTitle().isEmpty()
+                                    && t.getEventId() != null && !t.getEventId().isEmpty();
+
+                            if (hasDenormalized) {
+                                Event ev = eventDataMap.get(t.getEventId());
+                                if (ev != null) t.setEventStatus(ev.getStatus());
+                            } else {
+                                String eventId = utId != null ? ticketToEventMap.get(utId) : null;
+                                if (eventId == null) continue;
+                                t.setEventId(eventId);
+
+                                if (t.getPrice() <= 0 && orderItemId != null) {
+                                    Long price = priceMap.get(orderItemId);
+                                    if (price != null) {
+                                        t.setPrice(price);
+                                        if (t.getOriginalPrice() <= 0) t.setOriginalPrice(price);
+                                    }
+                                }
+
+                                Event ev = eventDataMap.get(eventId);
+                                if (ev == null) continue;
+                                t.setEventTitle(ev.getTitle());
+                                t.setEventImageUrl(ev.getPosterUrl() != null ? ev.getPosterUrl() : ev.getImageUrl());
+                                t.setEventDate(ev.getDate());
+                                t.setEventLocation(ev.getLocation());
+                                t.setEventStatus(ev.getStatus());
                             }
                         }
-
-                        Event ev = eventDataMap.get(eventId);
-                        if (ev == null) continue;
-                        t.setEventTitle(ev.getTitle());
-                        t.setEventImageUrl(ev.getPosterUrl() != null ? ev.getPosterUrl() : ev.getImageUrl());
-                        t.setEventDate(ev.getDate());
-                        t.setEventLocation(ev.getLocation());
-                        t.setEventStatus(ev.getStatus());
-                    }
-                    listener.onSuccess(transfers);
+                        listener.onSuccess(transfers);
+                    });
                 });
             });
         });
     }
 
-    /** Fetch user_tickets in batches of 30 — map user_ticket_id → event_id và → order_item_id */
+    /** Fetch user_tickets in batches of 30.
+     *  Populates: ticketToEvent (id→eventId), ticketToOrderItem (id→orderItemId),
+     *             ticketToLegacyTypeName (id→ticketTypeName for legacy docs without order_item_id). */
     private void fetchUserTickets(List<String> ids, int offset,
                                    Map<String, String> ticketToEvent,
                                    Map<String, String> ticketToOrderItem,
+                                   Map<String, String> ticketToLegacyTypeName,
                                    OnMapReady<String, String> callback) {
         if (offset >= ids.size()) {
             callback.onReady(ticketToEvent);
@@ -316,26 +300,31 @@ public class TicketTransferRepository {
                 .addOnSuccessListener(snap -> {
                     for (DocumentSnapshot doc : snap.getDocuments()) {
                         String userTicketId = doc.getString("user_ticket_id");
-                        String eventId = doc.getString("event_id");
+                        if (userTicketId == null) userTicketId = doc.getId();
+                        String eventId     = doc.getString("event_id");
                         String orderItemId = doc.getString("order_item_id");
-                        if (userTicketId != null && eventId != null) {
-                            ticketToEvent.put(userTicketId, eventId);
-                        }
-                        if (userTicketId != null && orderItemId != null) {
+                        // Legacy field written by SimulatedPaymentFragment
+                        String legacyName  = doc.getString("ticketTypeName");
+
+                        if (eventId != null) ticketToEvent.put(userTicketId, eventId);
+                        if (orderItemId != null && !orderItemId.isEmpty())
                             ticketToOrderItem.put(userTicketId, orderItemId);
-                        }
+                        else if (legacyName != null && !legacyName.isEmpty())
+                            ticketToLegacyTypeName.put(userTicketId, legacyName);
                     }
-                    fetchUserTickets(ids, end, ticketToEvent, ticketToOrderItem, callback);
+                    fetchUserTickets(ids, end, ticketToEvent, ticketToOrderItem,
+                            ticketToLegacyTypeName, callback);
                 })
                 .addOnFailureListener(e -> callback.onReady(ticketToEvent));
     }
 
-    /** Fetch giá vé từ order_items.price_per_ticket theo order_item_id (batch 30) */
+    /** Fetch giá vé + ticket_type_id từ order_items theo order_item_id (batch 30) */
     private void fetchOrderItemPrices(List<String> ids, int offset,
-                                      Map<String, Long> accumulator,
+                                      Map<String, Long> priceAcc,
+                                      Map<String, String> typeIdAcc,
                                       OnMapReady<String, Long> callback) {
         if (offset >= ids.size()) {
-            callback.onReady(accumulator);
+            callback.onReady(priceAcc);
             return;
         }
         int end = Math.min(offset + 30, ids.size());
@@ -347,13 +336,42 @@ public class TicketTransferRepository {
                     for (DocumentSnapshot doc : snap.getDocuments()) {
                         String orderItemId = doc.getString("order_item_id");
                         Long price = doc.getLong("price_per_ticket");
-                        if (orderItemId != null && price != null) {
-                            accumulator.put(orderItemId, price);
+                        String typeId = doc.getString("ticket_type_id");
+                        if (orderItemId != null) {
+                            if (price != null) priceAcc.put(orderItemId, price);
+                            if (typeId != null && !typeId.isEmpty()) typeIdAcc.put(orderItemId, typeId);
                         }
                     }
-                    fetchOrderItemPrices(ids, end, accumulator, callback);
+                    fetchOrderItemPrices(ids, end, priceAcc, typeIdAcc, callback);
                 })
-                .addOnFailureListener(e -> callback.onReady(accumulator));
+                .addOnFailureListener(e -> callback.onReady(priceAcc));
+    }
+
+    /** Fetch tên loại vé từ ticket_types collection (batch 10 doc gets) */
+    private void fetchTicketTypeNames(List<String> typeIds, int offset,
+                                      Map<String, String> nameAcc,
+                                      OnMapReady<String, String> callback) {
+        if (offset >= typeIds.size()) { callback.onReady(nameAcc); return; }
+        int end = Math.min(offset + 10, typeIds.size());
+        List<com.google.android.gms.tasks.Task<DocumentSnapshot>> tasks = new ArrayList<>();
+        for (String id : typeIds.subList(offset, end)) {
+            if (id != null && !id.isEmpty())
+                tasks.add(db.collection(FirebaseCollections.TICKET_TYPES).document(id).get());
+        }
+        if (tasks.isEmpty()) { fetchTicketTypeNames(typeIds, end, nameAcc, callback); return; }
+
+        com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks)
+                .addOnSuccessListener(results -> {
+                    for (Object obj : results) {
+                        DocumentSnapshot doc = (DocumentSnapshot) obj;
+                        if (doc.exists()) {
+                            String name = doc.getString("name");
+                            if (name != null) nameAcc.put(doc.getId(), name);
+                        }
+                    }
+                    fetchTicketTypeNames(typeIds, end, nameAcc, callback);
+                })
+                .addOnFailureListener(e -> callback.onReady(nameAcc));
     }
 
     /** Fetch events by doc IDs using individual get() calls batched */

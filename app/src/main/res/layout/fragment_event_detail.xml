@@ -200,6 +200,57 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
+                <!-- Event type (Offline / Online) -->
+                <LinearLayout
+                    android:id="@+id/rowEventType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_info"
+                        app:tint="@color/clr_primary_blue" />
+
+                    <TextView
+                        android:id="@+id/txtDetailEventType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+
+                <!-- Age restriction -->
+                <LinearLayout
+                    android:id="@+id/rowAgeRestriction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="@color/clr_primary_blue" />
+
+                    <TextView
+                        android:id="@+id/txtDetailAgeRestriction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:textColor="@color/clr_text_black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
                 <!-- Divider -->
                 <View
                     android:layout_width="match_parent"

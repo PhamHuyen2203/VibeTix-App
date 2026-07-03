@@ -1,7 +1,8 @@
 package com.example.vibetix.Activities.Organizer;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,6 +51,8 @@ import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -102,10 +105,15 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private TextInputEditText etOnlineLink;
     private AutoCompleteTextView ddAgeRestriction;
     private TextInputEditText etMaxTicketsPerTransaction;
+    // Required field TextInputLayouts (for red * hint + inline error)
+    private TextInputLayout tilTitle, tilCategory, tilStartTime, tilEndTime;
+    private TextInputLayout tilVenueName, tilVenueCity;
+    private TextInputLayout tilNewOrgName, tilNewOrgEmail, tilNewOrgPhone;
 
     // ─── Step 2: Time & Venue ────────────────────────────────────────────────
     private TextInputEditText etStartTime, etEndTime;
-    private TextInputEditText etVenueName, etVenueAddress, etVenueCity;
+    private TextInputEditText etVenueName, etVenueAddress;
+    private AutoCompleteTextView etVenueCity; // E5: dropdown tỉnh/thành phố từ API
 
     // ─── Step 3: Organizer ───────────────────────────────────────────────────
     private TextView tvPreviewTitle, tvPreviewTime, tvPreviewVenue;
@@ -146,6 +154,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private String existingEventId = null;
     private Event editingEvent = null;
     private Uri selectedPosterUri = null;
+    private byte[] selectedPosterBytes = null;
     private boolean isReadOnly = false;
     private String pendingRejectionReason = null;
 
@@ -231,7 +240,8 @@ public class CreateEditEventActivity extends AppCompatActivity {
         etEndTime      = findViewById(R.id.etEndTime);
         etVenueName    = findViewById(R.id.etVenueName);
         etVenueAddress = findViewById(R.id.etVenueAddress);
-        etVenueCity    = findViewById(R.id.etVenueCity);
+        etVenueCity    = findViewById(R.id.etVenueCity); // AutoCompleteTextView — E5
+        loadProvinces();
 
         // Step 3
         tvPreviewTitle   = findViewById(R.id.tvPreviewTitle);
@@ -249,6 +259,19 @@ public class CreateEditEventActivity extends AppCompatActivity {
         etNewOrgEmail    = findViewById(R.id.etNewOrgEmail);
         etNewOrgPhone    = findViewById(R.id.etNewOrgPhone);
         etNewOrgWebsite  = findViewById(R.id.etNewOrgWebsite);
+
+        // Required/validated field TILs (for red * hints + inline errors)
+        tilTitle        = findViewById(R.id.tilTitle);
+        tilCategory     = findViewById(R.id.tilCategory);
+        tilStartTime    = findViewById(R.id.tilStartTime);
+        tilEndTime      = findViewById(R.id.tilEndTime);
+        tilVenueName    = findViewById(R.id.tilVenueName);
+        tilVenueCity    = findViewById(R.id.tilVenueCity);
+        tilNewOrgName   = findViewById(R.id.tilNewOrgName);
+        tilNewOrgEmail  = findViewById(R.id.tilNewOrgEmail);
+        tilNewOrgPhone  = findViewById(R.id.tilNewOrgPhone);
+        markRequiredHints();
+        setupErrorClearWatchers();
 
         if (rgOrganizerMode != null) {
             rgOrganizerMode.setOnCheckedChangeListener((group, checkedId) -> {
@@ -377,6 +400,16 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 uri -> {
                     if (uri != null) {
                         selectedPosterUri = uri;
+                        // Read bytes immediately while URI permission is still valid
+                        try (InputStream is = getContentResolver().openInputStream(uri);
+                             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                            byte[] buf = new byte[4096];
+                            int len;
+                            while ((len = is.read(buf)) != -1) bos.write(buf, 0, len);
+                            selectedPosterBytes = bos.toByteArray();
+                        } catch (Exception e) {
+                            selectedPosterBytes = null;
+                        }
                         Glide.with(this).load(uri).into(ivEventPoster);
                     }
                 });
@@ -398,16 +431,61 @@ public class CreateEditEventActivity extends AppCompatActivity {
     }
 
     private void showDateTimePicker(Calendar cal, TextInputEditText target) {
-        new DatePickerDialog(this, (view, y, m, d) -> {
-            cal.set(Calendar.YEAR, y);
-            cal.set(Calendar.MONTH, m);
-            cal.set(Calendar.DAY_OF_MONTH, d);
-            new TimePickerDialog(this, (v2, h, min) -> {
-                cal.set(Calendar.HOUR_OF_DAY, h);
-                cal.set(Calendar.MINUTE, min);
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Chọn ngày")
+                .setSelection(cal.getTimeInMillis())
+                .build();
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            // selection là UTC millis; cập nhật ngày vào cal
+            Calendar picked = Calendar.getInstance();
+            picked.setTimeInMillis(selection);
+            cal.set(Calendar.YEAR,         picked.get(Calendar.YEAR));
+            cal.set(Calendar.MONTH,        picked.get(Calendar.MONTH));
+            cal.set(Calendar.DAY_OF_MONTH, picked.get(Calendar.DAY_OF_MONTH));
+
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setHour(cal.get(Calendar.HOUR_OF_DAY))
+                    .setMinute(cal.get(Calendar.MINUTE))
+                    .setTitleText("Chọn giờ")
+                    .build();
+            timePicker.addOnPositiveButtonClickListener(v -> {
+                cal.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                cal.set(Calendar.MINUTE,      timePicker.getMinute());
                 target.setText(dtFormat.format(cal.getTime()));
-            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show();
-        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+            });
+            timePicker.show(getSupportFragmentManager(), "time_picker");
+        });
+        datePicker.show(getSupportFragmentManager(), "date_picker");
+    }
+
+    private void showSaleDatePicker(Calendar cal, TextInputEditText target,
+                                    java.text.SimpleDateFormat fmt, String title) {
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText(title)
+                .setSelection(cal.getTimeInMillis())
+                .build();
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            Calendar picked = Calendar.getInstance();
+            picked.setTimeInMillis(selection);
+            cal.set(Calendar.YEAR,         picked.get(Calendar.YEAR));
+            cal.set(Calendar.MONTH,        picked.get(Calendar.MONTH));
+            cal.set(Calendar.DAY_OF_MONTH, picked.get(Calendar.DAY_OF_MONTH));
+
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .setHour(cal.get(Calendar.HOUR_OF_DAY))
+                    .setMinute(cal.get(Calendar.MINUTE))
+                    .setTitleText("Chọn giờ")
+                    .build();
+            timePicker.addOnPositiveButtonClickListener(v -> {
+                cal.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                cal.set(Calendar.MINUTE,      timePicker.getMinute());
+                target.setText(fmt.format(cal.getTime()));
+            });
+            timePicker.show(getSupportFragmentManager(), "sale_time_picker");
+        });
+        datePicker.show(getSupportFragmentManager(), "sale_date_picker");
     }
 
     // ── Step 4: Ticket Types ──────────────────────────────────────────────────
@@ -448,7 +526,13 @@ public class CreateEditEventActivity extends AppCompatActivity {
         TextInputEditText etDesc     = sheetView.findViewById(R.id.etTicketDesc);
         TextInputEditText etPrice    = sheetView.findViewById(R.id.etTicketPrice);
         TextInputEditText etQty      = sheetView.findViewById(R.id.etTotalQty);
+        TextInputEditText etSaleStart = sheetView.findViewById(R.id.etSaleStart);
+        TextInputEditText etSaleEnd   = sheetView.findViewById(R.id.etSaleEnd);
         MaterialButton btnSave = sheetView.findViewById(R.id.btnSaveTicketType);
+
+        java.text.SimpleDateFormat saleDateFmt = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+        Calendar saleStartCal = Calendar.getInstance();
+        Calendar saleEndCal   = Calendar.getInstance();
 
         // Pre-fill nếu đang sửa
         if (existing != null) {
@@ -456,6 +540,24 @@ public class CreateEditEventActivity extends AppCompatActivity {
             if (etDesc  != null && existing.getDescription() != null) etDesc.setText(existing.getDescription());
             if (etPrice != null) etPrice.setText(String.valueOf(existing.getPrice()));
             if (etQty   != null) etQty.setText(String.valueOf(existing.getTotalQuantity()));
+            if (existing.getSaleStart() != null) {
+                saleStartCal.setTimeInMillis(existing.getSaleStart().toDate().getTime());
+                if (etSaleStart != null) etSaleStart.setText(saleDateFmt.format(saleStartCal.getTime()));
+            }
+            if (existing.getSaleEnd() != null) {
+                saleEndCal.setTimeInMillis(existing.getSaleEnd().toDate().getTime());
+                if (etSaleEnd != null) etSaleEnd.setText(saleDateFmt.format(saleEndCal.getTime()));
+            }
+        }
+
+        // Date pickers for sale start/end
+        if (etSaleStart != null) {
+            etSaleStart.setOnClickListener(v -> showSaleDatePicker(saleStartCal, etSaleStart, saleDateFmt, "Ngày bắt đầu mở bán"));
+            etSaleStart.setFocusable(false);
+        }
+        if (etSaleEnd != null) {
+            etSaleEnd.setOnClickListener(v -> showSaleDatePicker(saleEndCal, etSaleEnd, saleDateFmt, "Ngày kết thúc mở bán"));
+            etSaleEnd.setFocusable(false);
         }
 
         if (btnSave != null) {
@@ -482,6 +584,12 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 tt.setTotalQuantity(qty);
                 tt.setAvailableQuantity(qty);
                 tt.setActive(true);
+
+                // Save sale dates if set
+                String saleStartStr = etSaleStart != null && etSaleStart.getText() != null ? etSaleStart.getText().toString().trim() : "";
+                String saleEndStr   = etSaleEnd   != null && etSaleEnd.getText()   != null ? etSaleEnd.getText().toString().trim()   : "";
+                if (!saleStartStr.isEmpty()) tt.setSaleStart(new com.google.firebase.Timestamp(saleStartCal.getTime()));
+                if (!saleEndStr.isEmpty())   tt.setSaleEnd(new com.google.firebase.Timestamp(saleEndCal.getTime()));
 
                 if (editPosition >= 0 && editPosition < draftTicketTypes.size()) {
                     draftTicketTypes.set(editPosition, tt);
@@ -1006,10 +1114,11 @@ public class CreateEditEventActivity extends AppCompatActivity {
     // ── Disable all fields (read-only mode) ───────────────────────────────────
     private void disableAllFields() {
         TextInputEditText[] fields = {etTitle, etDescription, etStartTime, etEndTime,
-                etVenueName, etVenueAddress, etVenueCity,
+                etVenueName, etVenueAddress,
                 etNewOrgName, etNewOrgEmail, etNewOrgPhone, etNewOrgWebsite,
                 etOnlineLink, etMaxTicketsPerTransaction};
         for (TextInputEditText f : fields) if (f != null) f.setEnabled(false);
+        if (etVenueCity != null) etVenueCity.setEnabled(false);
         if (ddCategory  != null) ddCategory.setEnabled(false);
         if (ddOrganizer != null) ddOrganizer.setEnabled(false);
         if (swIsFree    != null) swIsFree.setEnabled(false);
@@ -1029,30 +1138,93 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
     // ── Validation ────────────────────────────────────────────────────────────
     private boolean validateCurrentStep() {
+        clearStepErrors();
         switch (currentStep) {
             case 0:
                 if (etTitle == null || etTitle.getText() == null
                         || etTitle.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(this, "Vui lòng nhập tiêu đề sự kiện", Toast.LENGTH_SHORT).show();
-                    if (etTitle != null) etTitle.requestFocus();
+                    setFieldError(tilTitle, "Vui lòng nhập tiêu đề sự kiện");
+                    return false;
+                }
+                if (selectedCategory == null) {
+                    setFieldError(tilCategory, "Vui lòng chọn danh mục sự kiện");
                     return false;
                 }
                 break;
             case 1:
                 if (etStartTime == null || etStartTime.getText() == null
                         || etStartTime.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(this, "Vui lòng chọn thời gian bắt đầu", Toast.LENGTH_SHORT).show();
+                    setFieldError(tilStartTime, "Vui lòng chọn thời gian bắt đầu");
                     return false;
+                }
+                if (etEndTime != null && etEndTime.getText() != null
+                        && !etEndTime.getText().toString().trim().isEmpty()) {
+                    if (endCalendar.getTimeInMillis() <= startCalendar.getTimeInMillis()) {
+                        setFieldError(tilEndTime, "Thời gian kết thúc phải sau thời gian bắt đầu");
+                        return false;
+                    }
                 }
                 if (etVenueName == null || etVenueName.getText() == null
                         || etVenueName.getText().toString().trim().isEmpty()) {
-                    Toast.makeText(this, "Vui lòng nhập địa điểm tổ chức", Toast.LENGTH_SHORT).show();
-                    if (etVenueName != null) etVenueName.requestFocus();
+                    setFieldError(tilVenueName, "Vui lòng nhập tên địa điểm tổ chức");
                     return false;
+                }
+                if (etVenueCity == null || etVenueCity.getText() == null
+                        || etVenueCity.getText().toString().trim().isEmpty()) {
+                    setFieldError(tilVenueCity, "Vui lòng chọn tỉnh/thành phố");
+                    return false;
+                }
+                break;
+            case 2:
+                boolean isNewOrgMode = rgOrganizerMode != null
+                        && rgOrganizerMode.getCheckedRadioButtonId() == R.id.rbNewOrganizer;
+                if (isNewOrgMode) {
+                    String orgName  = etNewOrgName  != null && etNewOrgName.getText()  != null ? etNewOrgName.getText().toString().trim()  : "";
+                    String orgEmail = etNewOrgEmail != null && etNewOrgEmail.getText() != null ? etNewOrgEmail.getText().toString().trim() : "";
+                    String orgPhone = etNewOrgPhone != null && etNewOrgPhone.getText() != null ? etNewOrgPhone.getText().toString().trim() : "";
+                    if (orgName.isEmpty()) {
+                        setFieldError(tilNewOrgName, "Vui lòng nhập tên Ban tổ chức");
+                        return false;
+                    }
+                    if (orgEmail.isEmpty()) {
+                        setFieldError(tilNewOrgEmail, "Vui lòng nhập email liên hệ");
+                        return false;
+                    }
+                    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(orgEmail).matches()) {
+                        setFieldError(tilNewOrgEmail, "Email không đúng định dạng");
+                        return false;
+                    }
+                    if (orgPhone.isEmpty()) {
+                        setFieldError(tilNewOrgPhone, "Vui lòng nhập số điện thoại");
+                        return false;
+                    }
+                    if (!orgPhone.matches("^(\\+84|0)[0-9]{8,10}$")) {
+                        setFieldError(tilNewOrgPhone, "Số điện thoại không đúng định dạng (VD: 0912345678)");
+                        return false;
+                    }
                 }
                 break;
         }
         return true;
+    }
+
+    private void setFieldError(TextInputLayout til, String message) {
+        if (til == null) return;
+        til.setErrorEnabled(true);
+        til.setError(message);
+        View innerField = til.getEditText();
+        if (innerField != null) innerField.requestFocus();
+    }
+
+    private void clearStepErrors() {
+        TextInputLayout[] all = {
+                tilTitle, tilCategory, tilStartTime, tilEndTime,
+                tilVenueName, tilVenueCity,
+                tilNewOrgName, tilNewOrgEmail, tilNewOrgPhone
+        };
+        for (TextInputLayout t : all) {
+            if (t != null) { t.setError(null); t.setErrorEnabled(false); }
+        }
     }
 
     private boolean validateForm(String status) {
@@ -1154,6 +1326,12 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.err_empty_new_org_info), Toast.LENGTH_SHORT).show();
                 return;
             }
+            // E3: kiểm tra định dạng email ban tổ chức
+            if (!newOrgEmail.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(newOrgEmail).matches()) {
+                Toast.makeText(this, "Email ban tổ chức không đúng định dạng", Toast.LENGTH_SHORT).show();
+                if (etNewOrgEmail != null) etNewOrgEmail.requestFocus();
+                return;
+            }
             if (!"draft".equals(status) || !newOrgName.isEmpty()) {
                 createNewOrganizerAndSave(newOrgName, newOrgEmail, newOrgPhone, newOrgWebsite,
                         title, description, venueName, venueAddr, venueCity, startTime, endTime, status);
@@ -1197,7 +1375,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
     private void continueSaveFlow(String title, String desc, String venueName, String venueAddr,
                                   String venueCity, String startTime, String endTime, String status) {
-        if (selectedPosterUri != null) {
+        if (selectedPosterBytes != null) {
             uploadPosterThenSave(title, desc, venueName, venueAddr, venueCity, startTime, endTime, status);
         } else {
             String existingPoster = editingEvent != null ? editingEvent.getPosterUrl() : null;
@@ -1211,10 +1389,15 @@ public class CreateEditEventActivity extends AppCompatActivity {
         String userId = getCurrentUserId();
         StorageReference ref = storage.getReference()
                 .child("event_posters/" + (userId != null ? userId : "unknown") + "/" + UUID.randomUUID() + ".jpg");
-        ref.putFile(selectedPosterUri)
-                .addOnSuccessListener(snap -> ref.getDownloadUrl()
-                        .addOnSuccessListener(uri -> buildAndSaveEvent(title, desc, venueName, venueAddr, venueCity,
-                                startTime, endTime, status, uri.toString())))
+        com.google.firebase.storage.StorageMetadata metadata = new com.google.firebase.storage.StorageMetadata.Builder()
+                .setContentType("image/jpeg").build();
+        ref.putBytes(selectedPosterBytes, metadata)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) throw task.getException();
+                    return ref.getDownloadUrl();
+                })
+                .addOnSuccessListener(uri -> buildAndSaveEvent(title, desc, venueName, venueAddr, venueCity,
+                        startTime, endTime, status, uri.toString()))
                 .addOnFailureListener(e -> {
                     setButtonsEnabled(true);
                     Toast.makeText(this, "Lỗi upload ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1412,6 +1595,109 @@ public class CreateEditEventActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
+    }
+
+    // ── Danh sách 34 tỉnh/thành phố sau sáp nhập 2025 ──────────────────────────
+    private void loadProvinces() {
+        List<String> provinces = new ArrayList<>(java.util.Arrays.asList(
+                "Hà Nội",
+                "Hồ Chí Minh",
+                "Hải Phòng",
+                "Đà Nẵng",
+                "Cần Thơ",
+                "Vĩnh Phúc - Phú Thọ",
+                "Hà Giang - Tuyên Quang",
+                "Cao Bằng - Bắc Kạn",
+                "Lào Cai - Yên Bái",
+                "Điện Biên - Lai Châu",
+                "Sơn La - Hòa Bình",
+                "Thái Nguyên - Bắc Giang - Lạng Sơn",
+                "Quảng Ninh",
+                "Bắc Ninh - Hưng Yên",
+                "Hải Dương",
+                "Thái Bình - Hà Nam",
+                "Nam Định - Ninh Bình",
+                "Thanh Hóa",
+                "Nghệ An - Hà Tĩnh",
+                "Quảng Bình - Quảng Trị",
+                "Thừa Thiên Huế",
+                "Quảng Nam - Đà Nẵng",
+                "Quảng Ngãi - Bình Định",
+                "Phú Yên - Khánh Hòa",
+                "Ninh Thuận - Bình Thuận",
+                "Kon Tum - Gia Lai",
+                "Đắk Lắk - Đắk Nông",
+                "Lâm Đồng - Bình Phước",
+                "Bình Dương",
+                "Đồng Nai - Bà Rịa Vũng Tàu",
+                "Long An - Tiền Giang",
+                "Bến Tre - Vĩnh Long - Trà Vinh",
+                "Đồng Tháp - An Giang - Kiên Giang",
+                "Cà Mau - Bạc Liêu - Sóc Trăng - Hậu Giang"
+        ));
+        if (etVenueCity == null) return;
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_dropdown_item_1line, provinces);
+        etVenueCity.setAdapter(adapter);
+    }
+
+    // ── Required field red * hints ────────────────────────────────────────────
+    private void markRequiredHints() {
+        markRequired(tilTitle,      "Tiêu đề sự kiện");
+        markRequired(tilCategory,   "Chọn danh mục");
+        markRequired(tilStartTime,  "Thời gian bắt đầu");
+        markRequired(tilVenueName,  "Tên địa điểm");
+        markRequired(tilVenueCity,  "Thành phố / Tỉnh");
+        markRequired(tilNewOrgName,  "Tên Ban tổ chức");
+        markRequired(tilNewOrgEmail, "Email liên hệ");
+        markRequired(tilNewOrgPhone, "Số điện thoại");
+    }
+
+    private void markRequired(TextInputLayout til, String label) {
+        if (til == null) return;
+        android.text.SpannableString span = new android.text.SpannableString(label + " *");
+        span.setSpan(
+                new android.text.style.ForegroundColorSpan(android.graphics.Color.RED),
+                span.length() - 1, span.length(),
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        til.setHint(span);
+    }
+
+    // Auto-clear field error as soon as user edits the field
+    private void setupErrorClearWatchers() {
+        attachClearWatcher(etTitle,      tilTitle);
+        attachClearWatcher(etStartTime,  tilStartTime);
+        attachClearWatcher(etEndTime,    tilEndTime);
+        attachClearWatcher(etVenueName,  tilVenueName);
+        attachClearWatcher(etVenueCity,  tilVenueCity);
+        attachClearWatcher(etNewOrgName,  tilNewOrgName);
+        attachClearWatcher(etNewOrgEmail, tilNewOrgEmail);
+        attachClearWatcher(etNewOrgPhone, tilNewOrgPhone);
+        // Category dropdown — clear error on item selected
+        if (ddCategory != null) {
+            ddCategory.setOnItemClickListener((parent, view, pos, id) -> {
+                if (tilCategory != null) { tilCategory.setError(null); tilCategory.setErrorEnabled(false); }
+            });
+        }
+        // VenueCity dropdown
+        if (etVenueCity != null) {
+            etVenueCity.setOnItemClickListener((parent, view, pos, id) -> {
+                if (tilVenueCity != null) { tilVenueCity.setError(null); tilVenueCity.setErrorEnabled(false); }
+            });
+        }
+    }
+
+    private void attachClearWatcher(android.widget.EditText et, TextInputLayout til) {
+        if (et == null || til == null) return;
+        et.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                til.setError(null);
+                til.setErrorEnabled(false);
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
