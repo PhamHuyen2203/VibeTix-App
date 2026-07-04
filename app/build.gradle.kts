@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
 }
+
+// Đọc GEMINI_API_KEY từ local.properties (file này KHÔNG commit lên git)
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { localProps.load(it) }
+}
+val geminiApiKey: String = localProps.getProperty("GEMINI_API_KEY") ?: ""
 
 android {
     namespace = "com.example.vibetix"
@@ -21,6 +31,9 @@ android {
         ndk {
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
         }
+
+        // Key Gemini cho PosterDescriptionService (Accessibility Assistant)
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -39,6 +52,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

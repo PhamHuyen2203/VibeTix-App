@@ -29,7 +29,8 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back" 
+                android:contentDescription="Quay lại" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -71,7 +72,8 @@
                 android:gravity="center"
                 android:padding="4dp"
                 android:src="@android:drawable/checkbox_on_background"
-                app:tint="@color/clr_text_white" />
+                app:tint="@color/clr_text_white" 
+                android:importantForAccessibility="no" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -105,7 +107,8 @@
                 android:gravity="center"
                 android:padding="4dp"
                 android:src="@android:drawable/checkbox_on_background"
-                app:tint="@color/clr_text_white" />
+                app:tint="@color/clr_text_white" 
+                android:importantForAccessibility="no" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -203,7 +206,8 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_calendar_small"
-                    app:tint="@color/clr_primary_blue" />
+                    app:tint="@color/clr_primary_blue" 
+                    android:importantForAccessibility="no" />
 
                 <TextView
                     android:id="@+id/txtPaymentCountdown"
@@ -236,7 +240,8 @@
                         android:layout_height="72dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/event_live_non_song"
-                        app:cornerRadius="8dp" />
+                        app:cornerRadius="8dp" 
+                        android:contentDescription="Ảnh sự kiện" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -301,7 +306,8 @@
                         android:background="@drawable/bg_quick_chip"
                         android:padding="10dp"
                         android:src="@drawable/ic_auth_email"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:importantForAccessibility="no" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -337,7 +343,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerInParent="true"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="@color/clr_grey_1" />
+                        app:tint="@color/clr_grey_1" 
+                        android:contentDescription="Chỉnh sửa địa chỉ email nhận vé" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 

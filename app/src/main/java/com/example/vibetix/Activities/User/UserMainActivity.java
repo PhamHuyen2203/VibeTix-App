@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.vibetix.Accessibility.AccessibilityAssistantManager;
 import com.example.vibetix.Fragments.User.CreateEventFragment;
 import com.example.vibetix.Fragments.User.OrganizerHubFragment;
 import com.example.vibetix.Fragments.User.EventsFragment;
@@ -45,6 +46,12 @@ public class UserMainActivity extends AppCompatActivity {
 
     private int activeTabId = R.id.tabHome;
 
+    // ── Accessibility Assistant ──────────────────────────────────────────────
+    private static final int REQ_RECORD_AUDIO = 9001;
+    /** Pref (trong PREFS_PROFILE): user bật trợ lý giọng nói trong Cài đặt chưa. */
+    public static final String KEY_VOICE_ASSISTANT_ENABLED = "voice_assistant_enabled";
+    private AccessibilityAssistantManager assistantManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +61,7 @@ public class UserMainActivity extends AppCompatActivity {
         bindViews();
         applyNavBarInset();
         setupNavListeners();
+        setupAssistant();
 
         if (savedInstanceState == null) {
             // C1: Nếu được mở từ notification order_confirmed → mở thẳng tab Vé
@@ -273,6 +281,20 @@ public class UserMainActivity extends AppCompatActivity {
     private static final String KEY_PIN_HASH        = "user_pin_hash";
     private static final String KEY_PIN_FOR_TICKETS = "pin_for_tickets";
 
+    /** Trợ lý accessibility mở tab Vé — đi qua cùng luồng PIN gate như bấm tay. */
+    public void openTicketsTab() {
+        handleTicketsTabClick();
+    }
+
+    /** Cho trợ lý biết tab Vé có bị khóa PIN không (để thông báo phù hợp). */
+    public boolean isTicketsPinEnabled() {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREFS_PROFILE, Context.MODE_PRIVATE);
+        boolean pinEnabled = prefs.getBoolean(KEY_PIN_FOR_TICKETS, false);
+        String pinHash = prefs.getString(KEY_PIN_HASH, null);
+        if (pinHash == null) pinHash = prefs.getString("user_pin", null);
+        return pinEnabled && pinHash != null && !pinHash.isEmpty();
+    }
+
     private void handleTicketsTabClick() {
         SharedPreferences prefs = getSharedPreferences(Constants.PREFS_PROFILE, Context.MODE_PRIVATE);
         boolean pinEnabled = prefs.getBoolean(KEY_PIN_FOR_TICKETS, false);
@@ -369,6 +391,71 @@ public class UserMainActivity extends AppCompatActivity {
         StringBuilder sb = new StringBuilder();
         for (EditText b : boxes) if (b != null) sb.append(b.getText().toString().trim());
         return sb.toString();
+    }
+
+    // ── Accessibility Assistant ──────────────────────────────────────────────
+
+    /** Cho fragment (EventDetailFragment...) truy cập trợ lý để cập nhật ngữ cảnh. */
+    public AccessibilityAssistantManager getAssistantManager() {
+        return assistantManager;
+    }
+
+    private void setupAssistant() {
+        assistantManager = new AccessibilityAssistantManager(this);
+        ImageView btnMic = findViewById(R.id.btnAssistantMic);
+        if (btnMic != null) {
+            btnMic.setOnClickListener(v -> startVoiceAssistant());
+        }
+        // Nút mic chỉ hiện khi user đã bật "Trợ lý giọng nói" trong Cài đặt
+        boolean enabled = getSharedPreferences(Constants.PREFS_PROFILE, Context.MODE_PRIVATE)
+                .getBoolean(KEY_VOICE_ASSISTANT_ENABLED, false);
+        setAssistantMicVisible(enabled);
+    }
+
+    /**
+     * Hiện/ẩn nút mic trợ lý (gọi từ toggle trong Cài đặt).
+     * Khi ẩn thì tắt luôn phiên nghe/đọc đang chạy.
+     */
+    public void setAssistantMicVisible(boolean visible) {
+        View btnMic = findViewById(R.id.btnAssistantMic);
+        if (btnMic != null) {
+            btnMic.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+        if (!visible && assistantManager != null) {
+            assistantManager.disable();
+        }
+    }
+
+    private void startVoiceAssistant() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.RECORD_AUDIO}, REQ_RECORD_AUDIO);
+            return;
+        }
+        assistantManager.startListening();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions,
+                                           @androidx.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_RECORD_AUDIO) {
+            if (grantResults.length > 0
+                    && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                assistantManager.startListening();
+            } else {
+                assistantManager.getTts().speak(
+                        "Cần cấp quyền ghi âm để dùng trợ lý giọng nói. "
+                        + "Vui lòng vào Cài đặt ứng dụng để cấp quyền");
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (assistantManager != null) assistantManager.destroy();
+        super.onDestroy();
     }
 
     /**

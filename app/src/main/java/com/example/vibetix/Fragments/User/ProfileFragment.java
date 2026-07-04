@@ -55,6 +55,7 @@ public class ProfileFragment extends Fragment {
     private TextView     txtLangFlag, txtLangLabel;
     private LinearLayout btnLangToggle;
     private Switch       switchNotifications;
+    private Switch       switchVoiceAssistant;
     private Button       btnLogout;
 
     private SharedPreferences authPrefs, profilePrefs;
@@ -117,6 +118,7 @@ public class ProfileFragment extends Fragment {
         txtLangFlag         = v.findViewById(R.id.txtLangFlag);
         txtLangLabel        = v.findViewById(R.id.txtLangLabel);
         switchNotifications = v.findViewById(R.id.switchNotifications);
+        switchVoiceAssistant = v.findViewById(R.id.switchVoiceAssistant);
         btnLogout           = v.findViewById(R.id.btnLogout);
     }
 
@@ -314,6 +316,20 @@ public class ProfileFragment extends Fragment {
                     startActivity(i2);
                     b2.setChecked(!checked);
                 });
+            });
+        }
+
+        // Toggle Trợ lý giọng nói — hiện/ẩn nút mic nổi trên màn hình chính
+        if (switchVoiceAssistant != null) {
+            switchVoiceAssistant.setChecked(profilePrefs.getBoolean(
+                    UserMainActivity.KEY_VOICE_ASSISTANT_ENABLED, false));
+            switchVoiceAssistant.setOnCheckedChangeListener((btn, isChecked) -> {
+                profilePrefs.edit()
+                        .putBoolean(UserMainActivity.KEY_VOICE_ASSISTANT_ENABLED, isChecked)
+                        .apply();
+                if (getActivity() instanceof UserMainActivity) {
+                    ((UserMainActivity) getActivity()).setAssistantMicVisible(isChecked);
+                }
             });
         }
     }

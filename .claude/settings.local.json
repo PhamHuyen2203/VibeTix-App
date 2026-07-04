@@ -8,7 +8,11 @@
       "PowerShell(cd \"D:\\\\FINAL MOBILE\\\\VibeTix-App\"; $env:JAVA_HOME = \"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; $env:PATH = \"$env:JAVA_HOME\\\\bin;$env:PATH\"; .\\\\gradlew.bat assembleDebug 2>&1 | Select-Object -Last 8)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "PowerShell($javaHome = Get-ChildItem \"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName; if \\(-not $javaHome\\) { $javaHome = \\(Get-ChildItem \"C:\\\\Program Files\\\\Java\" -ErrorAction SilentlyContinue | Select-Object -Last 1\\).FullName }; Write-Output \"JAVA_HOME: $javaHome\")",
+      "PowerShell($env:JAVA_HOME = \"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\"; $env:PATH = \"$env:JAVA_HOME\\\\bin;$env:PATH\"; cd \"D:\\\\FINAL MOBILE\\\\VibeTix-App\"; .\\\\gradlew assembleDebug 2>&1 | Select-Object -Last 50)",
+      "Bash(grep -oP '@\\(color|drawable\\)/\\\\w+' app/src/main/res/layout/activity_organizer_revenue.xml)",
+      "PowerShell($adb = \"C:\\\\Users\\\\baony\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\"; if \\(Test-Path $adb\\) { & $adb devices } else { Write-Output \"adb not found at that path\" })"
     ]
   }
 }

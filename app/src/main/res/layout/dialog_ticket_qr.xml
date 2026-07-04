@@ -22,7 +22,8 @@
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_vibetix_logo_full"
-                app:tint="@color/clr_primary_blue" />
+                app:tint="@color/clr_primary_blue" 
+                android:importantForAccessibility="no" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -69,7 +70,8 @@
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_menu_gallery" />
+                android:src="@android:drawable/ic_menu_gallery" 
+                android:contentDescription="Mã QR của vé, đưa cho nhân viên soát vé quét" />
         </androidx.cardview.widget.CardView>
 
         <!-- QR navigation (mũi tên qua lại nếu nhiều vé) -->
