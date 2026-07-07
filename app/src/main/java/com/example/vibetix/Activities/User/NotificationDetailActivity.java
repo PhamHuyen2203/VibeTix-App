@@ -41,11 +41,11 @@ public class NotificationDetailActivity extends AppCompatActivity {
         if (btnAction != null) {
             if ("order_confirmed".equals(type)) {
                 btnAction.setVisibility(View.VISIBLE);
-                btnAction.setText("Xem vé của tôi");
+                btnAction.setText(getString(R.string.str_btn_view_my_tickets));
                 btnAction.setOnClickListener(v -> openTicketsTab());
             } else if ("staff_assigned".equals(type)) {
                 btnAction.setVisibility(View.VISIBLE);
-                btnAction.setText("Xem sự kiện của tôi");
+                btnAction.setText(getString(R.string.str_btn_view_my_events));
                 final String eventId = refId;
                 btnAction.setOnClickListener(v -> openEventHub(eventId));
             } else {

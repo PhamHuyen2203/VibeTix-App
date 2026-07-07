@@ -82,22 +82,22 @@ public class OrganizerOrderAdapter extends RecyclerView.Adapter<OrganizerOrderAd
             case "completed":
             case "confirmed":
             case "paid":
-                holder.tvStatus.setText("Thành công");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_order_status_success));
                 holder.tvStatus.setTextColor(0xFF27AE60);
                 setRoundedBadgeBg(holder.tvStatus, 0x1A27AE60);
                 break;
             case "cancelled":
-                holder.tvStatus.setText("Đã hủy");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_order_status_cancelled));
                 holder.tvStatus.setTextColor(0xFFEB5757);
                 setRoundedBadgeBg(holder.tvStatus, 0x1AEB5757);
                 break;
             case "refunded":
-                holder.tvStatus.setText("Hoàn tiền");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_order_status_refunded));
                 holder.tvStatus.setTextColor(0xFFE6B93E);
                 setRoundedBadgeBg(holder.tvStatus, 0x1AE6B93E);
                 break;
             default:
-                holder.tvStatus.setText("Chờ xử lý");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_order_status_pending));
                 holder.tvStatus.setTextColor(0xFF226CEB);
                 setRoundedBadgeBg(holder.tvStatus, 0x1A226CEB);
                 break;

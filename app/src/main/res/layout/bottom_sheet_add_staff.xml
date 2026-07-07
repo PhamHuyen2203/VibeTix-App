@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="20dp"
-            android:text="Thêm nhân sự"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="Email tài khoản VibeTix *"
+            android:hint="@string/str_hint_email"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:textColorHint="#757575"
             app:hintTextColor="@color/clr_primary_blue"
@@ -86,7 +86,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phân quyền (Vai trò)"
+            android:text="@string/label_discount_type"
             android:textColor="@color/clr_text_black"
             android:textStyle="bold"
             android:textSize="14sp"
@@ -103,7 +103,7 @@
                 android:id="@+id/rbRoleManager"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quản lý sự kiện (Manager)"
+                android:text="@string/role_manager"
                 android:textColor="@color/clr_text_black"
                 android:textSize="15sp"
                 android:textStyle="bold"/>
@@ -121,7 +121,7 @@
                 android:id="@+id/rbRoleScanner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nhân viên soát vé (Check-in Staff)"
+                android:text="@string/role_staff"
                 android:textColor="@color/clr_text_black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -140,7 +140,7 @@
             android:id="@+id/btnSaveStaff"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Xác nhận thêm"
+            android:text="@string/str_confirm"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/clr_text_white"
@@ -149,3 +149,4 @@
 
     </LinearLayout>
 </LinearLayout>
+

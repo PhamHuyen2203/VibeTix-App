@@ -52,7 +52,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TỔNG QUAN NGƯỜI MUA"
+                    android:text="@string/str_no_data"
                     android:textColor="#E2E8F0"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -88,7 +88,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ĐÃ CHECK-IN"
+                            android:text="@string/str_item_check_in_action"
                             android:textColor="#E2E8F0"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -114,7 +114,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="CHƯA CHECK-IN"
+                            android:text="@string/str_item_not_checked_in"
                             android:textColor="#E2E8F0"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -162,7 +162,7 @@
                     android:id="@+id/etSearch"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="Tìm tên, mã vé, email..."
+                    android:hint="@string/search_hint"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:background="@color/clr_bg_white" />
@@ -227,7 +227,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Chưa có người mua vé"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -237,7 +237,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Danh sách người mua vé sẽ hiển thị ở đây"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="14sp"
                     android:gravity="center" />
@@ -249,4 +249,6 @@
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
 

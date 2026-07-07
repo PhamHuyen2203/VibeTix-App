@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Chưa có nghệ sĩ nào"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -92,9 +92,10 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:backgroundTint="@color/clr_primary"
-        android:text="Thêm Nghệ sĩ"
+        android:text="@string/str_star_detail_title"
         android:textColor="@color/clr_text_white"
         app:icon="@drawable/ic_plus"
         app:iconTint="@color/clr_text_white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

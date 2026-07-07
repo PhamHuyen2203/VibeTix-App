@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Chi tiết đơn hàng"
+            android:text="@string/str_my_orders"
             android:textColor="@color/clr_text_black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -57,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Mã đơn hàng:"
+            android:text="@string/str_order_number_label"
             android:textColor="@color/clr_text_secondary"
             android:textSize="14sp" />
 
@@ -83,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Ngày mua:"
+            android:text="@string/str_order_time_label"
             android:textColor="@color/clr_text_secondary"
             android:textSize="14sp" />
 
@@ -108,7 +108,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Trạng thái:"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_secondary"
             android:textSize="14sp" />
 
@@ -135,7 +135,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Khách hàng"
+        android:text="@string/str_attendee_info_title"
         android:textColor="@color/clr_text_black"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -159,7 +159,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chi tiết vé"
+        android:text="@string/str_ticket_info_section"
         android:textColor="@color/clr_text_black"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -205,7 +205,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Tổng thu:"
+            android:text="@string/str_revenue_label"
             android:textColor="@color/clr_text_black"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -226,7 +226,7 @@
         android:layout_height="56dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="@color/clr_primary"
-        android:text="Xác nhận duyệt đơn"
+        android:text="@string/btn_approve"
         android:textColor="@color/clr_text_white"
         android:textSize="16sp"
         android:textStyle="bold"
@@ -234,3 +234,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+

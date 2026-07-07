@@ -132,7 +132,7 @@ public class NotificationPopupHelper {
         if (items.isEmpty()) {
             // Empty state
             TextView empty = new TextView(context);
-            empty.setText("Bạn chưa có thông báo nào.");
+            empty.setText(context.getString(R.string.str_no_notifications));
             empty.setTextColor(0xFF888888);
             empty.setTextSize(14f);
             empty.setPadding(48, 48, 48, 48);

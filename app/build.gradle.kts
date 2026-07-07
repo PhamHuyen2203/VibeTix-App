@@ -85,4 +85,5 @@ dependencies {
     implementation(libs.camera.view)
     implementation(libs.zxing)
     implementation(libs.play.services.auth)
+    implementation(libs.richeditor)
 }

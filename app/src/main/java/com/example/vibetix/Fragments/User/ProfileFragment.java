@@ -140,9 +140,9 @@ public class ProfileFragment extends Fragment {
         String cachedName   = authPrefs.getString(Constants.KEY_USER_NAME,   "");
         String cachedEmail  = authPrefs.getString(Constants.KEY_USER_EMAIL,  "");
         String cachedAvatar = authPrefs.getString(Constants.KEY_USER_AVATAR, "");
-        if (txtProfileName  != null) txtProfileName.setText(cachedName.isEmpty() ? "Người dùng VibeTix" : cachedName);
+        if (txtProfileName  != null) txtProfileName.setText(cachedName.isEmpty() ? getString(R.string.str_default_username_label) : cachedName);
         if (txtProfileEmail != null && !cachedEmail.isEmpty()) txtProfileEmail.setText(cachedEmail);
-        if (txtMemberSince  != null) txtMemberSince.setText("Thành viên từ 2024");
+        if (txtMemberSince  != null) txtMemberSince.setText(getString(R.string.str_member_since_label));
         // Avatar từ cache
         if (imgAvatar != null) {
             com.example.vibetix.Utils.ImageUtils.loadCircle(
@@ -176,7 +176,7 @@ public class ProfileFragment extends Fragment {
                 final String finalName   = name;
                 final String finalEmail  = email;
                 final String finalAvatar = avatar;
-                if (txtProfileName  != null) txtProfileName.setText(finalName.isEmpty() ? "Người dùng VibeTix" : finalName);
+                if (txtProfileName  != null) txtProfileName.setText(finalName.isEmpty() ? getString(R.string.str_default_username_label) : finalName);
                 if (txtProfileEmail != null) txtProfileEmail.setText(finalEmail);
                 if (imgAvatar != null) {
                     com.example.vibetix.Utils.ImageUtils.loadCircle(
@@ -375,7 +375,7 @@ public class ProfileFragment extends Fragment {
                 .remove(Constants.KEY_USER_PHONE)
                 .remove(Constants.KEY_USER_ROLE)
                 .apply();
-        Toast.makeText(requireContext(), "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.str_toast_logout_success), Toast.LENGTH_SHORT).show();
 
         // Start AuthActivity and clear backstack
         Intent intent = new Intent(requireContext(), com.example.vibetix.Activities.Auth.AuthActivity.class);
@@ -429,7 +429,7 @@ public class ProfileFragment extends Fragment {
 
         if (pm.isDefault()) {
             TextView def = new TextView(requireContext());
-            def.setText("Mặc định");
+            def.setText(getString(R.string.str_default_org_label));
             def.setTextColor(0xFF226CEB);
             def.setTextSize(10f);
             def.setBackgroundResource(R.drawable.bg_lang_chip);

@@ -19,6 +19,7 @@ mpandroidchart = "v3.1.0"
 mlkit-barcode = "17.3.0"
 camerax = "1.4.1"
 playServicesAuth = "21.3.0"
+richeditor = "2.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -47,6 +48,7 @@ camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.r
 camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+richeditor = { group = "jp.wasabeef", name = "richeditor-android", version.ref = "richeditor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -92,7 +92,7 @@
                 android:layout_marginStart="8dp"
                 android:insetBottom="0dp"
                 android:insetTop="0dp"
-                android:text="Chỉnh sửa"
+                android:text="@string/str_edit_profile"
                 android:textAllCaps="false"
                 android:textColor="@color/clr_text_white"
                 android:textSize="12sp"
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:gravity="center"
-                            android:text="Sự kiện"
+                            android:text="@string/str_events_count_label"
                             android:textColor="@color/clr_grey_1"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -208,7 +208,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:gravity="center"
-                            android:text="Vé đã bán"
+                            android:text="@string/str_tickets_sold_label"
                             android:textColor="@color/clr_grey_1"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -253,7 +253,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:gravity="center"
-                            android:text="Doanh thu"
+                            android:text="@string/str_revenue_label"
                             android:textColor="@color/clr_grey_1"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -280,7 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:text="Thông tin liên hệ"
+                        android:text="@string/str_contact_info_title"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -310,7 +310,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Email"
+                                android:text="@string/str_email_contact"
                                 android:textColor="@color/clr_grey_1"
                                 android:textSize="11sp" />
 
@@ -350,7 +350,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Điện thoại"
+                                android:text="@string/str_phone_contact"
                                 android:textColor="@color/clr_grey_1"
                                 android:textSize="11sp" />
 
@@ -389,7 +389,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Website"
+                                android:text="@string/str_website_contact"
                                 android:textColor="@color/clr_grey_1"
                                 android:textSize="11sp" />
 
@@ -434,7 +434,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="🏢 Hồ sơ Ban tổ chức"
+                            android:text="@string/str_org_profile_section_title"
                             android:textColor="@color/clr_text_black"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -464,7 +464,7 @@
                         android:layout_marginTop="12dp"
                         android:insetBottom="0dp"
                         android:insetTop="0dp"
-                        android:text="+ Thêm hồ sơ mới"
+                        android:text="@string/str_add_new_profile"
                         android:textAllCaps="false"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="14sp"
@@ -496,7 +496,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="4dp"
-                        android:text="Cài đặt"
+                        android:text="@string/str_settings_section_title"
                         android:textColor="@color/clr_grey_1"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -522,7 +522,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Cài đặt thông báo"
+                            android:text="@string/str_notification_settings"
                             android:textColor="@color/clr_text_black"
                             android:textSize="14sp" />
 
@@ -561,7 +561,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Thông tin thanh toán"
+                            android:text="@string/str_payment_info"
                             android:textColor="@color/clr_text_black"
                             android:textSize="14sp" />
 
@@ -600,7 +600,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Đổi mật khẩu"
+                            android:text="@string/str_change_password_action"
                             android:textColor="@color/clr_text_black"
                             android:textSize="14sp" />
 
@@ -648,3 +648,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
+

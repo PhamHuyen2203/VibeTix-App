@@ -136,12 +136,12 @@ public class ResaleEventDetailFragment extends Fragment {
     private void onBuyClick(TicketTransfer t) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để mua vé", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_login_to_buy), Toast.LENGTH_SHORT).show();
             return;
         }
         // Không cho tự mua vé của chính mình
         if (user.getUid().equals(t.getSenderId())) {
-            Toast.makeText(requireContext(), "Bạn không thể mua lại vé do chính mình đăng bán", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_cannot_buy_own_ticket), Toast.LENGTH_SHORT).show();
             return;
         }
 

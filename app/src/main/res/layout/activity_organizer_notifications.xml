@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Không có thông báo nào"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_secondary"
             android:textSize="16sp"
             android:gravity="center" />
@@ -49,3 +49,4 @@
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

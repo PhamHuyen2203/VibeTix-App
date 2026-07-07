@@ -155,11 +155,11 @@ public class QrScannerActivity extends AppCompatActivity {
     
     private void updateSyncButtonText() {
         int pendingCount = offlineSyncManager.getPendingSyncTickets().size();
-        btnSyncData.setText("Đồng bộ (" + pendingCount + ")");
+        btnSyncData.setText(getString(R.string.str_qr_sync_count, pendingCount));
     }
 
     private void downloadOfflineData() {
-        tvInstruction.setText("Đang tải dữ liệu...");
+        tvInstruction.setText(getString(R.string.str_qr_loading_data));
         btnDownloadData.setEnabled(false);
         db.collection("user_tickets").whereEqualTo("event_id", eventId).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -178,13 +178,13 @@ public class QrScannerActivity extends AppCompatActivity {
                         }
                     }
                     offlineSyncManager.saveOfflineTickets(ticketsMap);
-                    Toast.makeText(this, "Tải thành công " + ticketsMap.size() + " vé", Toast.LENGTH_SHORT).show();
-                    tvInstruction.setText("Tải hoàn tất. Đặt mã QR vào khung để quét");
+                    Toast.makeText(this, getString(R.string.str_qr_load_success, ticketsMap.size()), Toast.LENGTH_SHORT).show();
+                    tvInstruction.setText(getString(R.string.str_qr_load_done_instruction));
                     btnDownloadData.setEnabled(true);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
-                    tvInstruction.setText("Lỗi tải dữ liệu");
+                    Toast.makeText(this, getString(R.string.str_qr_load_data_error), Toast.LENGTH_SHORT).show();
+                    tvInstruction.setText(getString(R.string.str_qr_load_data_error));
                     btnDownloadData.setEnabled(true);
                 });
     }
@@ -192,10 +192,10 @@ public class QrScannerActivity extends AppCompatActivity {
     private void syncOfflineData() {
         List<String> pendingIds = offlineSyncManager.getPendingSyncTickets();
         if (pendingIds.isEmpty()) {
-            Toast.makeText(this, "Không có dữ liệu cần đồng bộ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_qr_no_sync_needed), Toast.LENGTH_SHORT).show();
             return;
         }
-        tvInstruction.setText("Đang đồng bộ...");
+        tvInstruction.setText(getString(R.string.str_qr_syncing));
         btnSyncData.setEnabled(false);
         
         // pendingIds lưu theo userTicketId (document ID) để update chính xác
@@ -209,12 +209,12 @@ public class QrScannerActivity extends AppCompatActivity {
         batch.commit().addOnSuccessListener(aVoid -> {
             offlineSyncManager.savePendingSyncTickets(new java.util.ArrayList<>());
             updateSyncButtonText();
-            Toast.makeText(this, "Đồng bộ thành công!", Toast.LENGTH_SHORT).show();
-            tvInstruction.setText("Đồng bộ thành công");
+            Toast.makeText(this, getString(R.string.str_qr_sync_success), Toast.LENGTH_SHORT).show();
+            tvInstruction.setText(getString(R.string.str_qr_sync_success_instruction));
             btnSyncData.setEnabled(true);
         }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Lỗi đồng bộ", Toast.LENGTH_SHORT).show();
-            tvInstruction.setText("Lỗi đồng bộ");
+            Toast.makeText(this, getString(R.string.str_qr_sync_error), Toast.LENGTH_SHORT).show();
+            tvInstruction.setText(getString(R.string.str_qr_sync_error));
             btnSyncData.setEnabled(true);
         });
     }
@@ -238,7 +238,7 @@ public class QrScannerActivity extends AppCompatActivity {
         builder.setTitle("Nhập mã vé thủ công");
 
         final EditText input = new EditText(this);
-        input.setHint("Nhập mã hiển thị vé (display_code, VD: VTX-1234)");
+        input.setHint(getString(R.string.str_qr_hint_manual_code));
         builder.setView(input);
         
         builder.setPositiveButton("Kiểm tra", (dialog, which) -> {
@@ -348,7 +348,7 @@ public class QrScannerActivity extends AppCompatActivity {
             return;
         }
 
-        tvInstruction.setText("Đang kiểm tra...");
+        tvInstruction.setText(getString(R.string.str_qr_checking));
         
         // Dùng display_code để thống nhất với màn hình nhập thủ công
         db.collection("user_tickets")
@@ -365,8 +365,8 @@ public class QrScannerActivity extends AppCompatActivity {
                                 return;
                             }
                             
-                            tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
-                            tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
+                            tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : getString(R.string.str_qr_anonymous_guest));
+                            tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : getString(R.string.str_qr_standard_ticket));
                             
                             if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
                                 showScanError("Vé đã được sử dụng (Check-in rồi)!");
@@ -392,7 +392,7 @@ public class QrScannerActivity extends AppCompatActivity {
     }
     
     private void handleScanOffline(String code) {
-        tvInstruction.setText("Đang kiểm tra offline...");
+        tvInstruction.setText(getString(R.string.str_qr_checking_offline));
         Map<String, com.example.vibetix.Models.UserTicket> offlineTickets = offlineSyncManager.getOfflineTickets();
         
         // Map được build bằng ticket_code làm key (xem downloadOfflineData)
@@ -404,8 +404,8 @@ public class QrScannerActivity extends AppCompatActivity {
                     showScanError("Vé này không thuộc sự kiện hiện tại!");
                     return;
                 }
-                tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : "Khách ẩn danh");
-                tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : "Vé chuẩn");
+                tvResultName.setText(ticket.getFullName() != null ? ticket.getFullName() : getString(R.string.str_qr_anonymous_guest));
+                tvResultTicketType.setText(ticket.getTicketTypeName() != null ? ticket.getTicketTypeName() : getString(R.string.str_qr_standard_ticket));
                 
                 if (com.example.vibetix.Models.UserTicket.Status.USED.equals(ticket.getStatus())) {
                     showScanError("Vé đã được sử dụng (Check-in rồi)!");
@@ -440,9 +440,9 @@ public class QrScannerActivity extends AppCompatActivity {
     
     private void showScanError(String msg) {
         playBeepAndVibrate(false);
-        tvResultName.setText("Mã vé không hợp lệ");
+        tvResultName.setText(getString(R.string.str_qr_invalid_code));
         tvResultIcon.setText("❌");
-        tvResultTicketType.setText("Không xác định");
+        tvResultTicketType.setText(getString(R.string.str_qr_unknown));
         tvResultMessage.setText(msg);
         tvResultMessage.setTextColor(ContextCompat.getColor(this, R.color.clr_error));
         showResultPanel();

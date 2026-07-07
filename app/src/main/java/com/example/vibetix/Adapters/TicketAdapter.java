@@ -78,7 +78,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
         holder.btnTicketQrAction.setVisibility(View.VISIBLE);
 
         if ("ACTIVE".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Còn hiệu lực");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_valid_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_success));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getPurchasePrice()) + " đ");
@@ -88,22 +88,22 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             boolean eventActive = evStatus.isEmpty() || "approved".equals(evStatus) || "ongoing".equals(evStatus);
             boolean canResell = eventActive && ticket.isTransferable();
             if (canResell) {
-                holder.btnTicketResellAction.setText("Bán lại vé");
+                holder.btnTicketResellAction.setText(context.getString(R.string.str_resell_ticket_btn));
                 holder.btnTicketResellAction.setEnabled(true);
                 holder.btnTicketResellAction.setVisibility(View.VISIBLE);
             } else {
                 holder.btnTicketResellAction.setVisibility(View.GONE);
             }
         } else if ("RESELLING".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Đang rao bán");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_reselling_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_primary_blue));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
 
-            holder.btnTicketResellAction.setText("Hủy bán");
+            holder.btnTicketResellAction.setText(context.getString(R.string.str_btn_cancel_resell));
             holder.btnTicketResellAction.setEnabled(true);
         } else if ("USED".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Đã sử dụng");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_used_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_grey_1));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_divider)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getPurchasePrice()) + " đ");
@@ -111,7 +111,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             holder.btnTicketResellAction.setVisibility(View.GONE);
             holder.btnTicketQrAction.setVisibility(View.GONE);
         } else if ("EXPIRED".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Hết hạn");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_expired_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_error));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_divider)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getPurchasePrice()) + " đ");
@@ -119,7 +119,7 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             holder.btnTicketResellAction.setVisibility(View.GONE);
             holder.btnTicketQrAction.setVisibility(View.GONE);
         } else if ("RESOLD".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Đã bán");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_sold_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_success));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_bg_section)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
@@ -127,12 +127,12 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             holder.btnTicketResellAction.setVisibility(View.GONE);
             holder.btnTicketQrAction.setVisibility(View.GONE);
         } else if ("RESALE_CANCELLED".equalsIgnoreCase(status)) {
-            holder.txtTicketStatusBadge.setText("Đã huỷ bán");
+            holder.txtTicketStatusBadge.setText(context.getString(R.string.str_ticket_cancelled_resell_badge));
             holder.txtTicketStatusBadge.setTextColor(context.getResources().getColor(R.color.clr_grey_1));
             holder.txtTicketStatusBadge.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.clr_divider)));
             holder.txtTicketPrice.setText(formatter.format(ticket.getResalePrice()) + " đ");
 
-            holder.btnTicketResellAction.setText("Đăng bán lại");
+            holder.btnTicketResellAction.setText(context.getString(R.string.str_btn_relist));
             holder.btnTicketResellAction.setEnabled(true);
             holder.btnTicketResellAction.setVisibility(View.VISIBLE);
             holder.btnTicketQrAction.setVisibility(View.GONE);

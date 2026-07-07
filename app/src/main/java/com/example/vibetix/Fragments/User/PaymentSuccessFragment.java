@@ -115,7 +115,7 @@ public class PaymentSuccessFragment extends Fragment {
         txtSuccessOrderId.setText(orderId);
         txtSuccessPaymentMethod.setText(paymentMethod);
         txtSuccessTicketType.setText(ticketTypeName);
-        txtSuccessQty.setText(quantity + " vé");
+        txtSuccessQty.setText(getString(R.string.str_ticket_qty_label, quantity));
         txtSuccessTotal.setText(formatter.format(finalTotal) + " đ");
         txtSuccessTime.setText(formattedDate);
         txtSuccessEmail.setText(email);

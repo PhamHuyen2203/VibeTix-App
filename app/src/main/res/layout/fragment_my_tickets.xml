@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="sans-serif-medium"
-                android:text="Vé của tôi  ✨"
+                android:text="@string/str_my_tickets_title"
                 android:textColor="@color/clr_text_black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -67,7 +67,7 @@
                 android:background="@drawable/bg_tab_active_outline"
                 android:gravity="center"
                 android:paddingVertical="8dp"
-                android:text="Vé đã mua"
+                android:text="@string/str_tab_purchased"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -80,7 +80,7 @@
                 android:background="@drawable/bg_chip_filter"
                 android:gravity="center"
                 android:paddingVertical="8dp"
-                android:text="Vé bán lại"
+                android:text="@string/str_tab_resale"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -110,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingVertical="10dp"
-                        android:text="Sắp diễn ra"
+                        android:text="@string/str_tab_upcoming"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -133,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingVertical="10dp"
-                        android:text="Đã kết thúc"
+                        android:text="@string/str_tab_ended"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="13sp" />
                     <View
@@ -170,7 +170,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Đang rao bán"
+                            android:text="@string/str_tab_reselling"
                             android:textColor="@color/clr_primary_blue"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -194,7 +194,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Chờ thanh toán"
+                            android:text="@string/str_tab_awaiting_payment"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <View
@@ -217,7 +217,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Đã bán"
+                            android:text="@string/str_tab_sold"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <View
@@ -240,7 +240,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Đã hủy"
+                            android:text="@string/str_tab_cancelled"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <View
@@ -263,7 +263,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Bị từ chối"
+                            android:text="@string/str_tab_rejected"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <View
@@ -286,7 +286,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingVertical="10dp"
-                            android:text="Hết hạn"
+                            android:text="@string/str_tab_expired"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <View
@@ -320,7 +320,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:fontFamily="sans-serif-medium"
-            android:text="Tổng thực nhận: 0 đ"
+            android:text="@string/str_total_earnings_label"
             android:textColor="@color/clr_text_black"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -418,7 +418,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Bạn chưa có vé nào cả!"
+                            android:text="@string/str_no_tickets_title"
                             android:textColor="@color/clr_text_black"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -430,7 +430,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:gravity="center"
-                            android:text="Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn."
+                            android:text="@string/str_no_tickets_desc"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="12sp" />
 
@@ -443,7 +443,7 @@
                             android:background="@drawable/bg_btn_gradient"
                             android:backgroundTint="@null"
                             android:fontFamily="sans-serif-medium"
-                            android:text="🎟  Mua vé ngay"
+                            android:text="@string/str_buy_ticket_emoji"
                             android:textColor="@color/clr_text_white"
                             app:cornerRadius="24dp" />
                     </LinearLayout>
@@ -461,7 +461,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Có thể bạn cũng thích"
+                        android:text="@string/str_suggestions_for_you"
                         android:textColor="@color/clr_text_black"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -471,7 +471,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="Xem tất cả ›"
+                        android:text="@string/str_see_all"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="13sp" />
                 </RelativeLayout>
@@ -488,3 +488,5 @@
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

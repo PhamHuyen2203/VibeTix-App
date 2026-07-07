@@ -123,7 +123,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     if (loadingView != null) loadingView.setVisibility(View.GONE);
-                    Toast.makeText(this, "Không thể tải sự kiện", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_cannot_load_event), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -144,7 +144,7 @@ public class EventDetailActivity extends AppCompatActivity {
         if (event.getVenueCity() != null && !event.getVenueCity().isEmpty()) {
             venueLine += (!venueLine.isEmpty() ? " • " : "") + event.getVenueCity();
         }
-        if (tvVenue != null) tvVenue.setText(venueLine.isEmpty() ? "Chưa có địa điểm" : venueLine);
+        if (tvVenue != null) tvVenue.setText(venueLine.isEmpty() ? getString(R.string.str_no_venue_yet) : venueLine);
 
         // Poster
         if (ivPoster != null) {
@@ -188,18 +188,18 @@ public class EventDetailActivity extends AppCompatActivity {
                         boolean verified = Boolean.TRUE.equals(doc.getBoolean("is_verified"));
                         if (tvOrgName != null) tvOrgName.setText(name != null ? name : "Ban tổ chức");
                         if (tvOrgStatus != null)
-                            tvOrgStatus.setText(verified ? "✓ Đã xác minh" : "Chưa xác minh");
+                            tvOrgStatus.setText(verified ? getString(R.string.str_organizer_verified) : getString(R.string.str_unverified));
                     }
                 });
     }
 
     private void handleBuyTicket() {
         if (ticketTypes.isEmpty()) {
-            Toast.makeText(this, "Chưa có loại vé nào", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_no_ticket_types), Toast.LENGTH_SHORT).show();
             return;
         }
         // TODO: Open purchase flow (Phase sau)
-        Toast.makeText(this, "Tính năng mua vé sẽ được bổ sung sớm!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.str_toast_buy_coming_soon), Toast.LENGTH_SHORT).show();
     }
 
     private String formatDate(String isoDate) {
@@ -233,8 +233,8 @@ public class EventDetailActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@androidx.annotation.NonNull VH h, int pos) {
             TicketType tt = items.get(pos);
-            h.tvName.setText(tt.getName() != null ? tt.getName() : "Vé");
-            h.tvPrice.setText(tt.getPrice() == 0 ? "Miễn phí" :
+            h.tvName.setText(tt.getName() != null ? tt.getName() : h.itemView.getContext().getString(R.string.str_default_ticket_name));
+            h.tvPrice.setText(tt.getPrice() == 0 ? h.itemView.getContext().getString(R.string.str_free_price) :
                     NumberFormat.getNumberInstance(new Locale("vi", "VN")).format(tt.getPrice()) + " ₫");
 
             if (tt.getDescription() != null && !tt.getDescription().trim().isEmpty()) {
@@ -266,22 +266,22 @@ public class EventDetailActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
 
             if (isBeforeSale) {
-                h.tvStatus.setText("Sắp mở bán");
+                h.tvStatus.setText(h.itemView.getContext().getString(R.string.str_ticket_status_upcoming));
                 h.tvStatus.setTextColor(0xFFF2994A); // Orange
                 h.tvQty.setText(formatDateForDisplay(tt.getSaleStart()));
                 h.tvQty.setTextColor(0xFFF2994A);
             } else if (isAfterSale) {
-                h.tvStatus.setText("Đã kết thúc bán");
+                h.tvStatus.setText(h.itemView.getContext().getString(R.string.str_ticket_status_ended));
                 h.tvStatus.setTextColor(0xFFEB5757); // Red
                 h.tvQty.setText("");
             } else if (qty <= 0) {
-                h.tvStatus.setText("Hết vé");
+                h.tvStatus.setText(h.itemView.getContext().getString(R.string.str_ticket_status_sold_out));
                 h.tvStatus.setTextColor(0xFFEB5757); // Red
                 h.tvQty.setText("");
             } else {
-                h.tvStatus.setText("Đang mở bán");
+                h.tvStatus.setText(h.itemView.getContext().getString(R.string.str_ticket_status_on_sale));
                 h.tvStatus.setTextColor(0xFF27AE60); // Green
-                h.tvQty.setText("Còn " + qty + " vé");
+                h.tvQty.setText(h.itemView.getContext().getString(R.string.str_tickets_remaining, qty));
                 h.tvQty.setTextColor(0xFF27AE60);
             }
         }

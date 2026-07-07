@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ public class OrganizerProfileFragment extends Fragment {
     private FirebaseAuth auth;
     private SessionManager sessionManager;
 
-    private TextView tvUserDisplayName, tvOrgCount, tvProfileError;
+    private TextView tvOrgCount, tvProfileError;
     private ProgressBar pbProfileLoading;
     private RecyclerView rvOrganizerProfiles;
     private LinearLayout layoutOrgEmpty;
@@ -67,8 +68,10 @@ public class OrganizerProfileFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         sessionManager = new SessionManager(requireContext());
 
-        tvUserDisplayName = view.findViewById(R.id.tvUserDisplayName);
         tvOrgCount = view.findViewById(R.id.tvOrgCount);
+
+        ImageButton btnBack = view.findViewById(R.id.btnBackOrgProfile);
+        if (btnBack != null) btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
         tvProfileError = view.findViewById(R.id.tvProfileError);
         pbProfileLoading = view.findViewById(R.id.pbProfileLoading);
         rvOrganizerProfiles = view.findViewById(R.id.rvOrganizerProfiles);
@@ -108,16 +111,6 @@ public class OrganizerProfileFragment extends Fragment {
         String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
         if (userId == null) { logout(); return; }
 
-        // Load user info from Firestore
-        db.collection("users").document(userId).get()
-                .addOnSuccessListener(userDoc -> {
-                    if (!isAdded() || userDoc == null) return;
-                    String name = userDoc.getString("full_name");
-                    String email = userDoc.getString("email");
-                    String phone = userDoc.getString("phone");
-                    String displayName = name != null && !name.isEmpty() ? name : "Ban tổ chức";
-                    tvUserDisplayName.setText(displayName);
-                });
 
         showLoading(true);
         db.collection("organizers")
@@ -137,7 +130,7 @@ public class OrganizerProfileFragment extends Fragment {
                         organizers.add(org);
                     }
 
-                    tvOrgCount.setText(organizers.size() + " hồ sơ ban tổ chức");
+                    tvOrgCount.setText(getString(R.string.str_organizer_count_label, organizers.size()));
                     showEmpty(false);
 
                     // Load events+tickets stats for each organizer in parallel
@@ -145,7 +138,7 @@ public class OrganizerProfileFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
-                    tvProfileError.setText("Không thể tải thông tin. Thử lại.");
+                    tvProfileError.setText(getString(R.string.str_cannot_load_profile));
                     tvProfileError.setVisibility(View.VISIBLE);
                 });
     }
@@ -328,7 +321,7 @@ public class OrganizerProfileFragment extends Fragment {
                                 adapter.notifyItemRemoved(idx);
                             }
                             if (orgList.isEmpty()) showEmpty(true);
-                            Toast.makeText(requireContext(), "Đã xóa hồ sơ BTC", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.str_organizer_deleted_toast), Toast.LENGTH_SHORT).show();
                         }
                     });
             })
@@ -409,7 +402,7 @@ public class OrganizerProfileFragment extends Fragment {
                 h.tvDescription.setText(desc);
                 h.tvDescription.setVisibility(View.VISIBLE);
             } else {
-                h.tvDescription.setText("Đơn vị tổ chức sự kiện");
+                h.tvDescription.setText(h.tvDescription.getContext().getString(R.string.str_organizer_type_label));
                 h.tvDescription.setVisibility(View.VISIBLE);
             }
             // Website small line
@@ -430,11 +423,11 @@ public class OrganizerProfileFragment extends Fragment {
             pill.setCornerRadius(100f);
             if (verified) {
                 pill.setColor(0x1A27AE60); // light green bg
-                h.tvVerifiedChip.setText("● Đã xác thực");
+                h.tvVerifiedChip.setText(h.tvVerifiedChip.getContext().getString(R.string.str_verified_chip));
                 h.tvVerifiedChip.setTextColor(0xFF27AE60);
             } else {
                 pill.setColor(0x1AE6A817); // light amber bg
-                h.tvVerifiedChip.setText("● Chờ xác thực");
+                h.tvVerifiedChip.setText(h.tvVerifiedChip.getContext().getString(R.string.str_pending_chip));
                 h.tvVerifiedChip.setTextColor(0xFFB8860B);
             }
             h.tvVerifiedChip.setBackground(pill);

@@ -115,7 +115,7 @@ public class RegisterFragment extends Fragment {
             etFullName.setText(prefillName);
         }
 
-        if (btnRegister != null) btnRegister.setText("Hoàn tất đăng ký");
+        if (btnRegister != null) btnRegister.setText(getString(R.string.str_btn_complete_register));
     }
 
     private void setupClickListeners(View view) {

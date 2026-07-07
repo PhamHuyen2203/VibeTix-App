@@ -62,7 +62,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
 
         eventId = getIntent().getStringExtra("EXTRA_EVENT_ID");
         if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "Không có sự kiện được chọn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_no_event_selected), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -115,7 +115,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     if (pbLoading != null) pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Lỗi tải loại vé", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_ticket_type_error), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -169,13 +169,13 @@ public class OrganizerBlastActivity extends AppCompatActivity {
             String body = etBody.getText() != null ? etBody.getText().toString().trim() : "";
 
             if (title.isEmpty() || body.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập tiêu đề và nội dung", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_enter_title_and_content), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             boolean isTicketTypeTarget = rbTicketType.isChecked();
             if (isTicketTypeTarget && selectedTicketType == null) {
-                Toast.makeText(this, "Vui lòng chọn loại vé", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_select_ticket_type), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -421,7 +421,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Lỗi tải lịch sử: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_history_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -472,7 +472,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
         batch.commit()
                 .addOnSuccessListener(aVoid -> {
                     binding.pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Đã hủy thông báo thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_notification_cancelled), Toast.LENGTH_SHORT).show();
                     loadBlastHistory();
                 })
                 .addOnFailureListener(e -> {
@@ -536,7 +536,7 @@ public class OrganizerBlastActivity extends AppCompatActivity {
             
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
             holder.tvTime.setText(sdf.format(item.getCreatedAt().toDate()));
-            holder.tvRecipients.setText(item.getRecipientCount() + " người nhận");
+            holder.tvRecipients.setText(holder.itemView.getContext().getString(R.string.str_recipients_count, item.getRecipientCount()));
 
             String status = item.getStatus();
             if ("pending".equalsIgnoreCase(status)) {
@@ -544,11 +544,11 @@ public class OrganizerBlastActivity extends AppCompatActivity {
                 holder.tvStatus.setTextColor(0xFFD97706);
                 holder.tvStatus.setBackgroundColor(0xFFFEF3C7);
             } else if ("sent".equalsIgnoreCase(status)) {
-                holder.tvStatus.setText("Đã gửi");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_status_sent));
                 holder.tvStatus.setTextColor(0xFF16A34A);
                 holder.tvStatus.setBackgroundColor(0xFFDCFCE7);
             } else if ("cancelled".equalsIgnoreCase(status)) {
-                holder.tvStatus.setText("Đã hủy");
+                holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_status_cancelled_label));
                 holder.tvStatus.setTextColor(0xFFDC2626);
                 holder.tvStatus.setBackgroundColor(0xFFFEE2E2);
             } else {

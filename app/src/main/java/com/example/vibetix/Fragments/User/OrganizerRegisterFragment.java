@@ -70,11 +70,11 @@ public class OrganizerRegisterFragment extends Fragment {
         String website     = edtWebsite     != null ? edtWebsite.getText().toString().trim()     : "";
 
         if (TextUtils.isEmpty(brandName)) {
-            if (edtBrandName != null) edtBrandName.setError("Vui lòng nhập tên ban tổ chức");
+            if (edtBrandName != null) edtBrandName.setError(getString(R.string.str_error_enter_brand_name));
             return;
         }
         if (TextUtils.isEmpty(description)) {
-            if (edtDescription != null) edtDescription.setError("Vui lòng nhập mô tả");
+            if (edtDescription != null) edtDescription.setError(getString(R.string.str_error_enter_description));
             return;
         }
 

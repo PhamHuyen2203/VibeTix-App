@@ -33,14 +33,14 @@
                     android:padding="10dp"
                     android:background="@drawable/bg_back_btn"
                     android:src="@drawable/ic_back"
-                    android:contentDescription="Quay lại" />
+                    android:contentDescription="@string/str_back" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Trung tâm trợ giúp"
+                    android:text="@string/str_help_center_title"
                     android:textColor="#FFFFFF"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -83,7 +83,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="VibeTix giúp bạn mua và bán vé một cách dễ dàng và an toàn. Dưới đây là những thông tin hữu ích về nền tảng."
+                        android:text="@string/str_help_center_desc"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -111,7 +111,7 @@
                     android:gravity="center"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="Gọi hotline  1900.8888"
+                    android:text="@string/str_help_hotline"
                     android:textColor="#FFFFFF"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -126,7 +126,7 @@
                     android:gravity="center"
                     android:clickable="true"
                     android:focusable="true"
-                    android:text="Email: support@vibetix.vn"
+                    android:text="@string/str_help_email"
                     android:textColor="@color/clr_primary_blue"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -136,3 +136,4 @@
 
     </LinearLayout>
 </FrameLayout>
+

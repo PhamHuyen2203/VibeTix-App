@@ -132,7 +132,11 @@ public class UserMainActivity extends AppCompatActivity {
     private void setupNavListeners() {
         tabHome   .setOnClickListener(v -> selectTab(R.id.tabHome));
         tabEvents .setOnClickListener(v -> selectTab(R.id.tabEvents));
-        tabCreate .setOnClickListener(v -> openSubFragment(new OrganizerHubFragment()));
+        tabCreate .setOnClickListener(v -> {
+            activeTabId = R.id.tabCreate;
+            updateTabStyles();
+            openSubFragment(new OrganizerHubFragment());
+        });
         tabTickets.setOnClickListener(v -> handleTicketsTabClick());
         tabProfile.setOnClickListener(v -> selectTab(R.id.tabProfile));
     }
@@ -160,8 +164,45 @@ public class UserMainActivity extends AppCompatActivity {
         activeTabId = tabId;
         updateTabStyles();
         String newTabTag = getActiveTabTag();
-        if (newTabTag.equals(currentTabTag)) return;
+        if (newTabTag.equals(currentTabTag)) {
+            // Cùng tab → reset về root (xóa sub-fragment, tạo lại fragment gốc)
+            resetCurrentTab(newTabTag);
+            return;
+        }
         switchToTab(newTabTag);
+    }
+
+    /** Reset tab hiện tại: pop về root rồi tạo lại đúng root fragment của tab đó thôi */
+    private void resetCurrentTab(String tabTag) {
+        androidx.fragment.app.FragmentManager fm = getSupportFragmentManager();
+
+        // 1. Pop hết back stack của tab này (đóng các sub-fragment)
+        fm.popBackStackImmediate(tabTag,
+                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+        // 2. Chỉ remove root fragment của tab này, giữ nguyên tất cả tab khác
+        Fragment existingRoot = fm.findFragmentByTag(tabTag);
+        if (existingRoot != null) {
+            fm.beginTransaction().remove(existingRoot).commitAllowingStateLoss();
+            fm.executePendingTransactions();
+        }
+
+        // 3. Reset tracking cho đúng tab này
+        tabCurrentTop.remove(tabTag);
+        currentTabTag = null;
+
+        // 4. Tạo lại root fragment mới cho tab này
+        Fragment newRoot = createRootForTab(tabTag);
+        androidx.fragment.app.FragmentTransaction ft = fm.beginTransaction();
+        // Ẩn các fragment của tab khác đang visible (nếu có)
+        for (Fragment f : fm.getFragments()) {
+            if (f != null && f.isAdded() && !f.isHidden()) ft.hide(f);
+        }
+        ft.add(R.id.frameContainerMain, newRoot, tabTag);
+        ft.commitAllowingStateLoss();
+
+        tabCurrentTop.put(tabTag, tabTag);
+        currentTabTag = tabTag;
     }
 
     /** Chuyển sang tab mới: ẩn tất cả fragment đang visible, hiện topmost của tab đích */
@@ -240,8 +281,9 @@ public class UserMainActivity extends AppCompatActivity {
         else if (activeTabId == R.id.tabProfile)
             setTabStyle(icProfile, txtProfile, R.drawable.ic_nav_profile,blue, true);
 
-        // "Tß¦ío sß+¦ kiß+çn" tab text m+áu x+ím (kh+¦ng c+¦ active state)
-        if (txtCreate != null) txtCreate.setTextColor(grey);
+        // Nút "Tạo sự kiện": sáng xanh khi active, xám khi không
+        if (txtCreate != null) txtCreate.setTextColor(
+                activeTabId == R.id.tabCreate ? blue : grey);
     }
 
     private void setTabStyle(ImageView icon, TextView label, int iconRes, int color, boolean bold) {

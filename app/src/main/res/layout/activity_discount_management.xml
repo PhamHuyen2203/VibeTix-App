@@ -36,17 +36,17 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hiệu lực" />
+                android:text="@string/label_active" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hết hạn" />
+                android:text="@string/str_tab_expired" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đã tắt" />
+                android:text="@string/status_cancelled" />
 
         </com.google.android.material.tabs.TabLayout>
 
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Không có mã giảm giá nào"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -110,10 +110,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="Thêm mã giảm giá"
+        android:text="@string/add_discount_title"
         android:textColor="@color/clr_text_white"
         app:icon="@drawable/ic_plus"
         app:iconTint="@color/clr_text_white"
         app:backgroundTint="@color/clr_primary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

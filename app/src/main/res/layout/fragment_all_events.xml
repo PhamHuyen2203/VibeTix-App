@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Khám phá sự kiện"
+            android:text="@string/str_explore_events_heading"
             android:textColor="@color/clr_text_white"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -49,7 +49,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:background="@null"
-                android:hint="Tìm kiếm sự kiện..."
+                android:hint="@string/str_hint_search_events"
                 android:textColor="@color/clr_text_white"
                 android:textColorHint="#80FFFFFF"
                 android:textSize="14sp"
@@ -82,7 +82,7 @@
                 android:id="@+id/chipAll"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Tất cả"
+                android:text="@string/str_filter_chip_all"
                 android:textSize="13sp"
                 android:checked="true"
                 style="@style/Widget.Material3.Chip.Filter" />
@@ -91,7 +91,7 @@
                 android:id="@+id/chipToday"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Hôm nay"
+                android:text="@string/str_filter_chip_today"
                 android:textSize="13sp"
                 style="@style/Widget.Material3.Chip.Filter" />
 
@@ -99,7 +99,7 @@
                 android:id="@+id/chipWeekend"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Cuối tuần"
+                android:text="@string/str_filter_chip_weekend"
                 android:textSize="13sp"
                 style="@style/Widget.Material3.Chip.Filter" />
 
@@ -107,7 +107,7 @@
                 android:id="@+id/chipMonth"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Tháng này"
+                android:text="@string/str_filter_chip_this_month"
                 android:textSize="13sp"
                 style="@style/Widget.Material3.Chip.Filter" />
 
@@ -115,7 +115,7 @@
                 android:id="@+id/chipFree"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Miễn phí"
+                android:text="@string/str_filter_chip_free"
                 android:textSize="13sp"
                 style="@style/Widget.Material3.Chip.Filter" />
 
@@ -127,7 +127,7 @@
         android:id="@+id/tvResultCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0 sự kiện"
+        android:text="@string/str_event_count_zero"
         android:textColor="@color/clr_text_secondary"
         android:textSize="12sp"
         android:paddingStart="20dp"
@@ -178,7 +178,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Không có sự kiện nào"
+                android:text="@string/str_no_events_in_filter"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/clr_text_black"
@@ -187,7 +187,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thử thay đổi bộ lọc hoặc tìm kiếm từ khóa khác"
+                android:text="@string/str_filter_hint_change"
                 android:textSize="14sp"
                 android:textColor="@color/clr_text_secondary"
                 android:gravity="center" />
@@ -197,3 +197,5 @@
     </FrameLayout>
 
 </LinearLayout>
+
+

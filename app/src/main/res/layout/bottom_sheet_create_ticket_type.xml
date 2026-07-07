@@ -19,7 +19,7 @@
         android:id="@+id/tvSheetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thêm loại vé mới"
+        android:text="@string/toast_add_ticket_type"
         android:textColor="@color/clr_text_black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -89,7 +89,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cho phép chuyển nhượng vé"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_black"
             android:textSize="14sp" />
 
@@ -105,7 +105,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="24dp"
-        android:text="Lưu loại vé"
+        android:text="@string/btn_save"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@color/clr_text_white"
@@ -113,3 +113,4 @@
         app:cornerRadius="8dp" />
 
 </LinearLayout>
+

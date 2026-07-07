@@ -101,7 +101,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
         if (eventId != null && !eventId.isEmpty()) {
             loadDiscounts();
         } else {
-            Toast.makeText(this, "Không tìm thấy thông tin sự kiện", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_event_info_not_found), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -124,7 +124,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
                     filterDiscounts(tabLayout.getSelectedTabPosition());
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi tải mã giảm giá: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_discount_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -172,7 +172,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
         dialog.getBehavior().setPeekHeight(700);
 
         boolean isEdit = (existing != null);
-        sheetBinding.tvBottomSheetTitle.setText(isEdit ? "Chỉnh sửa mã giảm giá" : "Thêm mã giảm giá");
+        sheetBinding.tvBottomSheetTitle.setText(isEdit ? getString(R.string.str_edit_discount_title) : getString(R.string.str_add_discount_title));
 
         // Setup Dropdown for Type
         String[] types = new String[]{"Phần trăm (%)", "Số tiền (VNĐ)"};
@@ -223,13 +223,13 @@ public class DiscountManagementActivity extends AppCompatActivity {
             else code = code.toUpperCase();
 
             if (TextUtils.isEmpty(title)) {
-                sheetBinding.etDiscountTitle.setError("Vui lòng nhập tên"); return;
+                sheetBinding.etDiscountTitle.setError(getString(R.string.str_error_enter_name)); return;
             }
             if (TextUtils.isEmpty(valueStr)) {
-                sheetBinding.etDiscountValue.setError("Vui lòng nhập giá trị"); return;
+                sheetBinding.etDiscountValue.setError(getString(R.string.str_error_enter_value)); return;
             }
             if (TextUtils.isEmpty(saleStart) || TextUtils.isEmpty(saleEnd)) {
-                Toast.makeText(this, "Vui lòng chọn thời gian", Toast.LENGTH_SHORT).show(); return;
+                Toast.makeText(this, getString(R.string.str_toast_select_time), Toast.LENGTH_SHORT).show(); return;
             }
 
             long value;
@@ -242,30 +242,30 @@ public class DiscountManagementActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(minOrderStr)) minOrder = Long.parseLong(minOrderStr);
                 if (!TextUtils.isEmpty(maxDiscStr)) maxDisc = Long.parseLong(maxDiscStr);
             } catch (Exception e) {
-                Toast.makeText(this, "Giá trị không hợp lệ", Toast.LENGTH_SHORT).show(); return;
+                Toast.makeText(this, getString(R.string.str_toast_invalid_value), Toast.LENGTH_SHORT).show(); return;
             }
             
             String discountType = typeStr.contains("%") ? "percentage" : "fixed";
             
             if ("percentage".equals(discountType) && value > 100) {
-                Toast.makeText(this, "Phần trăm giảm không được vượt quá 100", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_percent_over_100), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             com.google.firebase.Timestamp tsStart = displayToTimestamp(saleStart);
             com.google.firebase.Timestamp tsEnd   = displayToTimestamp(saleEnd);
             if (tsStart == null || tsEnd == null) {
-                Toast.makeText(this, "Ngày không hợp lệ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_invalid_date), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (tsEnd.compareTo(tsStart) <= 0) {
-                Toast.makeText(this, "Ngày kết thúc phải sau ngày bắt đầu", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_end_before_start), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             sheetBinding.btnSaveDiscount.setEnabled(false);
-            sheetBinding.btnSaveDiscount.setText("Đang lưu…");
+            sheetBinding.btnSaveDiscount.setText(getString(R.string.str_btn_saving));
 
             if (isEdit) {
                 updateDiscount(existing, title, discountType, value, limit, minOrder, maxDisc, tsStart, tsEnd, isActive, dialog);
@@ -304,7 +304,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
                 .set(discount)
                 .addOnSuccessListener(v -> {
                     dialog.dismiss();
-                    Toast.makeText(this, "Tạo thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_create_success), Toast.LENGTH_SHORT).show();
                     loadDiscounts();
                 })
                 .addOnFailureListener(e -> {
@@ -331,7 +331,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
                 .update(updates)
                 .addOnSuccessListener(v -> {
                     dialog.dismiss();
-                    Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_update_success), Toast.LENGTH_SHORT).show();
                     loadDiscounts();
                 })
                 .addOnFailureListener(e -> {

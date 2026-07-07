@@ -64,7 +64,7 @@
                 android:id="@+id/tvTicketStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trạng thái"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -82,3 +82,4 @@
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+

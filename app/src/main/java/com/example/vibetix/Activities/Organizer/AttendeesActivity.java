@@ -11,6 +11,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.vibetix.Adapters.Organizer.AttendeeAdapter;
+import com.example.vibetix.R;
 import com.example.vibetix.Models.UserTicket;
 import com.example.vibetix.Utils.CosineSimilarityUtils;
 import com.example.vibetix.databinding.ActivityAttendeesBinding;
@@ -46,7 +47,7 @@ public class AttendeesActivity extends AppCompatActivity {
 
         eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
         if (eventId == null) {
-            Toast.makeText(this, "Không tìm thấy sự kiện", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_event_not_found_label), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -109,7 +110,7 @@ public class AttendeesActivity extends AppCompatActivity {
                 .whereEqualTo("event_id", eventId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
-                        Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_load_data_error_short), Toast.LENGTH_SHORT).show();
                         binding.pbLoading.setVisibility(View.GONE);
                         showEmptyState();
                         return;
@@ -384,7 +385,7 @@ public class AttendeesActivity extends AppCompatActivity {
                 db.collection("user_tickets").document(ticketId)
                     .update("status", "used", "checked_in_at", new java.util.Date())
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Check-in thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_checkin_success), Toast.LENGTH_SHORT).show();
                     })
                     .addOnFailureListener(e -> 
                         Toast.makeText(this, "Lỗi check-in: " + e.getMessage(), Toast.LENGTH_SHORT).show());

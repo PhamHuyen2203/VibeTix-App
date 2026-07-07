@@ -114,7 +114,7 @@ public class LoginFragment extends Fragment {
 
         if (btnLoginApple != null) {
             btnLoginApple.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Đăng nhập bằng Apple chưa được hỗ trợ", Toast.LENGTH_SHORT).show());
+                Toast.makeText(requireContext(), getString(R.string.str_toast_apple_not_supported), Toast.LENGTH_SHORT).show());
         }
 
         TextView txtGoRegister = view.findViewById(R.id.txtGoToRegister);

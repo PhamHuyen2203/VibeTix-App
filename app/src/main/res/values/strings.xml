@@ -171,7 +171,7 @@
     <string name="str_attendee_label">Attendee: %1$s</string>
     <string name="str_ticket_type_label">Ticket Class: %1$s</string>
     <string name="str_original_price_label">Original Price: %1$s</string>
-    <string name="str_resale_price_label">Enter resale price</string>
+    <string name="str_hint_resale_price">Enter resale price</string>
     <string name="str_payment_success_title">Booking Successful!</string>
     <string name="str_payment_success_desc">Thank you! Your e-ticket has been issued and sent to your email.</string>
     <string name="str_order_id">Order ID: %1$s</string>
@@ -370,4 +370,909 @@
     <string name="err_load_event_details">Error loading event details</string>
     <string name="status_dot_prefix">● %s</string>
     <string name="txt_coming_soon">Coming soon</string>
+
+    <!-- Toast messages - Java -->
+    <string name="toast_reset_pin_hint">Go to Security &amp; Password to reset your PIN</string>
+    <string name="toast_err_load_event">Unable to load event</string>
+    <string name="toast_no_ticket_types">No ticket types available</string>
+    <string name="toast_event_not_found">Event not found</string>
+    <string name="toast_event_cancelled">Event cancelled successfully</string>
+    <string name="toast_auth_error">Authentication error</string>
+    <string name="toast_organizer_updated">Organizer profile updated successfully</string>
+    <string name="toast_organizer_saved">Organizer profile saved successfully</string>
+    <string name="toast_event_info_not_found">Event information not found</string>
+    <string name="toast_select_time_required">Please select a time</string>
+    <string name="toast_invalid_value">Invalid value</string>
+    <string name="toast_percent_exceeds_100">Discount percentage cannot exceed 100</string>
+    <string name="toast_invalid_date">Invalid date</string>
+    <string name="toast_created_success">Created successfully</string>
+    <string name="toast_updated_success">Updated successfully</string>
+    <string name="toast_checkin_success">Check-in successful!</string>
+    <string name="toast_checkin_error">Check-in error: </string>
+    <string name="toast_org_deleted">Organizer profile deleted</string>
+    <string name="toast_star_already_added">This artist has already been added</string>
+    <string name="toast_img_load_error">Unable to load image</string>
+    <string name="toast_select_event_type">Please select event format</string>
+    <string name="toast_enter_online_url">Please enter the online event URL</string>
+    <string name="toast_select_age_limit">Please select age restriction</string>
+    <string name="toast_enter_max_tickets">Please enter max tickets per transaction</string>
+    <string name="toast_max_tickets_gt_zero">Max tickets must be greater than 0</string>
+    <string name="toast_invalid_max_tickets">Invalid max tickets value</string>
+    <string name="toast_add_ticket_type">Please add at least one ticket type</string>
+    <string name="toast_invalid_org_email">Invalid organizer email format</string>
+    <string name="toast_user_info_not_found">User information not found</string>
+    <string name="toast_no_event_selected">No event selected</string>
+    <string name="toast_missing_event_id">Missing Event ID</string>
+    <string name="toast_user_email_not_found">No user found with this email</string>
+    <string name="toast_staff_already_exists">This staff member already exists in the event</string>
+    <string name="toast_staff_added">Staff member added successfully</string>
+    <string name="toast_staff_add_error">Error adding staff member</string>
+    <string name="toast_update_failed">Update failed</string>
+    <string name="toast_staff_deleted">Staff member removed</string>
+    <string name="toast_role_updated">Role updated</string>
+    <string name="toast_no_sync_data">No data to sync</string>
+    <string name="toast_sync_success">Sync successful!</string>
+    <string name="toast_sync_error">Sync error</string>
+    <string name="toast_camera_permission">Camera permission is required to scan QR codes</string>
+    <string name="toast_ticket_not_found">Ticket not found</string>
+    <string name="toast_enter_title_content">Please enter title and content</string>
+    <string name="toast_select_ticket_type_blast">Please select a ticket type</string>
+    <string name="toast_notification_cancelled">Notification cancelled successfully</string>
+    <string name="toast_end_date_after_start">End date must be on or after start date</string>
+    <string name="toast_invalid_price_qty">Invalid price or quantity</string>
+    <string name="toast_ticket_type_created">Ticket type created successfully ✓</string>
+    <string name="toast_ticket_type_updated">Ticket type updated ✓</string>
+    <string name="toast_ticket_type_deleted">Ticket type deleted</string>
+    <string name="toast_order_check_error">Unable to verify order</string>
+    <string name="toast_login_to_favorite">Please log in to save favorite events</string>
+    <string name="toast_processing_image">Processing image…</string>
+    <string name="toast_image_read_error">Unable to read image, please try again</string>
+    <string name="toast_avatar_updated">✓ Avatar updated</string>
+    <string name="toast_info_saved">✓ Information saved</string>
+    <string name="toast_save_failed">Save failed</string>
+    <string name="toast_pin_updated">✓ PIN updated</string>
+    <string name="toast_pin_save_failed">Failed to save PIN, please try again</string>
+    <string name="toast_pin_incorrect">Incorrect PIN</string>
+    <string name="toast_pin_old_incorrect">Incorrect current PIN</string>
+    <string name="toast_setup_pin_first">Please set up your PIN first</string>
+    <string name="toast_password_changed">✓ Password changed successfully!</string>
+    <string name="toast_password_change_failed">Password change failed. Please try again.</string>
+    <string name="toast_password_current_incorrect">Current password is incorrect</string>
+    <string name="toast_fetching_phone">Fetching phone number…</string>
+    <string name="toast_fetch_account_error">Unable to fetch account information</string>
+    <string name="toast_otp_length_error">OTP must be 6 digits</string>
+    <string name="toast_relogin_to_change_password">Please log in again to change your password</string>
+    <string name="toast_please_relogin">Please log in again</string>
+    <string name="toast_no_discount_available">No discount codes available</string>
+    <string name="toast_no_matching_discount">No matching discount for this order</string>
+    <string name="toast_voucher_load_error">Error loading voucher</string>
+    <string name="toast_login_to_follow">Please log in to follow</string>
+    <string name="toast_followed">Following!</string>
+    <string name="toast_qr_error">Error generating QR code</string>
+    <string name="toast_login_to_buy">Please log in to purchase tickets</string>
+    <string name="toast_cant_buy_own_ticket">You cannot buy a ticket you listed yourself</string>
+    <string name="toast_apple_login_unsupported">Apple login is not yet supported</string>
+    <string name="toast_logout_success">Logged out successfully</string>
+    <string name="toast_select_ticket_to_sell">Please select at least 1 ticket to sell</string>
+    <string name="toast_processing">Processing…</string>
+    <string name="toast_resale_success">Ticket listed for resale successfully!</string>
+    <string name="toast_select_payment_method">Please select a payment method type</string>
+    <string name="toast_enter_org_name">Please enter organizer name</string>
+    <string name="toast_save_error">Save error: </string>
+    <string name="toast_error_prefix">Error: </string>
+    <string name="toast_load_error">Error loading data: </string>
+    <string name="toast_upload_img_error">Image upload error: </string>
+    <string name="toast_save_venue_error">Error saving venue: </string>
+    <string name="toast_create_org_error">Error creating organizer: </string>
+    <string name="toast_update_error">Update error: </string>
+    <string name="toast_tickets_loaded">%d tickets loaded successfully</string>
+    <string name="toast_otp_sending">Sending OTP to %s…</string>
+    <string name="toast_staff_toggle">Staff %s</string>
+    <string name="toast_org_set_default">\"%s\" set as default organizer</string>
+    <string name="toast_org_deleted_name">\"%s\" deleted</string>
+    <string name="toast_payment_method_added">%s added</string>
+    <string name="toast_payment_method_deleted">%s deleted</string>
+    <string name="toast_invalid_price_for">Invalid price for %s</string>
+    <string name="toast_price_gt_zero_for">Price must be greater than 0 for %s</string>
+    <string name="toast_star_added">Artist added successfully</string>
+    <string name="toast_star_deleted">Deleted successfully</string>
+    <string name="toast_order_approved">Order approved</string>
+    <string name="toast_blast_title_empty">Please enter title and content</string>
+    <string name="toast_blast_cancelled">Notification cancelled successfully</string>
+    <string name="toast_blast_cancel_error">Error cancelling: </string>
+    <string name="toast_cancel_resale">Cancelling listing…</string>
+    <string name="toast_cancel_resale_success">Ticket listing cancelled!</string>
+    <string name="toast_cancel_resale_fail">Cancellation failed: </string>
+    <string name="toast_feature_coming_soon">Organizer profile (coming soon)</string>
+    <string name="toast_buy_ticket_coming_soon">Ticket purchase feature coming soon!</string>
+    <string name="toast_manage_orgs_coming_soon">Manage organizer profiles (coming soon)</string>
+    <string name="toast_discount_saved">Discount code saved: </string>
+    <string name="toast_category_added">Category added: </string>
+    <string name="toast_venue_added">Venue added: </string>
+    <string name="toast_save_error_short">Save error</string>
+    <string name="toast_approved_prefix">Approved: </string>
+    <string name="toast_rejected_prefix">Rejected: </string>
+    <string name="toast_staff_activate">activated</string>
+    <string name="toast_staff_deactivate">deactivated</string>
+    <string name="toast_update_status_error">Error updating status</string>
+    <string name="toast_update_role_error">Error updating role</string>
+    <string name="toast_delete_error">Error deleting</string>
+    <string name="toast_star_update_order_error">Error updating artist order: </string>
+    <string name="toast_star_update_error">Update error: </string>
+    <string name="toast_cancel_event_error">Error: </string>
+    <string name="toast_load_event_error">Unable to load event information</string>
+    <string name="toast_event_star_already">This artist is already in the list!</string>
+    <string name="toast_star_fail">Failed: </string>
+    <string name="toast_no_event_stats">No event selected</string>
+
+    <!-- Profile page -->
+    <string name="str_default_username">VibeTix User</string>
+    <string name="str_member_since_placeholder">Member since 2024</string>
+    <string name="str_favorites">Favorites</string>
+    <string name="str_following">Following</string>
+    <string name="str_settings_security_header">SETTINGS &amp; SECURITY</string>
+    <string name="str_account_info">Account Info</string>
+    <string name="str_my_organizer">My Organizer</string>
+    <string name="str_org_badge_pending">Pending</string>
+    <string name="str_security_password">Security &amp; Password</string>
+    <string name="str_app_language">App Language</string>
+    <string name="str_lang_label_vi">Viet</string>
+    <string name="str_voice_assistant">Voice Assistant</string>
+    <string name="str_help_center">Help Center</string>
+    <string name="str_version">Version 1.0.0</string>
+
+    <!-- My Tickets page -->
+    <string name="str_tab_purchased">Purchased</string>
+    <string name="str_tab_resale">Resale</string>
+    <string name="str_tab_upcoming">Upcoming</string>
+    <string name="str_tab_ended">Ended</string>
+    <string name="str_tab_reselling">Reselling</string>
+    <string name="str_tab_awaiting_payment">Awaiting Payment</string>
+    <string name="str_tab_sold">Sold</string>
+    <string name="str_tab_rejected">Rejected</string>
+    <string name="str_tab_cancelled">Cancelled</string>
+    <string name="str_buy_ticket_now">Buy tickets now</string>
+    <string name="str_suggestions_for_you">You might also like</string>
+    <string name="str_see_all">See all ›</string>
+    <string name="str_no_tickets_title">You have no tickets yet!</string>
+    <string name="str_no_tickets_desc">Explore events and book tickets for unforgettable experiences waiting for you.</string>
+
+    <!-- Security page -->
+    <string name="str_section_pin">PIN CODE</string>
+    <string name="str_section_password">PASSWORD</string>
+    <string name="str_setup_pin">Set up PIN</string>
+    <string name="str_pin_not_set">Not set up yet</string>
+    <string name="str_forgot_pin_sms">Forgot PIN? Verify via SMS</string>
+    <string name="str_protect_with_pin">Protect Ticket Details page with PIN</string>
+    <string name="str_change_password">Change Password</string>
+    <string name="str_save_new_password">Save New Password</string>
+    <string name="str_current_password_label">Current Password</string>
+    <string name="str_new_password_label">New Password</string>
+    <string name="str_confirm_new_password_label">Confirm New Password</string>
+    <string name="str_hint_current_password">Enter current password</string>
+    <string name="str_hint_min_6_chars">Minimum 6 characters</string>
+    <string name="str_hint_re_enter_password">Re-enter new password</string>
+
+    <!-- Account Info page -->
+    <string name="str_full_name_label">Full Name</string>
+    <string name="str_email_label">Email</string>
+    <string name="str_verified_label">Verified</string>
+    <string name="str_phone_label">Phone Number</string>
+    <string name="str_birthday_label">Date of Birth</string>
+    <string name="str_gender_label">Gender</string>
+    <string name="str_male">Male</string>
+    <string name="str_female">Female</string>
+    <string name="str_other_gender">Other</string>
+    <string name="str_save_changes">Save Changes</string>
+    <string name="str_hint_full_name_placeholder">Nguyen Van A</string>
+    <string name="str_hint_phone_placeholder">0912 345 678</string>
+    <string name="str_hint_date_ddmmyyyy">dd/mm/yyyy</string>
+
+    <!-- Event Detail page -->
+    <string name="str_event_detail_title">Event Details</string>
+    <string name="str_about_event">About this event</string>
+    <string name="str_see_more_expand">See more ▼</string>
+    <string name="str_schedule">Schedule</string>
+    <string name="str_organizer_section_title">Organizer</string>
+    <string name="str_official_organizer">Official organizer</string>
+    <string name="str_more_like_this">You might also like</string>
+    <string name="str_price_from_label">From</string>
+    <string name="str_book_now">Book Now</string>
+    <string name="str_no_description">No description yet</string>
+    <string name="str_unverified">Unverified</string>
+    <string name="str_see_more_action">See more</string>
+    <string name="str_organized_by">Organized by </string>
+
+    <!-- Select Ticket page -->
+    <string name="str_seat_map">Seat Map</string>
+    <string name="str_choose_ticket_type_label">Choose ticket type</string>
+    <string name="str_total_amount_label">Total</string>
+    <string name="str_please_select_ticket">Please select a ticket</string>
+    <string name="str_ticket_info_notice">• E-ticket will be sent to your email after successful payment.\n• Please arrive 15 minutes early for check-in.\n• Tickets are non-refundable. Please see detailed terms.</string>
+
+    <!-- Fill Attendee Info page -->
+    <string name="str_attendee_info_title">Attendee Information</string>
+    <string name="str_notes_label">Notes</string>
+    <string name="str_note_char_count">0/300</string>
+    <string name="str_referral_question">How did you hear about this event?</string>
+    <string name="str_referral_facebook">Facebook</string>
+    <string name="str_referral_linkedin">LinkedIn</string>
+    <string name="str_referral_website">Website</string>
+    <string name="str_referral_friends">Friend referral</string>
+    <string name="str_referral_other">Other</string>
+    <string name="str_total_payment_label">Total Payment</string>
+    <string name="str_hint_special_request">Special request, invoice request...</string>
+    <string name="str_hint_attendee_name">Nguyen Van A</string>
+    <string name="str_hint_attendee_email">email@example.com</string>
+
+    <!-- Simulated Payment page -->
+    <string name="str_payment_title">Payment</string>
+    <string name="str_order_summary">Order Summary</string>
+    <string name="str_platform_fee">Platform Fee ℹ</string>
+    <string name="str_discount_payment_label">Discount</string>
+    <string name="str_secure_payment_label">Secure payment methods</string>
+    <string name="str_vnpay_desc">VNPay Gateway (Pay via banking app)</string>
+    <string name="str_vietqr_desc">VietQR Transfer (Scan QR code to pay)</string>
+    <string name="str_zalopay_wallet">ZaloPay Wallet</string>
+    <string name="str_shopeepay_wallet">ShopeePay Wallet</string>
+    <string name="str_visa_desc">Visa, Mastercard, JCB (Coming soon)</string>
+    <string name="str_agree_terms_full">I have read and agree to VibeTix\'s Terms of Service and Privacy Policy.</string>
+    <string name="str_voucher_label">🎟  Discount Code / Voucher</string>
+    <string name="str_enter_voucher">Enter discount code ›</string>
+    <string name="str_email_receive_ticket_hint">Email to receive ticket</string>
+
+    <!-- Payment Success page -->
+    <string name="str_order_number_label">Order Number</string>
+    <string name="str_payment_method_row_label">Payment Method</string>
+    <string name="str_ticket_type_row_label">Ticket Type</string>
+    <string name="str_quantity_label">Quantity</string>
+    <string name="str_order_time_label">Order Time</string>
+    <string name="str_email_ticket_label">Email for ticket</string>
+    <string name="str_view_my_tickets_action">View My Tickets 🎟</string>
+    <string name="str_order_info_title">Order Information</string>
+
+    <!-- Events list page -->
+    <string name="str_sort_newest">Newest</string>
+    <string name="str_all_provinces">All provinces</string>
+    <string name="str_no_events_found">No events found</string>
+    <string name="str_no_events_network_msg">Please check your network or try a different category.</string>
+    <string name="str_retry">Retry</string>
+    <string name="str_explore_events_title">Explore Events</string>
+    <string name="str_event_count_zero">0 events</string>
+    <string name="str_no_events_in_filter">No events found</string>
+    <string name="str_filter_hint_change">Try changing filters or search for another keyword</string>
+
+    <!-- Search page -->
+    <string name="str_search_events_title">Search Events</string>
+    <string name="str_all_dates">All dates</string>
+    <string name="str_discover_by_category">Discover by Category</string>
+    <string name="str_discover_by_city">Discover by City</string>
+
+    <!-- Help Center page -->
+    <string name="str_help_center_title">Help Center</string>
+    <string name="str_help_center_desc">VibeTix helps you buy and sell tickets easily and safely. Below is helpful information about the platform.</string>
+    <string name="str_help_hotline">Call hotline  1900.8888</string>
+    <string name="str_help_email">Email: support@vibetix.vn</string>
+
+    <!-- Organizer Hub page -->
+    <string name="str_org_hub_title">VibeTix Organizer</string>
+    <string name="str_org_hub_subtitle">Start organizing your events</string>
+    <string name="str_org_hub_welcome">Welcome Organizer!</string>
+    <string name="str_org_hub_desc">Create and manage your events easily and professionally with VibeTix.</string>
+    <string name="str_org_benefit_1">Create events for free, no limit</string>
+    <string name="str_org_benefit_2">Sell tickets online, automated payments</string>
+    <string name="str_org_benefit_3">Track revenue in real time</string>
+    <string name="str_org_benefit_4">Scan QR codes for fast check-in</string>
+    <string name="str_org_create_first_event">🚀  Create Your First Event</string>
+
+    <!-- Create Event page -->
+    <string name="str_create_event_title">Create New Event</string>
+    <string name="str_create_event_feature_title">Create Event Feature</string>
+    <string name="str_create_event_for_verified">This feature is for verified organizers.\nComing soon in next version! 🚀</string>
+    <string name="str_register_organizer_action">Register as Organizer →</string>
+
+    <!-- Organizer Profile page -->
+    <string name="str_edit_profile">Edit</string>
+    <string name="str_events_count_label">Events</string>
+    <string name="str_tickets_sold_label">Tickets Sold</string>
+    <string name="str_revenue_label">Revenue</string>
+    <string name="str_contact_info_title">Contact Info</string>
+    <string name="str_email_contact">Email</string>
+    <string name="str_phone_contact">Phone</string>
+    <string name="str_website_contact">Website</string>
+    <string name="str_org_profile_section_title">🏢 Organizer Profile</string>
+    <string name="str_add_new_profile">+ Add new profile</string>
+    <string name="str_settings_section_title">Settings</string>
+    <string name="str_notification_settings">Notification settings</string>
+    <string name="str_payment_info">Payment info</string>
+    <string name="str_change_password_action">Change Password</string>
+
+    <!-- Organizer Profile List page -->
+    <string name="str_org_profile_list_title">Organizer Profiles</string>
+    <string name="str_add_new_action">+ Add New</string>
+    <string name="str_no_org_profiles">No organizer profiles yet</string>
+    <string name="str_org_profile_list_desc">Create your first profile to start\nmanaging your events</string>
+    <string name="str_create_new_event_action">Create Event</string>
+
+    <!-- Payment Methods page -->
+    <string name="str_payment_methods_title">Payment Methods</string>
+    <string name="str_saved_payment_methods">SAVED PAYMENT METHODS</string>
+    <string name="str_no_payment_methods">No payment methods saved</string>
+    <string name="str_add_payment_faster">Add a method for faster checkout</string>
+    <string name="str_add_new_method">+ Add new method</string>
+    <string name="str_add_method_title">Add Payment Method</string>
+    <string name="str_choose_method_type">Choose payment type</string>
+    <string name="str_method_momo">MoMo</string>
+    <string name="str_method_zalopay">ZaloPay</string>
+    <string name="str_method_visa">Visa</string>
+    <string name="str_method_atm">ATM</string>
+    <string name="str_hint_account_card_number">Account / Card number (optional)</string>
+    <string name="str_add_payment_method_btn">Add Payment Method</string>
+
+    <!-- Star Detail page -->
+    <string name="str_star_detail_title">Artist Info</string>
+    <string name="str_follow_action">+ Follow</string>
+    <string name="str_loading_placeholder">Loading...</string>
+    <string name="str_intro_section">Introduction</string>
+    <string name="str_no_artist_bio">No introduction available for this artist.</string>
+    <string name="str_artist_events_section">Activities / Events</string>
+    <string name="str_no_artist_events">No events from this artist on the platform yet.</string>
+
+    <!-- Captcha dialog -->
+    <string name="str_captcha_title">User Verification</string>
+    <string name="str_captcha_subtitle">Anti-bot automatic ticket buying</string>
+    <string name="str_captcha_instruction">Drag the piece to the correct position to complete the image</string>
+    <string name="str_captcha_loading">Please wait...</string>
+    <string name="str_captcha_slider_hint">← Drag right to piece together the image →</string>
+    <string name="str_captcha_reload">Reload</string>
+    <string name="str_captcha_success">✓ Verification successful!</string>
+    <string name="str_captcha_fail">✗ Incorrect, try again</string>
+
+    <!-- Date Filter dialog -->
+    <string name="str_date_today">Today</string>
+    <string name="str_date_tomorrow">Tomorrow</string>
+    <string name="str_date_weekend">Weekend</string>
+    <string name="str_date_this_month">This month</string>
+    <string name="str_date_reset">Reset</string>
+    <string name="str_date_apply">Apply</string>
+
+    <!-- Event Filter dialog -->
+    <string name="str_filter_title_dialog">Filter</string>
+    <string name="str_filter_location">Location</string>
+    <string name="str_filter_all_nation">Nationwide</string>
+    <string name="str_filter_hcmc">Ho Chi Minh City</string>
+    <string name="str_filter_hanoi">Hanoi</string>
+    <string name="str_filter_dalat">Da Lat</string>
+    <string name="str_filter_danang">Da Nang</string>
+    <string name="str_filter_price">Ticket Price</string>
+    <string name="str_filter_free_only_label">Free events only</string>
+    <string name="str_filter_genre">Genre</string>
+    <string name="str_filter_live_music">Live Music</string>
+    <string name="str_filter_arts">Arts</string>
+    <string name="str_filter_workshop">Workshop</string>
+    <string name="str_filter_tour">Tour</string>
+    <string name="str_filter_sports">Sports</string>
+    <string name="str_filter_festival">Festival</string>
+    <string name="str_filter_reset">Reset</string>
+    <string name="str_filter_apply">Apply</string>
+
+    <!-- Pass Ticket dialog -->
+    <string name="str_pass_ticket_title">Resell Ticket (Pass Ticket) 🎫</string>
+    <string name="str_pass_ticket_desc">List your ticket on the VibeTix marketplace. The buyer will receive a new ticket and funds will be transferred to your account after the transaction is successful.</string>
+    <string name="str_choose_ticket_to_sell">Choose ticket to sell *</string>
+    <string name="str_message_for_buyer">Message for buyer (optional)</string>
+    <string name="str_pass_later">Later</string>
+    <string name="str_confirm_list_for_sale">Confirm listing for sale</string>
+
+    <!-- QR Scanner -->
+    <string name="str_qr_frame_hint">Place QR code inside the frame to scan</string>
+    <string name="str_qr_flash">Flash</string>
+    <string name="str_qr_manual_input">Manual Input</string>
+    <string name="str_qr_scan_ticket">Scan Ticket</string>
+    <string name="str_qr_offline_mode">Offline Mode</string>
+    <string name="str_qr_load_db">Load DB</string>
+    <string name="str_qr_next_ticket">Scan next ticket</string>
+    <string name="str_qr_checkin_success">Check-in successful!</string>
+
+    <!-- Resale pages -->
+    <string name="str_resale_marketplace_title">Resale Tickets</string>
+    <string name="str_resale_empty">No tickets listed for resale yet.</string>
+    <string name="str_resale_detail_title">Resale Ticket Details</string>
+    <string name="str_resale_list_title">Resale ticket list</string>
+    <string name="str_resale_no_tickets">No resale tickets for this event.</string>
+
+    <!-- Ticket QR dialog -->
+    <string name="str_e_ticket_label">E-TICKET</string>
+    <string name="str_qr_instructions">Please show this QR code to the check-in staff at the entrance to enter the event.</string>
+    <string name="str_done">Done</string>
+
+    <!-- Ticket Detail dialog -->
+    <string name="str_ticket_info_section">TICKET INFO</string>
+    <string name="str_total_order_amount">Total Order</string>
+    <string name="str_attendee_label_row">Attendee</string>
+    <string name="str_close">Close</string>
+
+    <!-- Item layouts - static labels -->
+    <string name="str_item_attendee_ticket_type">Ticket Type</string>
+    <string name="str_item_not_checked_in">Not checked in</string>
+    <string name="str_item_check_in_action">Check-in</string>
+    <string name="str_item_valid_label">Valid</string>
+    <string name="str_item_resell_action_caps">RESELL TICKET</string>
+
+    <!-- All Events fragment -->
+    <string name="str_explore_events_heading">Explore Events</string>
+    <string name="str_filter_chip_all">All</string>
+    <string name="str_filter_chip_today">Today</string>
+    <string name="str_filter_chip_weekend">Weekend</string>
+    <string name="str_filter_chip_this_month">This month</string>
+    <string name="str_filter_chip_free">Free</string>
+    <string name="str_hint_search_events">Search events...</string>
+
+    <!-- My Events list (organizer) -->
+    <string name="str_my_events_title">My Events</string>
+    <string name="str_my_events_subtitle">Select an event to start managing</string>
+    <string name="str_no_events_yet">No events yet</string>
+    <string name="str_hint_search_my_events">Search events...</string>
+
+    <!-- Notification popup -->
+    <string name="str_notification_popup_title">Notifications</string>
+    <string name="str_view_all_notifications">View all notifications</string>
+    <string name="str_my_tickets_title">My Tickets  ✨</string>
+    <string name="str_total_earnings_label">Total Earnings: 0 ₫</string>
+    <string name="str_buy_ticket_emoji">🎟  Buy tickets now</string>
+
+    <!-- Create/Edit Event Activity -->
+    <string name="str_step_basic_info">Step 1/3: Basic Info</string>
+    <string name="str_rejected_event_label">Event Rejected</string>
+    <string name="str_upload_poster_hint">Tap to upload image</string>
+    <string name="str_hint_event_title">Event title *</string>
+    <string name="str_event_description_label">Event description</string>
+    <string name="str_hint_category">Select category</string>
+    <string name="str_hint_event_format">Event format *</string>
+    <string name="str_free_event_label">Free event</string>
+    <string name="str_hint_online_link">Online link (Zoom, Google Meet…)</string>
+    <string name="str_hint_age_limit">Age limit *</string>
+    <string name="str_hint_max_tickets_per_order">Max tickets per order *</string>
+    <string name="str_time_section_label">⏰ Event Time</string>
+    <string name="str_hint_start_time">Start time *</string>
+    <string name="str_hint_end_time">End time</string>
+    <string name="str_venue_section_label">📍 Venue</string>
+    <string name="str_hint_venue_name">Venue name (e.g. My Dinh Stadium)</string>
+    <string name="str_hint_venue_address">Detailed address</string>
+    <string name="str_hint_venue_city">City / Province</string>
+    <string name="str_organizer_form_section">🏢 Organizer *</string>
+    <string name="str_saved_organizer_tab">Saved</string>
+    <string name="str_new_organizer_tab">New</string>
+    <string name="str_hint_select_saved_organizer">Select saved organizer</string>
+    <string name="str_organizer_email_placeholder">Email: —</string>
+    <string name="str_organizer_phone_placeholder">Phone: —</string>
+    <string name="str_organizer_web_placeholder">Web: —</string>
+    <string name="str_hint_organizer_name">Organizer name *</string>
+    <string name="str_hint_organizer_email">Contact email *</string>
+    <string name="str_hint_organizer_phone">Phone number *</string>
+    <string name="str_hint_organizer_website">Website / Fanpage</string>
+    <string name="str_preview_section_label">ℹ️ Preview Info</string>
+    <string name="str_preview_name_label">Name:</string>
+    <string name="str_preview_time_label">Time:</string>
+    <string name="str_preview_venue_label">Venue:</string>
+    <string name="str_ticket_types_section_label">Ticket Types</string>
+    <string name="str_add_ticket_type_hint">Add at least 1 ticket type to submit for review</string>
+    <string name="str_add_ticket_type_btn">+ Add ticket type</string>
+    <string name="str_no_ticket_types">No ticket types yet</string>
+    <string name="str_add_ticket_type_prompt">Tap \'+ Add ticket type\' to get started</string>
+    <string name="str_artists_section_label">Artists</string>
+    <string name="str_artists_optional_hint">Optional — can be skipped</string>
+    <string name="str_add_artist_btn">+ Add artist</string>
+    <string name="str_no_artists_yet">No artists added yet</string>
+    <string name="str_artists_optional_note">Not required — you can add later</string>
+    <string name="str_save_draft_btn">💾 Save Draft</string>
+    <string name="str_submit_review_btn">🚀 Submit for Review</string>
+    <string name="str_back_btn">Back</string>
+    <string name="str_next_btn">Next</string>
+
+    <!-- Banner Promo Dialog -->
+    <string name="str_promo_badge">🎁 SPECIAL OFFER</string>
+    <string name="str_promo_discount_headline">Up to 30% OFF</string>
+    <string name="str_promo_discount_condition">For group purchases of 3 or more</string>
+    <string name="str_promo_conditions_header">CONDITIONS</string>
+    <string name="str_promo_condition_1">✅  Buy 3+ tickets at the same time</string>
+    <string name="str_promo_condition_2">✅  Applies to all events currently on sale</string>
+    <string name="str_promo_condition_3">✅  Payment via MoMo / ZaloPay / VNPay</string>
+    <string name="str_promo_expiry">⏰  Expires: 30/06/2026</string>
+    <string name="str_promo_dismiss_btn">Close</string>
+    <string name="str_promo_claim_btn">🎫 Claim now →</string>
+
+    <!-- Item layout static labels -->
+    <string name="str_resale_ticket_badge">Resale Ticket</string>
+    <string name="str_resale_badge_caps">RE-SALE</string>
+    <string name="str_resale_price_label">Resale price</string>
+    <string name="str_buy_resale_btn">Buy ticket</string>
+    <string name="str_discount_value_label">Discount value</string>
+    <string name="str_discount_used_label">Used</string>
+    <string name="str_discount_disable_btn">Disable</string>
+    <string name="str_tickets_sold_stat_label">Tickets Sold</string>
+    <string name="str_revenue_stat_label">Revenue</string>
+    <string name="str_fan_bought_label">Fans bought tickets</string>
+    <string name="str_conversion_rate_label">Conversion rate</string>
+    <string name="str_order_total_label">Total:</string>
+    <string name="str_approve_order_btn">Approve order</string>
+    <string name="str_checked_in_label">Checked in</string>
+
+    <!-- Staff / Ticket Type Management activities -->
+    <string name="str_staff_list_header">STAFF LIST</string>
+    <string name="str_staff_permission_label">Permission management</string>
+    <string name="str_total_count_label">TOTAL</string>
+    <string name="str_add_staff_empty_hint">Add staff to support\nyour event</string>
+    <string name="str_total_tickets_sold_header">TOTAL TICKETS SOLD</string>
+    <string name="str_ticket_types_count_header">TICKET TYPES</string>
+    <string name="str_create_first_ticket_hint">Create the first ticket type\nfor your event</string>
+    <!-- Organizer register -->
+    <string name="str_hint_organizer_brand_name">Organizer name *</string>
+    <string name="str_hint_organizer_bio">Organizer bio *</string>
+    <string name="str_hint_organizer_website_optional">Website (optional)</string>
+    <string name="str_organizer_review_notice">Your application will be reviewed within 1–3 business days. We will notify you by email when there is a result.</string>
+    <!-- Thank you message on payment success -->
+    <string name="str_payment_success_thank_you">Thank you for booking with VibeTix.\nE-ticket has been sent to your email and saved in My Tickets.</string>
+
+    <!-- SecurityFragment toasts and labels -->
+    <string name="str_pin_set_status">Set</string>
+    <string name="str_pin_not_set_status">Not set</string>
+    <string name="str_toast_set_pin_first">Please set up a PIN first</string>
+    <string name="str_toast_pin_incorrect">Incorrect PIN</string>
+    <string name="str_toast_old_pin_incorrect">Old PIN is incorrect</string>
+    <string name="str_toast_pin_mismatch">New PINs do not match, try again</string>
+    <string name="str_toast_pin_updated">✓ PIN updated successfully</string>
+    <string name="str_toast_pin_save_failed">Failed to save PIN, try again later</string>
+    <string name="str_toast_fill_all_fields">Please fill in all required fields</string>
+    <string name="str_toast_password_too_short">New password must be at least 6 characters</string>
+    <string name="str_toast_password_mismatch">Passwords do not match</string>
+    <string name="str_toast_relogin_required">Please log in again to change password</string>
+    <string name="str_btn_processing">Processing...</string>
+    <string name="str_toast_password_changed">✓ Password changed successfully!</string>
+    <string name="str_toast_password_change_failed">Password change failed. Try again later.</string>
+    <string name="str_toast_current_password_wrong">Current password is incorrect</string>
+    <string name="str_toast_fetching_phone">Fetching phone number...</string>
+    <string name="str_toast_cannot_get_account">Cannot retrieve account info</string>
+    <string name="str_toast_sending_otp">Sending OTP to %1$s…</string>
+    <string name="str_toast_otp_failed">Failed to send OTP: %1$s</string>
+    <string name="str_hint_otp_input">Enter 6-digit OTP</string>
+    <string name="str_dialog_title_sms_verify">Verify via SMS</string>
+    <string name="str_toast_otp_too_short">OTP must be 6 digits</string>
+    <string name="str_toast_otp_invalid">OTP is incorrect or expired</string>
+
+    <!-- MyTicketsFragment toasts and empty states -->
+    <string name="str_toast_resell_guide">Select a purchased ticket in the \'Purchased\' tab then tap \'Resell ticket\' to list it!</string>
+    <string name="str_toast_cancelling_resell">Cancelling listing...</string>
+    <string name="str_toast_resell_cancelled">Listing cancelled!</string>
+    <string name="str_toast_cancel_resell_failed">Cancel failed: %1$s</string>
+    <string name="str_toast_load_ticket_error">Error loading tickets: %1$s</string>
+    <string name="str_empty_no_tickets_title">You have no tickets yet!</string>
+    <string name="str_empty_no_tickets_subtitle">Explore events and book tickets for memorable experiences waiting for you.</string>
+    <string name="str_empty_no_ended_title">No ended tickets yet!</string>
+    <string name="str_empty_no_ended_subtitle">Your ticket purchase history will appear here.</string>
+    <string name="str_empty_no_reselling_title">You have no resell listings!</string>
+    <string name="str_empty_no_reselling_subtitle">Resell your ticket so others can attend the event.</string>
+    <string name="str_empty_no_sold_title">No sold tickets</string>
+    <string name="str_empty_no_sold_subtitle">You have no successfully sold tickets yet.</string>
+    <string name="str_empty_no_cancelled_title">No cancelled tickets</string>
+    <string name="str_empty_no_cancelled_subtitle">You have no cancelled listings yet.</string>
+    <string name="str_empty_no_expired_title">No expired tickets</string>
+    <string name="str_empty_no_expired_subtitle">Expired listings will appear here.</string>
+    <string name="str_resell_ticket_btn">Resell ticket</string>
+    <!-- EventDetailFragment strings -->
+    <string name="str_toast_load_event_error">Error loading event: %1$s</string>
+    <string name="str_event_format_label">Format: %1$s</string>
+    <string name="str_age_restriction_label">Age limit: %1$s</string>
+    <string name="str_event_ended">Event ended</string>
+    <string name="str_event_cancelled">Event cancelled</string>
+    
+    <string name="str_coming_soon">Coming soon</string>
+    <string name="str_book_tickets_now">Book tickets now</string>
+    <string name="str_not_open_yet">Not open for sale</string>
+    <string name="str_free_price">Free</string>
+    <string name="str_see_more_expand_icon">See more ▼</string>
+    <string name="str_buy_now_caps">BUY TICKETS NOW</string>
+    <string name="str_toast_login_to_save">Please log in to save favourite events</string>
+    <!-- AccountInfoFragment strings -->
+    <string name="str_toast_processing_image">Processing image...</string>
+    <string name="str_toast_cannot_read_image">Cannot read image, try again</string>
+    <string name="str_toast_avatar_updated">✓ Avatar updated</string>
+    <string name="str_toast_save_avatar_failed">Failed to save avatar: %1$s</string>
+    <string name="str_error_enter_full_name">Please enter your full name</string>
+    <string name="str_btn_saving">Saving...</string>
+    <string name="str_toast_info_saved">✓ Info saved</string>
+    <string name="str_toast_save_info_failed">Save failed: %1$s</string>
+    <!-- PassTicketDialogFragment strings -->
+    <string name="str_ticket_type_max_qty">%1$s (max %2$d)</string>
+    <string name="str_vnd_label">VND</string>
+    <string name="str_resale_price_tip">💡 Pricing 10–20%% lower will help sell faster.</string>
+    <string name="str_toast_please_relogin">Please log in again</string>
+    <string name="str_toast_enter_price_for">Please enter price for %1$s</string>
+    <string name="str_toast_invalid_price_for">Invalid price for %1$s</string>
+    <string name="str_toast_price_must_be_positive">Price must be greater than 0 for %1$s</string>
+    <string name="str_toast_select_at_least_one">Please select at least 1 ticket to sell</string>
+    <string name="str_toast_resell_success">Ticket listed for resale successfully!</string>
+    <!-- EventDetailActivity strings -->
+    <string name="str_toast_cannot_load_event">Cannot load event</string>
+    <string name="str_no_venue_yet">No venue set</string>
+    <string name="str_organizer_verified">✓ Verified</string>
+    <string name="str_toast_no_ticket_types">No ticket types yet</string>
+    <string name="str_toast_buy_coming_soon">Ticket purchasing will be added soon!</string>
+    <string name="str_default_ticket_name">Ticket</string>
+    <string name="str_ticket_status_upcoming">Coming soon</string>
+    <string name="str_ticket_status_ended">Sales ended</string>
+    <string name="str_ticket_status_sold_out">Sold out</string>
+    <string name="str_ticket_status_on_sale">On sale</string>
+    <string name="str_tickets_remaining">%1$d tickets left</string>
+    <!-- OrganizerProfileFragment strings -->
+    <string name="str_organizer_count_label">%1$d organizer profile(s)</string>
+    <string name="str_cannot_load_profile">Cannot load info. Try again.</string>
+    <string name="str_organizer_deleted_toast">Organizer profile deleted</string>
+    <string name="str_organizer_type_label">Event organizer</string>
+    <string name="str_verified_chip">● Verified</string>
+    <string name="str_pending_chip">● Pending</string>
+    <!-- User OrganizerProfileFragment strings -->
+    <string name="str_status_pending_review">⏳ Pending review</string>
+    <string name="str_description_label">Description</string>
+    <string name="str_default_label">Default</string>
+    <string name="str_activated_label">Activated</string>
+    <string name="str_not_activated_label">Not activated</string>
+    <string name="str_set_default_org_toast">Set \"%1$s\" as default organizer</string>
+    <string name="str_delete_org_btn">Delete this organizer</string>
+    <string name="str_toast_enter_org_name">Please enter organizer name</string>
+    <string name="str_toast_org_deleted">Deleted \"%1$s\"</string>
+    <!-- SimulatedPaymentFragment strings -->
+    <string name="str_toast_no_discount_codes">No discount codes available</string>
+    <string name="str_toast_no_matching_code">No matching code for this order</string>
+    <string name="str_voucher_code_label">Code: %1$s</string>
+    <string name="str_apply_btn">Apply</string>
+    <string name="str_toast_error_loading_voucher">Error loading voucher</string>
+    <!-- CreateOrganizerActivity strings -->
+    <string name="str_error_brand_name_empty">Brand name cannot be empty</string>
+    <string name="str_toast_auth_error">Authentication error</string>
+    <string name="str_toast_org_profile_updated">Organizer profile updated successfully.</string>
+    <string name="str_toast_update_error">Update error: %1$s</string>
+    <string name="str_toast_org_profile_saved">Organizer profile saved successfully.</string>
+    <string name="str_toast_save_data_error">Data save error: %1$s</string>
+    <string name="str_btn_save_org_profile">Save Profile</string>
+    <!-- TicketDetailActivity strings -->
+    <string name="str_toast_ticket_not_found">Ticket not found</string>
+    <string name="str_toast_load_info_error">Error loading info: %1$s</string>
+    <string name="str_toast_load_ticket_err">Error loading ticket: %1$s</string>
+    <string name="str_checked_in_status">Checked in</string>
+    <string name="str_not_checked_in_status">Not checked in</string>
+    <string name="str_ticket_code_label">Ticket code: #%1$s</string>
+    <!-- QrScannerActivity strings -->
+    <string name="str_qr_sync_count">Sync (%1$d)</string>
+    <string name="str_qr_loading_data">Loading data...</string>
+    <string name="str_qr_load_success">Loaded %1$d tickets successfully</string>
+    <string name="str_qr_load_done_instruction">Load complete. Place QR code in frame to scan</string>
+    <string name="str_qr_load_data_error">Error loading data</string>
+    <string name="str_qr_no_sync_needed">No data to sync</string>
+    <string name="str_qr_syncing">Syncing...</string>
+    <string name="str_qr_sync_success">Sync successful!</string>
+    <string name="str_qr_sync_success_instruction">Sync successful</string>
+    <string name="str_qr_sync_error">Sync error</string>
+    <string name="str_qr_hint_manual_code">Enter ticket display code (e.g. VTX-1234)</string>
+    <string name="str_qr_checking">Checking...</string>
+    <string name="str_qr_anonymous_guest">Anonymous guest</string>
+    <string name="str_qr_standard_ticket">Standard ticket</string>
+    <string name="str_qr_checking_offline">Checking offline...</string>
+    <string name="str_qr_invalid_code">Invalid ticket code</string>
+    <string name="str_qr_unknown">Unknown</string>
+    <!-- StaffManagementActivity strings -->
+    <string name="str_toast_load_list_error">Error loading list: %1$s</string>
+    <string name="str_toast_load_user_error">Error loading user info: %1$s</string>
+    <string name="str_staff_count_label">%1$d staff</string>
+    <string name="str_error_enter_email">Please enter email</string>
+    <string name="str_toast_staff_already_exists">This staff already exists in the event</string>
+    <string name="str_toast_staff_added">Staff added successfully</string>
+    <string name="str_toast_add_staff_error">Error adding staff</string>
+    <string name="str_toast_user_not_found">User not found with this email</string>
+    <string name="str_toast_staff_unlocked">Staff unlocked</string>
+    <string name="str_toast_staff_suspended">Staff suspended</string>
+    <string name="str_toast_status_update_error">Error updating status</string>
+    <string name="str_toast_role_updated">Role updated</string>
+    <string name="str_toast_role_update_error">Error updating role</string>
+    <string name="str_toast_staff_deleted">Staff removed</string>
+    <string name="str_toast_delete_error">Error deleting</string>
+    <!-- DiscountManagementActivity strings -->
+    <string name="str_toast_event_info_not_found">Event info not found</string>
+    <string name="str_toast_load_discount_error">Error loading discounts: %1$s</string>
+    <string name="str_edit_discount_title">Edit discount code</string>
+    <string name="str_add_discount_title">Add discount code</string>
+    <string name="str_error_enter_name">Please enter a name</string>
+    <string name="str_error_enter_value">Please enter a value</string>
+    <string name="str_toast_select_time">Please select a time period</string>
+    <string name="str_toast_invalid_value">Invalid value</string>
+    <string name="str_toast_percent_over_100">Discount percentage cannot exceed 100</string>
+    <string name="str_toast_invalid_date">Invalid date</string>
+    <string name="str_toast_end_before_start">End date must be after start date</string>
+    <string name="str_toast_create_success">Created successfully</string>
+    <string name="str_toast_update_success">Updated successfully</string>
+    <!-- TicketTypeManagementActivity strings -->
+    <string name="str_ticket_type_count_label">%1$d ticket type(s)</string>
+    <string name="str_edit_ticket_type_title">Edit ticket type</string>
+    <string name="str_add_ticket_type_title">Add ticket type</string>
+    <string name="str_error_enter_ticket_name">Please enter ticket type name</string>
+    <string name="str_error_enter_ticket_price">Please enter ticket price</string>
+    <string name="str_error_enter_ticket_qty">Please enter ticket quantity</string>
+    <string name="str_error_enter_sale_start">Please select sale start date</string>
+    <string name="str_error_enter_sale_end">Please select sale end date</string>
+    <string name="str_toast_end_date_before_start">End date must be on or after start date</string>
+    <string name="str_toast_invalid_price_qty">Invalid price or quantity</string>
+    <string name="str_error_invalid_price">Invalid price</string>
+    <string name="str_error_qty_must_be_positive">Quantity must be greater than 0</string>
+    <string name="str_toast_cannot_reduce_qty">Cannot reduce below tickets already sold (%1$d sold)!</string>
+    <string name="str_btn_save_ticket_type">SAVE INFO</string>
+    <string name="str_toast_ticket_type_created">Ticket type created ✓</string>
+    <string name="str_toast_ticket_type_updated">Ticket type updated ✓</string>
+    <string name="str_toast_cannot_check_orders">Cannot check orders</string>
+    <string name="str_toast_ticket_type_deleted">Ticket type deleted</string>
+    <string name="str_toast_update_failed">Update failed</string>
+    <string name="str_ticket_sold_fraction">%1$d / %2$d tickets</string>
+    <string name="str_status_active">Active</string>
+    <string name="str_status_disabled">Disabled</string>
+    <!-- CreateEditEventActivity strings -->
+    <string name="str_rejection_reason_label">Reason: %1$s</string>
+    <string name="str_edit_ticket_type_sheet">Edit ticket type</string>
+    <string name="str_add_ticket_type_sheet">Add ticket type</string>
+    <string name="str_toast_artist_already_added">This artist has already been added</string>
+    <string name="str_btn_update">Update</string>
+    <string name="str_org_phone_label">Phone: %1$s</string>
+    <string name="str_toast_select_event_format">Please select event format</string>
+    <string name="str_toast_enter_online_link">Please enter online link</string>
+    <string name="str_toast_select_age_limit">Please select age limit</string>
+    <string name="str_toast_enter_max_tickets">Please enter max tickets per order</string>
+    <string name="str_toast_max_tickets_positive">Max tickets must be greater than 0</string>
+    <string name="str_toast_max_tickets_invalid">Invalid max tickets value</string>
+    <string name="str_toast_add_one_ticket_type">Please add at least one ticket type</string>
+    <string name="str_toast_invalid_org_email">Organizer email format is invalid</string>
+    <string name="str_toast_create_org_error">Error creating organizer: %1$s</string>
+    <string name="str_toast_upload_image_error">Error uploading image: %1$s</string>
+    <string name="str_toast_save_venue_error">Error saving venue: %1$s</string>
+    <string name="str_toast_save_error">Save error: %1$s</string>
+    <string name="str_toast_save_ticket_artist_error">Error saving ticket/artist: %1$s</string>
+    <string name="str_toast_cannot_load_image">Cannot load image</string>
+    <string name="str_hint_display_name">Display name</string>
+    <!-- TicketAdapter status labels -->
+    <string name="str_ticket_valid_badge">Valid</string>
+    <string name="str_ticket_reselling_badge">Reselling</string>
+    <string name="str_ticket_used_badge">Used</string>
+    <string name="str_ticket_expired_badge">Expired</string>
+    <string name="str_ticket_sold_badge">Sold</string>
+    <string name="str_ticket_cancelled_resell_badge">Resell cancelled</string>
+    <string name="str_btn_cancel_resell">Cancel listing</string>
+    <string name="str_btn_relist">Relist</string>
+    <!-- OrganizerBlastActivity strings -->
+    <string name="str_toast_no_event_selected">No event selected</string>
+    <string name="str_toast_load_ticket_type_error">Error loading ticket types</string>
+    <string name="str_toast_enter_title_and_content">Please enter title and content</string>
+    <string name="str_toast_select_ticket_type">Please select a ticket type</string>
+    <string name="str_toast_load_history_error">Error loading history: %1$s</string>
+    <string name="str_toast_notification_cancelled">Notification cancelled successfully</string>
+    <string name="str_recipients_count">%1$d recipients</string>
+    <string name="str_status_sent">Sent</string>
+    <string name="str_status_cancelled_label">Cancelled</string>
+    <!-- EventStarManagementActivity strings -->
+    <string name="str_toast_event_not_found">Event not found</string>
+    <string name="str_toast_update_error_msg">Update error: %1$s</string>
+    <string name="str_toast_order_update_error">Error updating order: %1$s</string>
+    <string name="str_toast_load_data_error">Error loading data</string>
+    <string name="str_toast_artist_already_in_list">This artist is already in the list!</string>
+    <string name="str_toast_artist_added">Artist added successfully</string>
+    <string name="str_toast_failed_msg">Failed: %1$s</string>
+    <string name="str_hint_artist_role">Role (e.g. Headliner, MC…)</string>
+    <string name="str_toast_deleted_success">Deleted successfully</string>
+    <!-- StarDetailFragment strings -->
+    <string name="str_official_organizer_label">Official organizer</string>
+    <string name="str_follower_count_label">%1$d followers</string>
+    <string name="str_toast_login_to_follow">Please log in to follow</string>
+    <string name="str_toast_followed">Followed!</string>
+    <string name="str_btn_following">Following</string>
+    <string name="str_btn_follow">+ Follow</string>
+    <!-- SelectTicketFragment strings -->
+    <string name="str_tickets_remaining_qty">%1$d tickets left</string>
+    <string name="str_btn_please_select_ticket">Please select a ticket</string>
+    <!-- ProfileFragment strings -->
+    <string name="str_default_username_label">VibeTix User</string>
+    <string name="str_member_since_label">Member since 2024</string>
+    <string name="str_toast_logout_success">Logged out successfully</string>
+    <string name="str_default_org_label">Default</string>
+    <!-- TicketDetailDialogFragment strings -->
+    <string name="str_discount_code_label">Discount code</string>
+    <!-- SearchFragment strings -->
+    <string name="str_all_dates_label">All dates</string>
+    <string name="str_toast_cannot_load_events">Cannot load events</string>
+    <string name="str_search_results_count">Search results (%1$d)</string>
+    <!-- Adapter status labels -->
+    <string name="str_discount_status_disabled">Disabled</string>
+    <string name="str_discount_status_upcoming">Upcoming</string>
+    <string name="str_discount_status_expired">Expired</string>
+    <string name="str_discount_status_running">Running</string>
+    <string name="str_discount_expiry_label">Expires: %1$s</string>
+    <string name="str_btn_deactivate">Deactivate</string>
+    <string name="str_btn_activate">Activate</string>
+    <string name="str_attendee_unknown_name">Unknown guest</string>
+    <string name="str_attendee_no_email">No email</string>
+    <string name="str_attendee_ticket_count">%1$d ticket(s)</string>
+    <string name="str_default_ticket_type">Default ticket</string>
+    <string name="str_checked_in_badge">Checked in ✓</string>
+    <string name="str_not_checked_in_badge">Not checked in</string>
+    <string name="str_resale_default_type">Resale ticket</string>
+    <string name="str_resale_negotiate_price">Negotiable</string>
+    <string name="str_resale_qty_label">Quantity: 1</string>
+    <string name="str_resale_seller_label">Seller: %1$s</string>
+    <!-- EventsFragment strings -->
+    <string name="str_cannot_load_data">Cannot load data</string>
+    <string name="str_event_not_found_label">No events found</string>
+    <string name="str_check_network_retry">Please check your internet connection and try again.</string>
+    <string name="str_try_other_filter">Please try a different filter or keyword.</string>
+    <string name="str_sort_latest">Latest</string>
+    <string name="str_all_cities">All cities</string>
+    <!-- MasterDataFragment strings -->
+    <string name="str_toast_category_added">Category added: %1$s</string>
+    <string name="str_toast_venue_added">Venue added: %1$s</string>
+    <string name="str_toast_save_error_short">Save error</string>
+    <!-- EventHubActivity strings -->
+    <string name="str_toast_org_profile_coming_soon">Organizer profile (coming soon)</string>
+    <string name="str_toast_event_cancelled_ok">Event cancelled successfully</string>
+    <string name="str_toast_cannot_load_event_info">Cannot load event info</string>
+    <!-- OrderManagementActivity strings -->
+    <string name="str_toast_load_data_err">Error loading data: %1$s</string>
+    <string name="str_toast_order_approved">Order approved</string>
+    <!-- AttendeesActivity strings -->
+    <string name="str_toast_load_data_error_short">Error loading data</string>
+    <string name="str_toast_checkin_success">Check-in successful!</string>
+    <!-- OrganizerRegisterFragment strings -->
+    <string name="str_error_enter_brand_name">Please enter organizer name</string>
+    <string name="str_error_enter_description">Please enter description</string>
+    <!-- PaymentMethodsFragment strings -->
+    <string name="str_toast_deleted_method">Deleted %1$s</string>
+    <string name="str_toast_select_method_type">Please select a payment method type</string>
+    <string name="str_toast_method_added">%1$s added</string>
+    <!-- TicketQrDialogFragment strings -->
+    <string name="str_ticket_tier_label">Tier: %1$s</string>
+    <string name="str_toast_qr_error">Error generating QR code</string>
+    <!-- StaffAdapter strings -->
+    <string name="str_vibetix_account">VibeTix account</string>
+    <string name="str_role_manager_label">Manager</string>
+    <string name="str_role_checkin_label">Check-in staff</string>
+    <string name="str_staff_active_label">Active</string>
+    <string name="str_staff_suspended_label">Suspended</string>
+    <!-- OrganizerOrderAdapter strings -->
+    <string name="str_order_status_success">Success</string>
+    <string name="str_order_status_cancelled">Cancelled</string>
+    <string name="str_order_status_refunded">Refunded</string>
+    <string name="str_order_status_pending">Pending</string>
+    <!-- PaymentSuccessFragment strings -->
+    <string name="str_ticket_qty_label">%1$d ticket(s)</string>
+    <!-- ResaleEventDetailFragment strings -->
+    <string name="str_toast_login_to_buy">Please log in to buy tickets</string>
+    <string name="str_toast_cannot_buy_own_ticket">You cannot buy back a ticket you listed yourself</string>
+    <!-- LoginFragment strings -->
+    <string name="str_toast_apple_not_supported">Apple sign-in is not yet supported</string>
+    <!-- RegisterFragment strings -->
+    <string name="str_btn_complete_register">Complete registration</string>
+    <!-- NotificationDetailActivity strings -->
+    <string name="str_btn_view_my_tickets">View My Tickets</string>
+    <string name="str_btn_view_my_events">View My Events</string>
+    <!-- NotificationPopupHelper strings -->
+    <string name="str_no_notifications">You have no notifications yet.</string>
+    <!-- FillAttendeeInfoFragment strings -->
+    <string name="str_attendee_info_title_screen">Attendee Info</string>
+    <string name="str_nav_home_label">Home</string>
+    <string name="str_nav_events_label">Events</string>
+    <string name="str_nav_create_label">Create</string>
+    <string name="str_nav_tickets_label">My Tickets</string>
+    <string name="str_nav_profile_label">Profile</string>
+    <string name="str_select_time_title">Select Time</string>
+    <string name="str_tab_expired">Expired</string>
 </resources>
+
+
+
+
+
+
+

@@ -261,11 +261,11 @@ public class OrganizerProfileFragment extends Fragment {
         int ph = (int)(10*dp), pv = (int)(3*dp);
         txtStatus.setPadding(ph, pv, ph, pv);
         if (org.isPending()) {
-            txtStatus.setText("⏳ Đang chờ duyệt");
+            txtStatus.setText(getString(R.string.str_status_pending_review));
             txtStatus.setTextColor(0xFFE6B93E);
             txtStatus.setBackgroundResource(R.drawable.bg_status_pending);
         } else if (org.isApproved()) {
-            txtStatus.setText("✓ Đã xác minh");
+            txtStatus.setText(getString(R.string.str_organizer_verified));
             txtStatus.setTextColor(0xFF27AE60);
             txtStatus.setBackgroundResource(R.drawable.bg_status_approved);
         } else {
@@ -320,7 +320,7 @@ public class OrganizerProfileFragment extends Fragment {
         // ── Description ──────────────────────────────────────────────────────
         if (org.getDescription() != null && !org.getDescription().isEmpty()) {
             TextView lblDesc = new TextView(requireContext());
-            lblDesc.setText("Mô tả");
+            lblDesc.setText(getString(R.string.str_description_label));
             lblDesc.setTextColor(0xFF808E92);
             lblDesc.setTextSize(11f);
             lblDesc.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -387,14 +387,14 @@ public class OrganizerProfileFragment extends Fragment {
             defaultInfo.setOrientation(LinearLayout.VERTICAL);
 
             TextView txtDefaultLabel = new TextView(requireContext());
-            txtDefaultLabel.setText("Mặc định");
+            txtDefaultLabel.setText(getString(R.string.str_default_label));
             txtDefaultLabel.setTextColor(0xFF1C1B1B);
             txtDefaultLabel.setTextSize(13f);
             txtDefaultLabel.setTypeface(null, android.graphics.Typeface.BOLD);
             defaultInfo.addView(txtDefaultLabel);
 
             TextView txtDefaultSub = new TextView(requireContext());
-            txtDefaultSub.setText(org.isDefault() ? "Đã kích hoạt" : "Chưa kích hoạt");
+            txtDefaultSub.setText(org.isDefault() ? getString(R.string.str_activated_label) : getString(R.string.str_not_activated_label));
             txtDefaultSub.setTextColor(org.isDefault() ? 0xFF27AE60 : 0xFF808E92);
             txtDefaultSub.setTextSize(11f);
             defaultInfo.addView(txtDefaultSub);
@@ -411,10 +411,10 @@ public class OrganizerProfileFragment extends Fragment {
                 }
                 org.setDefault(checked);
                 saveOrgList();
-                txtDefaultSub.setText(checked ? "Đã kích hoạt" : "Chưa kích hoạt");
+                txtDefaultSub.setText(checked ? getString(R.string.str_activated_label) : getString(R.string.str_not_activated_label));
                 txtDefaultSub.setTextColor(checked ? 0xFF27AE60 : 0xFF808E92);
                 if (checked)
-                    Toast.makeText(requireContext(), "✓ Đã đặt \"" + org.getBrandName() + "\" làm BTC mặc định", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_set_default_org_toast, org.getBrandName()), Toast.LENGTH_SHORT).show();
             });
             rowDefault.addView(sw);
             card.addView(rowDefault);
@@ -448,7 +448,7 @@ public class OrganizerProfileFragment extends Fragment {
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         delTxtLp.setMarginStart((int)(6*dp));
         txtDel.setLayoutParams(delTxtLp);
-        txtDel.setText("Xóa ban tổ chức này");
+        txtDel.setText(getString(R.string.str_delete_org_btn));
         txtDel.setTextColor(0xFFEB5757);
         txtDel.setTextSize(13f);
         btnDeleteRow.addView(txtDel);
@@ -505,7 +505,7 @@ public class OrganizerProfileFragment extends Fragment {
                 .setPositiveButton(isEdit ? "Lưu thay đổi" : "Gửi đăng ký", (dialog, which) -> {
                     String brand = edtBrand != null ? edtBrand.getText().toString().trim() : "";
                     if (TextUtils.isEmpty(brand)) {
-                        Toast.makeText(requireContext(), "Vui lòng nhập tên ban tổ chức", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.str_toast_enter_org_name), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     String desc = edtDesc != null ? edtDesc.getText().toString().trim() : "";
@@ -542,7 +542,7 @@ public class OrganizerProfileFragment extends Fragment {
                     orgList.remove(org);
                     saveOrgList();
                     refreshUI();
-                    Toast.makeText(requireContext(), "Đã xóa \"" + org.getBrandName() + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_org_deleted, org.getBrandName()), Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Hủy", null)
                 .show();

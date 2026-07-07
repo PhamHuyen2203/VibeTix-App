@@ -48,16 +48,16 @@ public class ResaleTicketListAdapter extends RecyclerView.Adapter<ResaleTicketLi
         TicketTransfer t = listings.get(position);
 
         String typeName = t.getTicketTypeName();
-        h.txtType.setText(typeName != null && !typeName.isEmpty() ? typeName : "Vé bán lại");
+        h.txtType.setText(typeName != null && !typeName.isEmpty() ? typeName : context.getString(R.string.str_resale_default_type));
         h.txtMessage.setText(t.getMessage() != null && !t.getMessage().isEmpty()
                 ? t.getMessage() : "Không có lời nhắn");
-        h.txtPrice.setText(t.getPrice() > 0 ? formatter.format(t.getPrice()) + " đ" : "Thương lượng");
-        h.txtQty.setText("Số lượng: 1");
+        h.txtPrice.setText(t.getPrice() > 0 ? formatter.format(t.getPrice()) + " đ" : context.getString(R.string.str_resale_negotiate_price));
+        h.txtQty.setText(context.getString(R.string.str_resale_qty_label));
 
         // Mã người bán rút gọn (4 ký tự cuối UID)
         String sid = t.getSenderId();
         String shortId = (sid != null && sid.length() >= 4) ? sid.substring(sid.length() - 4) : "****";
-        h.txtSeller.setText("Người bán: " + shortId);
+        h.txtSeller.setText(context.getString(R.string.str_resale_seller_label, shortId));
 
         h.btnBuy.setOnClickListener(v -> {
             if (listener != null) listener.onBuyClick(t);

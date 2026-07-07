@@ -87,7 +87,7 @@
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
                 android:background="@drawable/bg_role_badge_manager"
-                android:text="Quản lý"
+                android:text="@string/role_manager"
                 android:textColor="@color/clr_primary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -99,9 +99,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Kích hoạt  "
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_black"
                 android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

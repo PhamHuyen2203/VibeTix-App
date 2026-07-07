@@ -166,10 +166,25 @@ public class MyEventsListFragment extends Fragment {
         if (currentUserId == null) return;
         pbLoading.setVisibility(View.VISIBLE);
 
-        // 1. Lấy tất cả quyền từ event_staff
-        db.collection("event_staff")
-                .whereEqualTo("user_id", currentUserId)
-                .get()
+        // 1. Lấy tất cả quyền từ event_staff — cache trước, server sau
+        com.google.firebase.firestore.Query staffQuery = db.collection("event_staff")
+                .whereEqualTo("user_id", currentUserId);
+
+        // Cache-first: hiển thị ngay từ cache nếu có
+        staffQuery.get(com.google.firebase.firestore.Source.CACHE)
+                .addOnSuccessListener(cached -> {
+                    if (isAdded() && cached != null && !cached.isEmpty()) {
+                        Map<String, String> roleMap = new HashMap<>();
+                        for (DocumentSnapshot doc : cached.getDocuments()) {
+                            String eId = doc.getString("event_id");
+                            String role = doc.getString("role");
+                            if (eId != null && role != null) roleMap.put(eId, role);
+                        }
+                        if (!roleMap.isEmpty()) fetchEventDetailsChunked(new ArrayList<>(roleMap.keySet()), roleMap);
+                    }
+                });
+
+        staffQuery.get(com.google.firebase.firestore.Source.SERVER)
                 .addOnSuccessListener(staffSnap -> {
                     if (!isAdded()) return;
                     if (staffSnap == null || staffSnap.isEmpty()) {

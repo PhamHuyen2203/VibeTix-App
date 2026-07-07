@@ -38,7 +38,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Logo Ban tổ chức"
+                android:text="@string/str_org_profile_section_title"
                 android:textColor="@color/clr_text_secondary"
                 android:layout_marginBottom="8dp" />
 
@@ -117,7 +117,7 @@
                 android:id="@+id/cbIsDefault"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Đặt làm hồ sơ mặc định"
+                android:text="@string/str_no_data"
                 android:checked="true"
                 android:layout_marginBottom="24dp" />
 
@@ -125,7 +125,7 @@
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:text="Lưu Hồ Sơ"
+                android:text="@string/btn_save"
                 app:cornerRadius="8dp"
                 android:layout_marginBottom="16dp" />
 
@@ -133,3 +133,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

@@ -48,7 +48,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tổng hợp Doanh thu"
+                        android:text="@string/str_revenue_label"
                         android:textColor="@color/clr_text_white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -94,7 +94,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Tổng doanh thu"
+                        android:text="@string/str_revenue_label"
                         android:textColor="#AAFFFFFF"
                         android:textSize="11sp" />
 
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Vé đã bán"
+                        android:text="@string/str_tickets_sold_label"
                         android:textColor="#AAFFFFFF"
                         android:textSize="11sp" />
 
@@ -158,7 +158,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Sự kiện"
+                        android:text="@string/str_events_count_label"
                         android:textColor="#AAFFFFFF"
                         android:textSize="11sp" />
 
@@ -243,7 +243,7 @@
                                 android:background="@drawable/bg_badge_approved"
                                 android:paddingHorizontal="8dp"
                                 android:paddingVertical="3dp"
-                                android:text="Đã xác thực"
+                                android:text="@string/str_verified_label"
                                 android:textColor="@color/clr_success"
                                 android:textSize="10sp"
                                 android:textStyle="bold"
@@ -353,7 +353,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="4dp"
-                android:text="DANH SÁCH SỰ KIỆN"
+                android:text="@string/str_my_events_title"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="11sp"
                 android:textStyle="bold"
@@ -388,7 +388,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:text="Chưa có dữ liệu doanh thu"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -397,7 +397,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="Các sự kiện sẽ hiển thị tại đây"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="13sp" />
 
@@ -417,3 +417,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

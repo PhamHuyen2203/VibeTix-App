@@ -209,7 +209,7 @@ public class SimulatedPaymentFragment extends Fragment {
                 .get()
                 .addOnSuccessListener(snap -> {
                     if (!isAdded() || snap.isEmpty()) {
-                        Toast.makeText(requireContext(), "Không có mã giảm giá khả dụng", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.str_toast_no_discount_codes), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -270,7 +270,7 @@ public class SimulatedPaymentFragment extends Fragment {
                     }
 
                     if (codes.isEmpty()) {
-                        Toast.makeText(requireContext(), "Không có mã phù hợp cho đơn này", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.str_toast_no_matching_code), Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -305,7 +305,7 @@ public class SimulatedPaymentFragment extends Fragment {
 
                         // Dòng 2: Mã code
                         TextView txtCode = new TextView(requireContext());
-                        txtCode.setText("Mã: " + codes.get(i));
+                        txtCode.setText(getString(R.string.str_voucher_code_label, codes.get(i)));
                         txtCode.setTextSize(12);
                         txtCode.setTextColor(getResources().getColor(R.color.clr_text_secondary));
                         txtCode.setPadding(0, dp(4), 0, 0);
@@ -313,7 +313,7 @@ public class SimulatedPaymentFragment extends Fragment {
 
                         // Nút "Áp dụng"
                         TextView btnApply = new TextView(requireContext());
-                        btnApply.setText("Áp dụng");
+                        btnApply.setText(getString(R.string.str_apply_btn));
                         btnApply.setTextSize(13);
                         btnApply.setTextColor(getResources().getColor(R.color.clr_primary_blue));
                         btnApply.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -341,7 +341,7 @@ public class SimulatedPaymentFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    if (isAdded()) Toast.makeText(requireContext(), "Lỗi tải voucher", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) Toast.makeText(requireContext(), getString(R.string.str_toast_error_loading_voucher), Toast.LENGTH_SHORT).show();
                 });
     }
 

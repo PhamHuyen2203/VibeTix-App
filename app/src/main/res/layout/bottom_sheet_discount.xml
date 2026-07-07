@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="20dp"
-                android:text="Thêm mã giảm giá"
+                android:text="@string/add_discount_title"
                 android:textColor="@color/clr_text_black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -223,7 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Thời gian áp dụng"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -315,7 +315,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kích hoạt mã giảm giá"
+                        android:text="@string/str_no_data"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -323,7 +323,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mã giảm giá có thể được sử dụng ngay lập tức"
+                        android:text="@string/str_no_data"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="12sp" />
 
@@ -343,7 +343,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="20dp"
-                android:text="Lưu mã giảm giá"
+                android:text="@string/btn_save"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/clr_text_white"
@@ -355,3 +355,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
+

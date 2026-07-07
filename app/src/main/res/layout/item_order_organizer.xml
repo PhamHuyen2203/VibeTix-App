@@ -76,7 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tổng tiền:"
+                    android:text="@string/str_order_total_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="13sp" />
 
@@ -125,10 +125,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Duyệt đơn hàng"
+                android:text="@string/str_approve_order_btn"
                 android:visibility="gone"
                 app:cornerRadius="8dp" />
         </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

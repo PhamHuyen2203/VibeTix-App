@@ -26,7 +26,7 @@
             android:id="@+id/tvOrgSwitchName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ban tổ chức"
+            android:text="@string/str_my_organizer"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/clr_text_black" />
@@ -35,7 +35,7 @@
             android:id="@+id/tvOrgSwitchSub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nhấn để chọn"
+            android:text="@string/str_no_data"
             android:textSize="12sp"
             android:textColor="@color/clr_text_secondary" />
     </LinearLayout>
@@ -49,3 +49,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+

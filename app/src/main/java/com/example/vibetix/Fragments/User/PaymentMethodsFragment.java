@@ -147,7 +147,7 @@ public class PaymentMethodsFragment extends Fragment {
                             adapter.notifyItemRemoved(position);
                             adapter.notifyItemRangeChanged(position, methods.size());
                             updateEmptyState();
-                            Toast.makeText(requireContext(), "Đã xóa " + name, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), getString(R.string.str_toast_deleted_method, name), Toast.LENGTH_SHORT).show();
                         })
                         .setNegativeButton("Hủy", null)
                         .show();
@@ -224,7 +224,7 @@ public class PaymentMethodsFragment extends Fragment {
 
     private void confirmAddPayment() {
         if (selectedType == null) {
-            Toast.makeText(requireContext(), "Vui lòng chọn loại phương thức", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_select_method_type), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -243,7 +243,7 @@ public class PaymentMethodsFragment extends Fragment {
         updateEmptyState();
         hideBottomSheet();
 
-        Toast.makeText(requireContext(), "Đã thêm " + displayName, Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.str_toast_method_added, displayName), Toast.LENGTH_SHORT).show();
     }
 
     private String getDisplayName(String type) {

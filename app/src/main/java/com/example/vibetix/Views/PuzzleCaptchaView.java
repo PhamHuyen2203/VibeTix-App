@@ -42,6 +42,15 @@ public class PuzzleCaptchaView extends View {
     private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private boolean generated = false;
 
+    public interface OnPuzzleReadyListener {
+        void onPuzzleReady();
+    }
+    private OnPuzzleReadyListener puzzleReadyListener;
+
+    public void setOnPuzzleReadyListener(OnPuzzleReadyListener l) {
+        this.puzzleReadyListener = l;
+    }
+
     public PuzzleCaptchaView(Context ctx) { super(ctx); init(); }
     public PuzzleCaptchaView(Context ctx, AttributeSet a) { super(ctx, a); init(); }
     public PuzzleCaptchaView(Context ctx, AttributeSet a, int s) { super(ctx, a, s); init(); }
@@ -123,6 +132,7 @@ public class PuzzleCaptchaView extends View {
         pieceX = 0f;
         generated = true;
         invalidate();
+        if (puzzleReadyListener != null) puzzleReadyListener.onPuzzleReady();
     }
 
     private static final int[] PALETTE = {

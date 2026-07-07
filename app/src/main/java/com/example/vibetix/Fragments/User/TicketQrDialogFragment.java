@@ -194,8 +194,8 @@ public class TicketQrDialogFragment extends DialogFragment {
         currentQr = index;
 
         txtQrDialogEventTitle.setText(ticket.getEventTitle());
-        txtQrDialogAttendee.setText("Người tham dự: " + (ticket.getAttendeeName() != null ? ticket.getAttendeeName() : ""));
-        txtQrDialogTicketTypeName.setText("Hạng vé: " + (index < ticketLabels.size() ? ticketLabels.get(index) : ""));
+        txtQrDialogAttendee.setText(getString(R.string.str_attendee_label, ticket.getAttendeeName() != null ? ticket.getAttendeeName() : ""));
+        txtQrDialogTicketTypeName.setText(getString(R.string.str_ticket_tier_label, index < ticketLabels.size() ? ticketLabels.get(index) : ""));
         txtQrDialogTicketId.setText(displayCodes.get(index));
 
         // QR encode ticket_code (UUID) — organizer quét khớp Firebase user_tickets.ticket_code
@@ -204,7 +204,7 @@ public class TicketQrDialogFragment extends DialogFragment {
             Bitmap bmp = encoder.encodeBitmap(ticketCodes.get(index), BarcodeFormat.QR_CODE, 400, 400);
             imvQrCodeGraphic.setImageBitmap(bmp);
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "Lỗi tạo mã QR", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_qr_error), Toast.LENGTH_SHORT).show();
         }
 
         // Navigation

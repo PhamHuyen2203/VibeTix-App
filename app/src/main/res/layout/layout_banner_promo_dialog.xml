@@ -30,7 +30,7 @@
             android:paddingEnd="10dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:text="🎁 ƯU ĐÃI ĐẶC BIỆT"
+            android:text="@string/str_promo_badge"
             android:textColor="#E6B93E"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Giảm giá lên đến 30% OFF"
+            android:text="@string/str_promo_discount_headline"
             android:textColor="#1C1B1B"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -49,7 +49,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cho vé nhóm từ 3 người trở lên"
+            android:text="@string/str_promo_discount_condition"
             android:textColor="#226CEB"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -65,21 +65,21 @@
             android:layout_marginBottom="14dp">
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="ĐỀU KIỆN ÁP DỤNG"
+                android:text="@string/str_promo_conditions_header"
                 android:textColor="#808E92" android:textSize="11sp" android:textStyle="bold"
                 android:letterSpacing="0.05" android:layout_marginBottom="8dp"/>
 
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="✅  Mua từ 3 vé trở lên cùng lúc"
+                android:text="@string/str_promo_condition_1"
                 android:textColor="#1C1B1B" android:textSize="13sp" android:layout_marginBottom="4dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="✅  Áp dụng cho tất cả sự kiện đang mở bán"
+                android:text="@string/str_promo_condition_2"
                 android:textColor="#1C1B1B" android:textSize="13sp" android:layout_marginBottom="4dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="✅  Thanh toán qua MoMo / ZaloPay / VNPay"
+                android:text="@string/str_promo_condition_3"
                 android:textColor="#1C1B1B" android:textSize="13sp" android:layout_marginBottom="4dp"/>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="⏰  Hết hạn: 30/06/2026"
+                android:text="@string/str_promo_expiry"
                 android:textColor="#EB5757" android:textSize="13sp" android:textStyle="bold"/>
         </LinearLayout>
 
@@ -97,7 +97,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/bg_search_bar"
                 android:gravity="center"
-                android:text="Đóng"
+                android:text="@string/str_promo_dismiss_btn"
                 android:textColor="#808E92"
                 android:textSize="14sp"
                 android:clickable="true"
@@ -110,7 +110,7 @@
                 android:layout_weight="2"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
-                android:text="🎫 Nhận ngay →"
+                android:text="@string/str_promo_claim_btn"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -119,3 +119,4 @@
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
+

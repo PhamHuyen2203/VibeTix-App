@@ -230,13 +230,13 @@ public class AccountInfoFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
         if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(false);
-        Toast.makeText(requireContext(), "Đang xử lý ảnh...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.str_toast_processing_image), Toast.LENGTH_SHORT).show();
 
         // Compress: max 400×400, max 150 KB
         byte[] compressed = ImageUtils.compressToJpeg(requireContext(), uri, 400, 150);
         if (compressed == null) {
             if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
-            Toast.makeText(requireContext(), "Không đọc được ảnh, thử lại", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_cannot_read_image), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -258,12 +258,12 @@ public class AccountInfoFragment extends Fragment {
                 if (!isAdded()) return;
                 if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
                 authPrefs.edit().putString(Constants.KEY_USER_AVATAR, base64).apply();
-                Toast.makeText(requireContext(), "✓ Đã cập nhật ảnh đại diện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_avatar_updated), Toast.LENGTH_SHORT).show();
             })
             .addOnFailureListener(e -> {
                 if (!isAdded()) return;
                 if (btnCameraAvatar != null) btnCameraAvatar.setEnabled(true);
-                Toast.makeText(requireContext(), "Lưu ảnh thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_save_avatar_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
             });
     }
 
@@ -298,7 +298,7 @@ public class AccountInfoFragment extends Fragment {
         String dob   = edtDob.getText().toString().trim();
 
         if (TextUtils.isEmpty(name)) {
-            edtFullName.setError("Vui lòng nhập họ và tên");
+            edtFullName.setError(getString(R.string.str_error_enter_full_name));
             edtFullName.requestFocus();
             return;
         }
@@ -328,7 +328,7 @@ public class AccountInfoFragment extends Fragment {
             updates.put("dob",       dob);
             updates.put("gender",    gender);
 
-            if (btnSaveInfo != null) { btnSaveInfo.setEnabled(false); btnSaveInfo.setText("Đang lưu..."); }
+            if (btnSaveInfo != null) { btnSaveInfo.setEnabled(false); btnSaveInfo.setText(getString(R.string.str_btn_saving)); }
 
             FirebaseFirestore.getInstance()
                 .collection("users")
@@ -336,18 +336,18 @@ public class AccountInfoFragment extends Fragment {
                 .set(updates, com.google.firebase.firestore.SetOptions.merge())
                 .addOnSuccessListener(v -> {
                     if (!isAdded()) return;
-                    if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText("Lưu thay đổi"); }
-                    Toast.makeText(requireContext(), "✓ Đã lưu thông tin", Toast.LENGTH_SHORT).show();
+                    if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText(getString(R.string.str_save_changes)); }
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_info_saved), Toast.LENGTH_SHORT).show();
                     if (getParentFragmentManager().getBackStackEntryCount() > 0)
                         getParentFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> {
                     if (!isAdded()) return;
-                    if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText("Lưu thay đổi"); }
-                    Toast.makeText(requireContext(), "Lưu thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (btnSaveInfo != null) { btnSaveInfo.setEnabled(true); btnSaveInfo.setText(getString(R.string.str_save_changes)); }
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_save_info_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
         } else {
-            Toast.makeText(requireContext(), "✓ Đã lưu thông tin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_info_saved), Toast.LENGTH_SHORT).show();
             if (getParentFragmentManager().getBackStackEntryCount() > 0)
                 getParentFragmentManager().popBackStack();
         }

@@ -229,7 +229,7 @@ public class EventDetailFragment extends Fragment {
             @Override
             public void onFailure(Exception e) {
                 if (isAdded()) {
-                    Toast.makeText(requireContext(), "Lỗi tải sự kiện: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_load_event_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -266,7 +266,7 @@ public class EventDetailFragment extends Fragment {
                 || evType.toLowerCase().contains("tuyến"));
         if (evType != null && !evType.isEmpty()) {
             if (rowEventType != null) rowEventType.setVisibility(View.VISIBLE);
-            if (txtDetailEventType != null) txtDetailEventType.setText("Hình thức: " + evType);
+            if (txtDetailEventType != null) txtDetailEventType.setText(getString(R.string.str_event_format_label, evType));
         }
         // ── Location — online event → hiện "Sự kiện trực tuyến" ────────
         String displayLocation;
@@ -289,7 +289,7 @@ public class EventDetailFragment extends Fragment {
                 && !ageRestriction.equalsIgnoreCase("Không giới hạn")) {
             if (rowAgeRestriction != null) rowAgeRestriction.setVisibility(View.VISIBLE);
             if (txtDetailAgeRestriction != null)
-                txtDetailAgeRestriction.setText("Giới hạn độ tuổi: " + ageRestriction);
+                txtDetailAgeRestriction.setText(getString(R.string.str_age_restriction_label, ageRestriction));
         }
 
         // ── Description (render HTML in WebView) ────────────────────────
@@ -330,29 +330,29 @@ public class EventDetailFragment extends Fragment {
         String evStatus = event.getStatus() != null ? event.getStatus().toLowerCase() : "";
         if ("completed".equals(evStatus)) {
             btnBookTickets.setEnabled(false);
-            btnBookTickets.setText("Sự kiện đã kết thúc");
+            btnBookTickets.setText(getString(R.string.str_event_ended));
             btnBookTickets.setAlpha(0.5f);
         } else if ("cancelled".equals(evStatus)) {
             btnBookTickets.setEnabled(false);
-            btnBookTickets.setText("Sự kiện đã huỷ");
+            btnBookTickets.setText(getString(R.string.str_event_cancelled));
             btnBookTickets.setAlpha(0.5f);
         } else if (event.isSoldOut()) {
             btnBookTickets.setEnabled(false);
-            btnBookTickets.setText("Đã hết vé");
+            btnBookTickets.setText(getString(R.string.str_sold_out));
             btnBookTickets.setAlpha(0.5f);
         } else if ("approved".equals(evStatus) && isEventNotStartedYet(event.getStartTime())) {
             // E4: đã approved nhưng chưa tới giờ mở bán → Coming Soon
             btnBookTickets.setEnabled(false);
-            btnBookTickets.setText("Sắp ra mắt");
+            btnBookTickets.setText(getString(R.string.str_coming_soon));
             btnBookTickets.setAlpha(0.7f);
         } else if ("approved".equals(evStatus) || "ongoing".equals(evStatus)) {
             btnBookTickets.setEnabled(true);
-            btnBookTickets.setText("Đặt vé ngay");
+            btnBookTickets.setText(getString(R.string.str_book_tickets_now));
             btnBookTickets.setAlpha(1f);
         } else {
             // pending/draft/rejected — không nên vào được màn này nhưng vẫn guard
             btnBookTickets.setEnabled(false);
-            btnBookTickets.setText("Chưa mở bán");
+            btnBookTickets.setText(getString(R.string.str_not_open_yet));
             btnBookTickets.setAlpha(0.5f);
         }
 
@@ -395,7 +395,7 @@ public class EventDetailFragment extends Fragment {
      */
     private void populatePriceUI(Event event) {
         if (event.isFree() || (event.getMinPrice() == 0 && event.getMaxPrice() == 0)) {
-            txtDetailMinPrice.setText("Miễn phí");
+            txtDetailMinPrice.setText(getString(R.string.str_free_price));
         } else if (event.getMaxPrice() > event.getMinPrice()) {
             txtDetailMinPrice.setText(formatter.format(event.getMinPrice()) + " - " + formatter.format(event.getMaxPrice()) + " đ");
         } else {
@@ -486,7 +486,7 @@ public class EventDetailFragment extends Fragment {
                 if (viewDescriptionGradient != null) viewDescriptionGradient.setVisibility(View.GONE);
             } else {
                 lp.height = (int)(200 * getResources().getDisplayMetrics().density);
-                txtDescriptionToggle.setText("Xem thêm ▼");
+                txtDescriptionToggle.setText(getString(R.string.str_see_more_expand_icon));
                 if (viewDescriptionGradient != null) viewDescriptionGradient.setVisibility(View.VISIBLE);
             }
             webDetailDescription.setLayoutParams(lp);
@@ -598,7 +598,7 @@ public class EventDetailFragment extends Fragment {
         TextView btnBuy = new TextView(requireContext());
         btnBuy.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        btnBuy.setText("MUA VÉ NGAY");
+        btnBuy.setText(getString(R.string.str_buy_now_caps));
         btnBuy.setTextSize(11f);
         btnBuy.setTextColor(getResources().getColor(R.color.clr_text_white));
         btnBuy.setBackgroundResource(R.drawable.bg_resale_badge);
@@ -639,7 +639,7 @@ public class EventDetailFragment extends Fragment {
                 TextView txtPrice = new TextView(requireContext());
                 txtPrice.setLayoutParams(new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                txtPrice.setText(price != null && price > 0 ? formatter.format(price) + " đ" : "Miễn phí");
+                txtPrice.setText(price != null && price > 0 ? formatter.format(price) + " đ" : getString(R.string.str_free_price));
                 txtPrice.setTextSize(14f);
                 txtPrice.setTextColor(getResources().getColor(R.color.clr_primary_blue));
                 txtPrice.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -706,13 +706,13 @@ public class EventDetailFragment extends Fragment {
 
     private void updateInterestUI() {
         if (txtDetailInterest != null) {
-            txtDetailInterest.setText(currentInterestCount + " lượt quan tâm");
+            txtDetailInterest.setText(getString(R.string.str_interest_count, currentInterestCount));
         }
     }
 
     private void toggleFavorite() {
         if (userId.isEmpty()) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để lưu sự kiện yêu thích", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_login_to_save), Toast.LENGTH_SHORT).show();
             return;
         }
 

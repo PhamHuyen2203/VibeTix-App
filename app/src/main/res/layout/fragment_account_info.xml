@@ -37,13 +37,13 @@
                         android:padding="10dp"
                         android:background="@drawable/bg_back_btn"
                         android:src="@drawable/ic_back"
-                        android:contentDescription="Quay lại" />
+                        android:contentDescription="@string/str_back" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="Thông tin tài khoản"
+                        android:text="@string/str_account_info"
                         android:textColor="#FFFFFF"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -79,7 +79,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_camera"
-                            android:contentDescription="Chọn ảnh" />
+                            android:contentDescription="@string/str_back" />
                     </LinearLayout>
                 </FrameLayout>
 
@@ -105,7 +105,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:text="Họ và tên"
+                    android:text="@string/str_full_name_label"
                     android:textColor="#1C1B1B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -134,7 +134,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="Nhập họ và tên"
+                        android:hint="@string/str_hint_full_name"
                         android:inputType="textPersonName|textCapWords"
                         android:maxLines="1"
                         android:singleLine="true"
@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="6dp"
-                    android:text="Email"
+                    android:text="@string/str_email_label"
                     android:textColor="#1C1B1B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -177,7 +177,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="email@example.com"
+                        android:hint="@string/str_hint_email"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:singleLine="true"
@@ -196,7 +196,7 @@
                         android:paddingEnd="8dp"
                         android:paddingTop="3dp"
                         android:paddingBottom="3dp"
-                        android:text="Đã xác minh"
+                        android:text="@string/str_verified_label"
                         android:textColor="#27AE60"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -207,7 +207,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="6dp"
-                    android:text="Số điện thoại"
+                    android:text="@string/str_phone_label"
                     android:textColor="#1C1B1B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -236,7 +236,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="0xxxxxxxxx"
+                        android:hint="@string/str_hint_phone_placeholder"
                         android:inputType="phone"
                         android:maxLines="1"
                         android:singleLine="true"
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="6dp"
-                    android:text="Ngày sinh"
+                    android:text="@string/str_birthday_label"
                     android:textColor="#1C1B1B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -280,7 +280,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="dd/mm/yyyy"
+                        android:hint="@string/str_hint_date_ddmmyyyy"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:cursorVisible="false"
@@ -295,7 +295,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Giới tính"
+                    android:text="@string/str_gender_label"
                     android:textColor="#1C1B1B"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -312,7 +312,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:buttonTint="@color/clr_primary_blue"
-                        android:text="Nam"
+                        android:text="@string/str_male"
                         android:textColor="#1C1B1B"
                         android:textSize="14sp" />
 
@@ -322,7 +322,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="24dp"
                         android:buttonTint="@color/clr_primary_blue"
-                        android:text="Nữ"
+                        android:text="@string/str_female"
                         android:textColor="#1C1B1B"
                         android:textSize="14sp" />
 
@@ -331,7 +331,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/clr_primary_blue"
-                        android:text="Khác"
+                        android:text="@string/str_other_gender"
                         android:textColor="#1C1B1B"
                         android:textSize="14sp" />
                 </RadioGroup>
@@ -348,7 +348,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="32dp"
                 android:background="@drawable/bg_btn_primary"
-                android:text="Lưu thay đổi"
+                android:text="@string/str_save_changes"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -358,3 +358,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </FrameLayout>
+

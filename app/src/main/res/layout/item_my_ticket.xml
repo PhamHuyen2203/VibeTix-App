@@ -61,7 +61,7 @@
                     android:id="@+id/tvTicketStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hợp lệ"
+                    android:text="@string/str_item_valid_label"
                     android:textColor="@color/clr_success"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -86,3 +86,4 @@
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
+

@@ -182,7 +182,7 @@ public class StarDetailFragment extends Fragment {
                     if (desc != null && !desc.isEmpty()) {
                         txtStarBio.setText(desc);
                     }
-                    txtStarSubtitle.setText("Ban tổ chức chính thức");
+                    txtStarSubtitle.setText(getString(R.string.str_official_organizer_label));
                     // Đếm follower thực từ user_star_follows
                     loadOrganizerFollowerCount();
                     checkFollowStatus();
@@ -198,7 +198,7 @@ public class StarDetailFragment extends Fragment {
                     if (!isAdded()) return;
                     currentFollowerCount = snap != null ? snap.size() : 0;
                     if (txtStarFollowers != null) {
-                        txtStarFollowers.setText(formatter.format(currentFollowerCount) + " người theo dõi");
+                        txtStarFollowers.setText(getString(R.string.str_follower_count_label, formatter.format(currentFollowerCount)));
                     }
                 });
     }
@@ -220,7 +220,7 @@ public class StarDetailFragment extends Fragment {
 
         Long followers = doc.getLong("follower_count");
         currentFollowerCount = followers != null ? followers.intValue() : 0;
-        txtStarFollowers.setText(formatter.format(currentFollowerCount) + " người theo dõi");
+        txtStarFollowers.setText(getString(R.string.str_follower_count_label, formatter.format(currentFollowerCount)));
         checkFollowStatus();
 
         String bio = doc.getString("bio");
@@ -361,7 +361,7 @@ public class StarDetailFragment extends Fragment {
     private void toggleFollow() {
         com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để theo dõi", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_login_to_follow), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -387,7 +387,7 @@ public class StarDetailFragment extends Fragment {
                         .update("follower_count", com.google.firebase.firestore.FieldValue.increment(1));
             }
 
-            Toast.makeText(requireContext(), "Đã theo dõi!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_followed), Toast.LENGTH_SHORT).show();
         } else {
             followDoc.delete();
             currentFollowerCount = Math.max(0, currentFollowerCount - 1);
@@ -400,7 +400,7 @@ public class StarDetailFragment extends Fragment {
 
         // Cập nhật UI số follow
         if (txtStarFollowers != null) {
-            txtStarFollowers.setText(formatter.format(currentFollowerCount) + " người theo dõi");
+            txtStarFollowers.setText(getString(R.string.str_follower_count_label, formatter.format(currentFollowerCount)));
         }
     }
 
@@ -408,10 +408,10 @@ public class StarDetailFragment extends Fragment {
     private void updateFollowUI() {
         if (btnFollowStar == null) return;
         if (isFollowing) {
-            btnFollowStar.setText("Đang theo dõi");
+            btnFollowStar.setText(getString(R.string.str_btn_following));
             btnFollowStar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF808E92));
         } else {
-            btnFollowStar.setText("+ Theo dõi");
+            btnFollowStar.setText(getString(R.string.str_btn_follow));
             btnFollowStar.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF22C55E));
         }
     }

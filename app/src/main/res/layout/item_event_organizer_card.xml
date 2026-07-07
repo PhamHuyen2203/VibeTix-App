@@ -165,7 +165,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vé đã bán"
+                    android:text="@string/str_tickets_sold_stat_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="10sp"
                     android:textAllCaps="true" />
@@ -196,7 +196,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Doanh thu"
+                    android:text="@string/str_revenue_stat_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="10sp"
                     android:textAllCaps="true" />
@@ -215,3 +215,4 @@
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

@@ -61,7 +61,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
 
         eventId = getIntent().getStringExtra("EXTRA_EVENT_ID");
         if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "Không tìm thấy sự kiện", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_event_not_found), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -90,7 +90,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
                 db.collection(FirebaseCollections.EVENT_STARS).document(docId)
                         .update("is_confirmed", isConfirmed)
                         .addOnFailureListener(e -> {
-                            Toast.makeText(EventStarManagementActivity.this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EventStarManagementActivity.this, getString(R.string.str_toast_update_error_msg, e.getMessage()), Toast.LENGTH_SHORT).show();
                             wrapper.eventStar.setConfirmed(!isConfirmed); // revert
                             adapter.notifyDataSetChanged();
                         });
@@ -144,7 +144,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
         }
         
         batch.commit().addOnFailureListener(e -> 
-            Toast.makeText(this, "Lỗi cập nhật thứ tự: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.str_toast_order_update_error, e.getMessage()), Toast.LENGTH_SHORT).show()
         );
     }
 
@@ -219,7 +219,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_data_error), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -297,7 +297,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
         // Check if already in list
         for (OrganizerEventStarAdapter.EventStarWrapper wrapper : wrapperList) {
             if (wrapper.star != null && wrapper.star.getStarId().equals(star.getStarId())) {
-                Toast.makeText(this, "Nghệ sĩ này đã có trong danh sách!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_artist_already_in_list), Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -317,13 +317,13 @@ public class EventStarManagementActivity extends AppCompatActivity {
         db.collection(FirebaseCollections.EVENT_STARS).document(docId)
                 .set(es)
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(this, "Đã thêm nghệ sĩ thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_artist_added), Toast.LENGTH_SHORT).show();
                     triggerNotificationForFollowers(star);
                     loadEventStars();
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_failed_msg, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -380,7 +380,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
         layout.setPadding(50, 20, 50, 20);
 
         final EditText etRole = new EditText(this);
-        etRole.setHint("Vai trò (VD: Headliner, MC...)");
+        etRole.setHint(getString(R.string.str_hint_artist_role));
         etRole.setText(wrapper.eventStar.getRole());
         layout.addView(etRole);
 
@@ -421,7 +421,7 @@ public class EventStarManagementActivity extends AppCompatActivity {
                     db.collection(FirebaseCollections.EVENT_STARS).document(docId)
                             .delete()
                             .addOnSuccessListener(unused -> {
-                                Toast.makeText(this, "Đã xoá thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.str_toast_deleted_success), Toast.LENGTH_SHORT).show();
                                 loadEventStars();
                             })
                             .addOnFailureListener(e -> {

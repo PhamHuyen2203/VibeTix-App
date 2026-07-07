@@ -33,7 +33,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:layout_marginEnd="40dp"
-            android:text="Vé bán lại"
+            android:text="@string/str_resale_marketplace_title"
             android:textColor="@color/clr_text_white"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -54,8 +54,9 @@
         android:layout_weight="1"
         android:gravity="center"
         android:padding="32dp"
-        android:text="Hiện chưa có vé nào được đăng bán lại."
+        android:text="@string/str_resale_empty"
         android:textColor="@color/clr_text_secondary"
         android:textSize="15sp"
         android:visibility="gone" />
 </LinearLayout>
+

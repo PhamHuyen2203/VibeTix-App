@@ -20,7 +20,7 @@
             android:id="@+id/tvTicketType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Loại vé"
+            android:text="@string/str_item_attendee_ticket_type"
             android:textColor="@color/clr_text_black"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Chưa check-in"
+            android:text="@string/str_item_not_checked_in"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -51,7 +51,7 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:text="Check-in"
+        android:text="@string/str_item_check_in_action"
         android:textSize="12sp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -59,3 +59,4 @@
         android:textColor="@color/clr_primary_blue" />
 
 </LinearLayout>
+

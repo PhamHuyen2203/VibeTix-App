@@ -153,7 +153,7 @@ public class StaffManagementActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Lỗi tải danh sách: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_list_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -188,14 +188,14 @@ public class StaffManagementActivity extends AppCompatActivity {
             updateUI();
         }).addOnFailureListener(e -> {
             binding.pbLoading.setVisibility(View.GONE);
-            Toast.makeText(this, "Lỗi tải thông tin user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_load_user_error, e.getMessage()), Toast.LENGTH_SHORT).show();
         });
     }
 
     private void updateUI() {
         binding.pbLoading.setVisibility(View.GONE);
         staffAdapter.notifyDataSetChanged();
-        binding.tvStaffCount.setText(staffList.size() + " nhân sự");
+        binding.tvStaffCount.setText(getString(R.string.str_staff_count_label, staffList.size()));
         
         if (staffList.isEmpty()) {
             binding.layoutEmptyStaff.setVisibility(View.VISIBLE);
@@ -219,7 +219,7 @@ public class StaffManagementActivity extends AppCompatActivity {
                     sheetBinding.etStaffEmail.getText().toString().trim() : "";
                     
             if (TextUtils.isEmpty(email)) {
-                sheetBinding.etStaffEmail.setError("Vui lòng nhập email");
+                sheetBinding.etStaffEmail.setError(getString(R.string.str_error_enter_email));
                 return;
             }
 
@@ -242,7 +242,7 @@ public class StaffManagementActivity extends AppCompatActivity {
                         // Check if already in list
                         for (EventStaff s : staffList) {
                             if (s.getUserId() != null && s.getUserId().equals(targetUserId)) {
-                                Toast.makeText(this, "Nhân sự này đã tồn tại trong sự kiện", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.str_toast_staff_already_exists), Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
@@ -258,7 +258,7 @@ public class StaffManagementActivity extends AppCompatActivity {
 
                         db.collection("event_staff").document(staffId).set(newStaff)
                                 .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Đã thêm nhân sự thành công", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, getString(R.string.str_toast_staff_added), Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                     loadStaffList();
                                     // C2: Gửi notification cho nhân sự vừa được thêm
@@ -267,10 +267,10 @@ public class StaffManagementActivity extends AppCompatActivity {
                                     NotificationTriggerManager.triggerStaffAssigned(
                                             targetUserId, eventId, eventTitle, roleName);
                                 })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi thêm nhân sự", Toast.LENGTH_SHORT).show());
+                                .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.str_toast_add_staff_error), Toast.LENGTH_SHORT).show());
 
                     } else {
-                        Toast.makeText(this, "Không tìm thấy user với email này", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_user_not_found), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -280,10 +280,10 @@ public class StaffManagementActivity extends AppCompatActivity {
         db.collection("event_staff").document(staff.getStaffId())
                 .update("is_active", isActive)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Đã " + (isActive ? "mở khóa" : "tạm ngưng") + " nhân sự", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, isActive ? getString(R.string.str_toast_staff_unlocked) : getString(R.string.str_toast_staff_suspended), Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi khi cập nhật trạng thái", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_status_update_error), Toast.LENGTH_SHORT).show();
                     // Revert locally if failed
                     staff.setActive(!isActive);
                     staffAdapter.notifyDataSetChanged();
@@ -311,11 +311,11 @@ public class StaffManagementActivity extends AppCompatActivity {
         db.collection("event_staff").document(staff.getStaffId())
             .update("role", newRole)
             .addOnSuccessListener(aVoid -> {
-                Toast.makeText(this, "Đã cập nhật vai trò", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_role_updated), Toast.LENGTH_SHORT).show();
                 staff.setRole(newRole);
                 staffAdapter.notifyDataSetChanged();
             })
-            .addOnFailureListener(e -> Toast.makeText(this, "Lỗi cập nhật vai trò", Toast.LENGTH_SHORT).show());
+            .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.str_toast_role_update_error), Toast.LENGTH_SHORT).show());
     }
 
     private void confirmDeleteStaff(EventStaff staff) {
@@ -326,11 +326,11 @@ public class StaffManagementActivity extends AppCompatActivity {
                 db.collection("event_staff").document(staff.getStaffId())
                     .delete()
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Đã xóa nhân sự", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_staff_deleted), Toast.LENGTH_SHORT).show();
                         staffList.remove(staff);
                         updateUI();
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Lỗi khi xóa", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> Toast.makeText(this, getString(R.string.str_toast_delete_error), Toast.LENGTH_SHORT).show());
             })
             .setNegativeButton("Hủy", null)
             .show();

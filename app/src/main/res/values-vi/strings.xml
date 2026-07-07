@@ -171,7 +171,7 @@
     <string name="str_attendee_label">Người tham dự: %1$s</string>
     <string name="str_ticket_type_label">Hạng vé: %1$s</string>
     <string name="str_original_price_label">Giá mua gốc: %1$s đ</string>
-    <string name="str_resale_price_label">Nhập giá bán lại (đ)</string>
+    <string name="str_hint_resale_price">Nhập giá bán lại (đ)</string>
     <string name="str_payment_success_title">Đặt vé thành công!</string>
     <string name="str_payment_success_desc">Cảm ơn bạn! Vé điện tử đã được xuất và gửi đến email của bạn.</string>
     <string name="str_order_id">Mã đơn hàng: %1$s</string>
@@ -368,4 +368,910 @@
     <string name="err_load_event_details">Lỗi khi lấy chi tiết sự kiện</string>
     <string name="status_dot_prefix">● %s</string>
     <string name="txt_coming_soon">Sắp diễn ra</string>
+
+    <!-- Toast messages - Java -->
+    <string name="toast_reset_pin_hint">Vào Bảo mật &amp; Mật khẩu để đặt lại PIN</string>
+    <string name="toast_err_load_event">Không thể tải sự kiện</string>
+    <string name="toast_no_ticket_types">Chưa có loại vé nào</string>
+    <string name="toast_event_not_found">Không tìm thấy sự kiện</string>
+    <string name="toast_event_cancelled">Đã huỷ sự kiện thành công</string>
+    <string name="toast_auth_error">Lỗi xác thực người dùng</string>
+    <string name="toast_organizer_updated">Đã cập nhật hồ sơ BTC thành công</string>
+    <string name="toast_organizer_saved">Lưu hồ sơ Ban tổ chức thành công</string>
+    <string name="toast_event_info_not_found">Không tìm thấy thông tin sự kiện</string>
+    <string name="toast_select_time_required">Vui lòng chọn thời gian</string>
+    <string name="toast_invalid_value">Giá trị không hợp lệ</string>
+    <string name="toast_percent_exceeds_100">Phần trăm giảm không được vượt quá 100</string>
+    <string name="toast_invalid_date">Ngày không hợp lệ</string>
+    <string name="toast_created_success">Tạo thành công</string>
+    <string name="toast_updated_success">Cập nhật thành công</string>
+    <string name="toast_checkin_success">Check-in thành công!</string>
+    <string name="toast_checkin_error">Lỗi check-in: </string>
+    <string name="toast_org_deleted">Đã xóa hồ sơ BTC</string>
+    <string name="toast_star_already_added">Nghệ sĩ này đã được thêm</string>
+    <string name="toast_img_load_error">Không tải được ảnh</string>
+    <string name="toast_select_event_type">Vui lòng chọn hình thức tổ chức</string>
+    <string name="toast_enter_online_url">Vui lòng nhập đường dẫn trực tuyến</string>
+    <string name="toast_select_age_limit">Vui lòng chọn giới hạn độ tuổi</string>
+    <string name="toast_enter_max_tickets">Vui lòng nhập số vé tối đa mỗi giao dịch</string>
+    <string name="toast_max_tickets_gt_zero">Số vé tối đa phải lớn hơn 0</string>
+    <string name="toast_invalid_max_tickets">Số vé tối đa không hợp lệ</string>
+    <string name="toast_add_ticket_type">Vui lòng thêm ít nhất một loại vé</string>
+    <string name="toast_invalid_org_email">Email ban tổ chức không đúng định dạng</string>
+    <string name="toast_user_info_not_found">Không tìm thấy thông tin người dùng</string>
+    <string name="toast_no_event_selected">Không có sự kiện được chọn</string>
+    <string name="toast_missing_event_id">Thiếu Event ID</string>
+    <string name="toast_user_email_not_found">Không tìm thấy user với email này</string>
+    <string name="toast_staff_already_exists">Nhân sự này đã tồn tại trong sự kiện</string>
+    <string name="toast_staff_added">Đã thêm nhân sự thành công</string>
+    <string name="toast_staff_add_error">Lỗi thêm nhân sự</string>
+    <string name="toast_update_failed">Cập nhật thất bại</string>
+    <string name="toast_staff_deleted">Đã xóa nhân sự</string>
+    <string name="toast_role_updated">Đã cập nhật vai trò</string>
+    <string name="toast_no_sync_data">Không có dữ liệu cần đồng bộ</string>
+    <string name="toast_sync_success">Đồng bộ thành công!</string>
+    <string name="toast_sync_error">Lỗi đồng bộ</string>
+    <string name="toast_camera_permission">Cần cấp quyền Camera để quét mã QR</string>
+    <string name="toast_ticket_not_found">Không tìm thấy vé</string>
+    <string name="toast_enter_title_content">Vui lòng nhập tiêu đề và nội dung</string>
+    <string name="toast_select_ticket_type_blast">Vui lòng chọn loại vé</string>
+    <string name="toast_notification_cancelled">Đã hủy thông báo thành công</string>
+    <string name="toast_end_date_after_start">Ngày kết thúc phải sau hoặc bằng ngày bắt đầu</string>
+    <string name="toast_invalid_price_qty">Giá hoặc số lượng không hợp lệ</string>
+    <string name="toast_ticket_type_created">Đã tạo loại vé thành công ✓</string>
+    <string name="toast_ticket_type_updated">Đã cập nhật loại vé ✓</string>
+    <string name="toast_ticket_type_deleted">Đã xóa loại vé</string>
+    <string name="toast_order_check_error">Không kiểm tra được đơn hàng</string>
+    <string name="toast_login_to_favorite">Vui lòng đăng nhập để lưu sự kiện yêu thích</string>
+    <string name="toast_processing_image">Đang xử lý ảnh…</string>
+    <string name="toast_image_read_error">Không đọc được ảnh, thử lại</string>
+    <string name="toast_avatar_updated">✓ Đã cập nhật ảnh đại diện</string>
+    <string name="toast_info_saved">✓ Đã lưu thông tin</string>
+    <string name="toast_save_failed">Lưu thất bại</string>
+    <string name="toast_pin_updated">✓ Mã PIN đã được cập nhật</string>
+    <string name="toast_pin_save_failed">Lưu PIN thất bại, thử lại sau</string>
+    <string name="toast_pin_incorrect">Mã PIN không đúng</string>
+    <string name="toast_pin_old_incorrect">Mã PIN cũ không đúng</string>
+    <string name="toast_setup_pin_first">Vui lòng thiết lập mã PIN trước</string>
+    <string name="toast_password_changed">✓ Đổi mật khẩu thành công!</string>
+    <string name="toast_password_change_failed">Đổi mật khẩu thất bại. Thử lại sau.</string>
+    <string name="toast_password_current_incorrect">Mật khẩu hiện tại không đúng</string>
+    <string name="toast_fetching_phone">Đang lấy số điện thoại…</string>
+    <string name="toast_fetch_account_error">Không thể lấy thông tin tài khoản</string>
+    <string name="toast_otp_length_error">Mã OTP phải đủ 6 chữ số</string>
+    <string name="toast_relogin_to_change_password">Vui lòng đăng nhập lại để đổi mật khẩu</string>
+    <string name="toast_please_relogin">Vui lòng đăng nhập lại</string>
+    <string name="toast_no_discount_available">Không có mã giảm giá khả dụng</string>
+    <string name="toast_no_matching_discount">Không có mã phù hợp cho đơn này</string>
+    <string name="toast_voucher_load_error">Lỗi tải voucher</string>
+    <string name="toast_login_to_follow">Vui lòng đăng nhập để theo dõi</string>
+    <string name="toast_followed">Đã theo dõi!</string>
+    <string name="toast_qr_error">Lỗi tạo mã QR</string>
+    <string name="toast_login_to_buy">Vui lòng đăng nhập để mua vé</string>
+    <string name="toast_cant_buy_own_ticket">Bạn không thể mua lại vé do chính mình đăng bán</string>
+    <string name="toast_apple_login_unsupported">Đăng nhập bằng Apple chưa được hỗ trợ</string>
+    <string name="toast_logout_success">Đăng xuất thành công</string>
+    <string name="toast_select_ticket_to_sell">Vui lòng chọn ít nhất 1 vé muốn bán</string>
+    <string name="toast_processing">Đang xử lý…</string>
+    <string name="toast_resale_success">Đã đăng bán lại vé thành công!</string>
+    <string name="toast_select_payment_method">Vui lòng chọn loại phương thức</string>
+    <string name="toast_enter_org_name">Vui lòng nhập tên ban tổ chức</string>
+    <string name="toast_save_error">Lỗi lưu: </string>
+    <string name="toast_error_prefix">Lỗi: </string>
+    <string name="toast_load_error">Lỗi tải dữ liệu: </string>
+    <string name="toast_upload_img_error">Lỗi upload ảnh: </string>
+    <string name="toast_save_venue_error">Lỗi lưu địa điểm: </string>
+    <string name="toast_create_org_error">Lỗi tạo Ban tổ chức: </string>
+    <string name="toast_update_error">Lỗi cập nhật: </string>
+    <string name="toast_tickets_loaded">Tải thành công %d vé</string>
+    <string name="toast_otp_sending">Đang gửi mã OTP đến %s…</string>
+    <string name="toast_staff_toggle">Nhân sự %s</string>
+    <string name="toast_org_set_default">Đã đặt \"%s\" làm BTC mặc định</string>
+    <string name="toast_org_deleted_name">Đã xóa \"%s\"</string>
+    <string name="toast_payment_method_added">Đã thêm %s</string>
+    <string name="toast_payment_method_deleted">Đã xóa %s</string>
+    <string name="toast_invalid_price_for">Giá không hợp lệ cho %s</string>
+    <string name="toast_price_gt_zero_for">Giá phải lớn hơn 0 cho %s</string>
+    <string name="toast_star_added">Đã thêm nghệ sĩ thành công</string>
+    <string name="toast_star_deleted">Đã xoá thành công</string>
+    <string name="toast_order_approved">Đã duyệt đơn hàng</string>
+    <string name="toast_blast_title_empty">Vui lòng nhập tiêu đề và nội dung</string>
+    <string name="toast_blast_cancelled">Đã hủy thông báo thành công</string>
+    <string name="toast_blast_cancel_error">Lỗi khi hủy: </string>
+    <string name="toast_cancel_resale">Đang hủy đăng bán…</string>
+    <string name="toast_cancel_resale_success">Đã huỷ đăng bán vé!</string>
+    <string name="toast_cancel_resale_fail">Huỷ đăng bán thất bại: </string>
+    <string name="toast_feature_coming_soon">Hồ sơ Ban tổ chức (sắp ra mắt)</string>
+    <string name="toast_buy_ticket_coming_soon">Tính năng mua vé sẽ được bổ sung sớm!</string>
+    <string name="toast_manage_orgs_coming_soon">Quản lý hồ sơ Ban tổ chức (sắp ra mắt)</string>
+    <string name="toast_discount_saved">Đã lưu mã giảm giá: </string>
+    <string name="toast_category_added">Đã thêm danh mục: </string>
+    <string name="toast_venue_added">Đã thêm địa điểm: </string>
+    <string name="toast_save_error_short">Lỗi khi lưu</string>
+    <string name="toast_approved_prefix">Đã duyệt: </string>
+    <string name="toast_rejected_prefix">Đã từ chối: </string>
+    <string name="toast_staff_activate">mở khóa</string>
+    <string name="toast_staff_deactivate">tạm ngưng</string>
+    <string name="toast_update_status_error">Lỗi khi cập nhật trạng thái</string>
+    <string name="toast_update_role_error">Lỗi cập nhật vai trò</string>
+    <string name="toast_delete_error">Lỗi khi xóa</string>
+    <string name="toast_star_update_order_error">Lỗi cập nhật thứ tự: </string>
+    <string name="toast_star_update_error">Lỗi cập nhật: </string>
+    <string name="toast_cancel_event_error">Lỗi: </string>
+    <string name="toast_load_event_error">Không thể tải thông tin sự kiện</string>
+    <string name="toast_event_star_already">Nghệ sĩ này đã có trong danh sách!</string>
+    <string name="toast_star_fail">Thất bại: </string>
+    <string name="toast_no_event_stats">Không có sự kiện được chọn</string>
+
+    <!-- Profile page -->
+    <string name="str_default_username">Người dùng VibeTix</string>
+    <string name="str_member_since_placeholder">Thành viên từ 2024</string>
+    <string name="str_favorites">Yêu thích</string>
+    <string name="str_following">Đang theo dõi</string>
+    <string name="str_settings_security_header">CÀI ĐẶT &amp; BẢO MẬT</string>
+    <string name="str_account_info">Thông tin tài khoản</string>
+    <string name="str_my_organizer">Ban tổ chức của tôi</string>
+    <string name="str_org_badge_pending">Chờ duyệt</string>
+    <string name="str_security_password">Bảo mật &amp; Mật khẩu</string>
+    <string name="str_app_language">Ngôn ngữ ứng dụng</string>
+    <string name="str_lang_label_vi">Việt</string>
+    <string name="str_voice_assistant">Trợ lý giọng nói</string>
+    <string name="str_help_center">Trung tâm trợ giúp</string>
+    <string name="str_version">Phiên bản 1.0.0</string>
+
+    <!-- My Tickets page -->
+    <string name="str_tab_purchased">Vé đã mua</string>
+    <string name="str_tab_resale">Vé bán lại</string>
+    <string name="str_tab_upcoming">Sắp diễn ra</string>
+    <string name="str_tab_ended">Đã kết thúc</string>
+    <string name="str_tab_reselling">Đang rao bán</string>
+    <string name="str_tab_awaiting_payment">Chờ thanh toán</string>
+    <string name="str_tab_sold">Đã bán</string>
+    <string name="str_tab_rejected">Bị từ chối</string>
+    <string name="str_tab_cancelled">Đã hủy</string>
+    <string name="str_buy_ticket_now">Mua vé ngay</string>
+    <string name="str_suggestions_for_you">Có thể bạn cũng thích</string>
+    <string name="str_see_all">Xem tất cả ›</string>
+    <string name="str_no_tickets_title">Bạn chưa có vé nào cả!</string>
+    <string name="str_no_tickets_desc">Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn.</string>
+
+    <!-- Security page -->
+    <string name="str_section_pin">MÃ PIN</string>
+    <string name="str_section_password">MẬT KHẨU</string>
+    <string name="str_setup_pin">Thiết lập mã PIN</string>
+    <string name="str_pin_not_set">Chưa thiết lập</string>
+    <string name="str_forgot_pin_sms">Quên mã PIN? Xác nhận qua SMS</string>
+    <string name="str_protect_with_pin">Bảo vệ trang Chi tiết vé bằng PIN</string>
+    <string name="str_change_password">Đổi mật khẩu</string>
+    <string name="str_save_new_password">Lưu mật khẩu mới</string>
+    <string name="str_current_password_label">Mật khẩu hiện tại</string>
+    <string name="str_new_password_label">Mật khẩu mới</string>
+    <string name="str_confirm_new_password_label">Xác nhận mật khẩu mới</string>
+    <string name="str_hint_current_password">Nhập mật khẩu hiện tại</string>
+    <string name="str_hint_min_6_chars">Tối thiểu 6 ký tự</string>
+    <string name="str_hint_re_enter_password">Nhập lại mật khẩu mới</string>
+
+    <!-- Account Info page -->
+    <string name="str_full_name_label">Họ và tên</string>
+    <string name="str_email_label">Email</string>
+    <string name="str_verified_label">Đã xác minh</string>
+    <string name="str_phone_label">Số điện thoại</string>
+    <string name="str_birthday_label">Ngày sinh</string>
+    <string name="str_gender_label">Giới tính</string>
+    <string name="str_male">Nam</string>
+    <string name="str_female">Nữ</string>
+    <string name="str_other_gender">Khác</string>
+    <string name="str_save_changes">Lưu thay đổi</string>
+    <string name="str_hint_full_name_placeholder">Nguyễn Văn A</string>
+    <string name="str_hint_phone_placeholder">0912 345 678</string>
+    <string name="str_hint_date_ddmmyyyy">dd/mm/yyyy</string>
+
+    <!-- Event Detail page -->
+    <string name="str_event_detail_title">Chi tiết sự kiện</string>
+    <string name="str_about_event">Giới thiệu sự kiện</string>
+    <string name="str_see_more_expand">Xem thêm ▼</string>
+    <string name="str_schedule">Lịch diễn</string>
+    <string name="str_organizer_section_title">Ban tổ chức</string>
+    <string name="str_official_organizer">Đơn vị tổ chức chính thức</string>
+    <string name="str_more_like_this">Có thể bạn cũng thích</string>
+    <string name="str_price_from_label">Giá vé từ</string>
+    <string name="str_book_now">Đặt vé ngay</string>
+    <string name="str_no_description">Chưa có mô tả</string>
+    <string name="str_unverified">Chưa xác minh</string>
+    <string name="str_see_more_action">Xem thêm</string>
+    <string name="str_organized_by">Tổ chức bởi </string>
+
+    <!-- Select Ticket page -->
+    <string name="str_seat_map">Sơ đồ chỗ ngồi</string>
+    <string name="str_choose_ticket_type_label">Chọn loại vé</string>
+    <string name="str_total_amount_label">Tổng cộng</string>
+    <string name="str_please_select_ticket">Vui lòng chọn vé</string>
+    <string name="str_ticket_info_notice">• Vé điện tử sẽ được gửi đến email của bạn sau khi thanh toán thành công.\n• Vui lòng đến trước 15 phút để làm thủ tục check-in.\n• Vé đã mua không hoàn hủy. Vui lòng xem điều kiện chi tiết.</string>
+
+    <!-- Fill Attendee Info page -->
+    <string name="str_attendee_info_title">Thông tin người tham dự</string>
+    <string name="str_notes_label">Ghi chú</string>
+    <string name="str_note_char_count">0/300</string>
+    <string name="str_referral_question">Bạn biết đến sự kiện này qua kênh nào?</string>
+    <string name="str_referral_facebook">Facebook</string>
+    <string name="str_referral_linkedin">LinkedIn</string>
+    <string name="str_referral_website">Website</string>
+    <string name="str_referral_friends">Bạn bè giới thiệu</string>
+    <string name="str_referral_other">Khác</string>
+    <string name="str_total_payment_label">Tổng thanh toán</string>
+    <string name="str_hint_special_request">Yêu cầu đặc biệt, xuất hóa đơn...</string>
+    <string name="str_hint_attendee_name">Nguyễn Văn A</string>
+    <string name="str_hint_attendee_email">email@example.com</string>
+
+    <!-- Simulated Payment page -->
+    <string name="str_payment_title">Thanh toán</string>
+    <string name="str_order_summary">Tóm tắt đơn hàng</string>
+    <string name="str_platform_fee">Phí nền tảng ℹ</string>
+    <string name="str_discount_payment_label">Giảm giá</string>
+    <string name="str_secure_payment_label">Phương thức thanh toán bảo mật</string>
+    <string name="str_vnpay_desc">Cổng thanh toán VNPay (Thanh toán qua ứng dụng ngân hàng)</string>
+    <string name="str_vietqr_desc">Chuyển khoản VietQR (Quét mã QR để thanh toán)</string>
+    <string name="str_zalopay_wallet">Ví điện tử ZaloPay</string>
+    <string name="str_shopeepay_wallet">Ví điện tử ShopeePay</string>
+    <string name="str_visa_desc">Thẻ quốc tế Visa, Mastercard, JCB (Sắp ra mắt)</string>
+    <string name="str_agree_terms_full">Tôi đã đọc và đồng ý với Quy chế hoạt động của VibeTix và Chính sách bảo mật.</string>
+    <string name="str_voucher_label">🎟  Mã giảm giá / Voucher</string>
+    <string name="str_enter_voucher">Nhập mã giảm giá ›</string>
+    <string name="str_email_receive_ticket_hint">Email nhận vé</string>
+
+    <!-- Payment Success page -->
+    <string name="str_order_number_label">Mã đơn hàng</string>
+    <string name="str_payment_method_row_label">Phương thức thanh toán</string>
+    <string name="str_ticket_type_row_label">Loại vé</string>
+    <string name="str_quantity_label">Số lượng</string>
+    <string name="str_order_time_label">Thời gian đặt</string>
+    <string name="str_email_ticket_label">Email nhận vé</string>
+    <string name="str_view_my_tickets_action">Xem vé của tôi 🎟</string>
+    <string name="str_order_info_title">Thông tin đơn hàng</string>
+
+    <!-- Events list page -->
+    <string name="str_sort_newest">Mới nhất</string>
+    <string name="str_all_provinces">Tất cả tỉnh thành</string>
+    <string name="str_no_events_found">Không tìm thấy sự kiện</string>
+    <string name="str_no_events_network_msg">Vui lòng kiểm tra lại kết nối mạng hoặc thử lọc lại danh mục khác.</string>
+    <string name="str_retry">Thử lại</string>
+    <string name="str_explore_events_title">Khám phá sự kiện</string>
+    <string name="str_event_count_zero">0 sự kiện</string>
+    <string name="str_no_events_in_filter">Không có sự kiện nào</string>
+    <string name="str_filter_hint_change">Thử thay đổi bộ lọc hoặc tìm kiếm từ khóa khác</string>
+
+    <!-- Search page -->
+    <string name="str_search_events_title">Tìm kiếm sự kiện</string>
+    <string name="str_all_dates">Tất cả các ngày</string>
+    <string name="str_discover_by_category">Khám phá theo Thể loại</string>
+    <string name="str_discover_by_city">Khám phá theo Thành phố</string>
+
+    <!-- Help Center page -->
+    <string name="str_help_center_title">Trung tâm trợ giúp</string>
+    <string name="str_help_center_desc">VibeTix giúp bạn mua và bán vé một cách dễ dàng và an toàn. Dưới đây là những thông tin hữu ích về nền tảng.</string>
+    <string name="str_help_hotline">Gọi hotline  1900.8888</string>
+    <string name="str_help_email">Email: support@vibetix.vn</string>
+
+    <!-- Organizer Hub page -->
+    <string name="str_org_hub_title">VibeTix Organizer</string>
+    <string name="str_org_hub_subtitle">Bắt đầu tổ chức sự kiện của bạn</string>
+    <string name="str_org_hub_welcome">Chào mừng Organizer!</string>
+    <string name="str_org_hub_desc">Tạo và quản lý sự kiện của bạn một cách dễ dàng, chuyên nghiệp cùng VibeTix.</string>
+    <string name="str_org_benefit_1">Tạo sự kiện miễn phí, không giới hạn</string>
+    <string name="str_org_benefit_2">Bán vé trực tuyến, thanh toán tự động</string>
+    <string name="str_org_benefit_3">Theo dõi doanh thu thời gian thực</string>
+    <string name="str_org_benefit_4">Quét mã QR check-in nhanh chóng</string>
+    <string name="str_org_create_first_event">🚀  Tạo Sự Kiện Đầu Tiên</string>
+
+    <!-- Create Event page -->
+    <string name="str_create_event_title">Tạo sự kiện mới</string>
+    <string name="str_create_event_feature_title">Tính năng Tạo sự kiện</string>
+    <string name="str_create_event_for_verified">Chức năng này dành cho Ban tổ chức đã được xác minh.\nSắp ra mắt trong phiên bản tiếp theo! 🚀</string>
+    <string name="str_register_organizer_action">Đăng ký Ban tổ chức →</string>
+
+    <!-- Organizer Profile page -->
+    <string name="str_edit_profile">Chỉnh sửa</string>
+    <string name="str_events_count_label">Sự kiện</string>
+    <string name="str_tickets_sold_label">Vé đã bán</string>
+    <string name="str_revenue_label">Doanh thu</string>
+    <string name="str_contact_info_title">Thông tin liên hệ</string>
+    <string name="str_email_contact">Email</string>
+    <string name="str_phone_contact">Điện thoại</string>
+    <string name="str_website_contact">Website</string>
+    <string name="str_org_profile_section_title">🏢 Hồ sơ Ban tổ chức</string>
+    <string name="str_add_new_profile">+ Thêm hồ sơ mới</string>
+    <string name="str_settings_section_title">Cài đặt</string>
+    <string name="str_notification_settings">Cài đặt thông báo</string>
+    <string name="str_payment_info">Thông tin thanh toán</string>
+    <string name="str_change_password_action">Đổi mật khẩu</string>
+
+    <!-- Organizer Profile List page -->
+    <string name="str_org_profile_list_title">Hồ sơ ban tổ chức</string>
+    <string name="str_add_new_action">+ Thêm mới</string>
+    <string name="str_no_org_profiles">Chưa có hồ sơ ban tổ chức</string>
+    <string name="str_org_profile_list_desc">Tạo hồ sơ đầu tiên để bắt đầu\nquản lý sự kiện của bạn</string>
+    <string name="str_create_new_event_action">Tạo sự kiện</string>
+
+    <!-- Payment Methods page -->
+    <string name="str_payment_methods_title">Phương thức thanh toán</string>
+    <string name="str_saved_payment_methods">PHƯƠNG THỨC ĐÃ LƯU</string>
+    <string name="str_no_payment_methods">Chưa có phương thức thanh toán</string>
+    <string name="str_add_payment_faster">Thêm phương thức để thanh toán nhanh hơn</string>
+    <string name="str_add_new_method">+ Thêm phương thức mới</string>
+    <string name="str_add_method_title">Thêm phương thức</string>
+    <string name="str_choose_method_type">Chọn loại phương thức</string>
+    <string name="str_method_momo">MoMo</string>
+    <string name="str_method_zalopay">ZaloPay</string>
+    <string name="str_method_visa">Visa</string>
+    <string name="str_method_atm">ATM</string>
+    <string name="str_hint_account_card_number">Số tài khoản / Số thẻ (tùy chọn)</string>
+    <string name="str_add_payment_method_btn">Thêm phương thức</string>
+
+    <!-- Star Detail page -->
+    <string name="str_star_detail_title">Thông tin nghệ sĩ</string>
+    <string name="str_follow_action">+ Theo dõi</string>
+    <string name="str_loading_placeholder">Đang tải...</string>
+    <string name="str_intro_section">Giới thiệu</string>
+    <string name="str_no_artist_bio">Chưa có thông tin giới thiệu cho nghệ sĩ này.</string>
+    <string name="str_artist_events_section">Lịch hoạt động / Sự kiện tham gia</string>
+    <string name="str_no_artist_events">Hiện chưa có sự kiện nào của nghệ sĩ này trên hệ thống.</string>
+
+    <!-- Captcha dialog -->
+    <string name="str_captcha_title">Xác Minh Người Dùng</string>
+    <string name="str_captcha_subtitle">Chống bot tự động mua vé</string>
+    <string name="str_captcha_instruction">Kéo mảnh ghép vào đúng vị trí để hoàn thiện bức hình</string>
+    <string name="str_captcha_loading">Đợi một chút...</string>
+    <string name="str_captcha_slider_hint">← Kéo sang phải để ghép hình →</string>
+    <string name="str_captcha_reload">Tải lại</string>
+    <string name="str_captcha_success">✓ Xác minh thành công!</string>
+    <string name="str_captcha_fail">✗ Chưa đúng, thử lại</string>
+
+    <!-- Date Filter dialog -->
+    <string name="str_date_today">Hôm nay</string>
+    <string name="str_date_tomorrow">Ngày mai</string>
+    <string name="str_date_weekend">Cuối tuần</string>
+    <string name="str_date_this_month">Tháng này</string>
+    <string name="str_date_reset">Đặt lại</string>
+    <string name="str_date_apply">Áp dụng</string>
+
+    <!-- Event Filter dialog -->
+    <string name="str_filter_title_dialog">Bộ lọc</string>
+    <string name="str_filter_location">Địa điểm</string>
+    <string name="str_filter_all_nation">Toàn quốc</string>
+    <string name="str_filter_hcmc">TP. Hồ Chí Minh</string>
+    <string name="str_filter_hanoi">Hà Nội</string>
+    <string name="str_filter_dalat">Đà Lạt</string>
+    <string name="str_filter_danang">Đà Nẵng</string>
+    <string name="str_filter_price">Giá vé</string>
+    <string name="str_filter_free_only_label">Chỉ sự kiện miễn phí</string>
+    <string name="str_filter_genre">Thể loại</string>
+    <string name="str_filter_live_music">Nhạc sống</string>
+    <string name="str_filter_arts">Nghệ thuật</string>
+    <string name="str_filter_workshop">Workshop</string>
+    <string name="str_filter_tour">Tour</string>
+    <string name="str_filter_sports">Thể thao</string>
+    <string name="str_filter_festival">Lễ hội</string>
+    <string name="str_filter_reset">Đặt lại</string>
+    <string name="str_filter_apply">Áp dụng</string>
+
+    <!-- Pass Ticket dialog -->
+    <string name="str_pass_ticket_title">Bán lại vé (Pass vé) 🎫</string>
+    <string name="str_pass_ticket_desc">Đăng bán vé của bạn lên sàn giao dịch VibeTix. Người mua sẽ nhận được vé mới và tiền sẽ được chuyển vào tài khoản của bạn sau khi giao dịch thành công.</string>
+    <string name="str_choose_ticket_to_sell">Chọn loại vé muốn bán *</string>
+    <string name="str_message_for_buyer">Lời nhắn cho người mua (tuỳ chọn)</string>
+    <string name="str_pass_later">Để sau</string>
+    <string name="str_confirm_list_for_sale">Xác nhận đăng bán</string>
+
+    <!-- QR Scanner -->
+    <string name="str_qr_frame_hint">Đặt mã QR vào khung để quét</string>
+    <string name="str_qr_flash">Đèn Flash</string>
+    <string name="str_qr_manual_input">Nhập tay</string>
+    <string name="str_qr_scan_ticket">Quét vé</string>
+    <string name="str_qr_offline_mode">Offline Mode</string>
+    <string name="str_qr_load_db">Tải DB</string>
+    <string name="str_qr_next_ticket">Quét vé tiếp theo</string>
+    <string name="str_qr_checkin_success">Check-in thành công!</string>
+
+    <!-- Resale pages -->
+    <string name="str_resale_marketplace_title">Vé bán lại</string>
+    <string name="str_resale_empty">Hiện chưa có vé nào được đăng bán lại.</string>
+    <string name="str_resale_detail_title">Chi tiết vé bán lại</string>
+    <string name="str_resale_list_title">Danh sách vé bán lại</string>
+    <string name="str_resale_no_tickets">Chưa có vé bán lại cho sự kiện này.</string>
+
+    <!-- Ticket QR dialog -->
+    <string name="str_e_ticket_label">E-TICKET</string>
+    <string name="str_qr_instructions">Vui lòng đưa mã QR này cho nhân viên soát vé tại cửa để vào cổng sự kiện.</string>
+    <string name="str_done">Xong</string>
+
+    <!-- Ticket Detail dialog -->
+    <string name="str_ticket_info_section">THÔNG TIN VÉ</string>
+    <string name="str_total_order_amount">Tổng đơn hàng</string>
+    <string name="str_attendee_label_row">Người tham dự</string>
+    <string name="str_close">Đóng</string>
+
+    <!-- Item layouts - static labels -->
+    <string name="str_item_attendee_ticket_type">Loại vé</string>
+    <string name="str_item_not_checked_in">Chưa check-in</string>
+    <string name="str_item_check_in_action">Check-in</string>
+    <string name="str_item_valid_label">Hợp lệ</string>
+    <string name="str_item_resell_action_caps">BÁN LẠI VÉ</string>
+
+    <!-- All Events fragment -->
+    <string name="str_explore_events_heading">Khám phá sự kiện</string>
+    <string name="str_filter_chip_all">Tất cả</string>
+    <string name="str_filter_chip_today">Hôm nay</string>
+    <string name="str_filter_chip_weekend">Cuối tuần</string>
+    <string name="str_filter_chip_this_month">Tháng này</string>
+    <string name="str_filter_chip_free">Miễn phí</string>
+    <string name="str_hint_search_events">Tìm kiếm sự kiện...</string>
+
+    <!-- My Events list (organizer) -->
+    <string name="str_my_events_title">Sự kiện của tôi</string>
+    <string name="str_my_events_subtitle">Chọn sự kiện để bắt đầu quản lý</string>
+    <string name="str_no_events_yet">Chưa có sự kiện nào</string>
+    <string name="str_hint_search_my_events">Tìm kiếm sự kiện...</string>
+
+    <!-- Notification popup -->
+    <string name="str_notification_popup_title">Thông báo</string>
+    <string name="str_view_all_notifications">Xem tất cả thông báo</string>
+    <string name="str_my_tickets_title">Vé của tôi  ✨</string>
+    <string name="str_total_earnings_label">Tổng thực nhận: 0 đ</string>
+    <string name="str_buy_ticket_emoji">🎟  Mua vé ngay</string>
+
+    <!-- Create/Edit Event Activity -->
+    <string name="str_step_basic_info">Bước 1/3: Thông tin cơ bản</string>
+    <string name="str_rejected_event_label">Sự kiện bị từ chối</string>
+    <string name="str_upload_poster_hint">Nhấn để tải ảnh lên</string>
+    <string name="str_hint_event_title">Tiêu đề sự kiện *</string>
+    <string name="str_event_description_label">Mô tả sự kiện</string>
+    <string name="str_hint_category">Chọn danh mục</string>
+    <string name="str_hint_event_format">Hình thức tổ chức *</string>
+    <string name="str_free_event_label">Sự kiện miễn phí</string>
+    <string name="str_hint_online_link">Đường dẫn trực tuyến (Zoom, Google Meet...)</string>
+    <string name="str_hint_age_limit">Giới hạn độ tuổi *</string>
+    <string name="str_hint_max_tickets_per_order">Số vé tối đa mỗi giao dịch *</string>
+    <string name="str_time_section_label">⏰ Thời gian diễn ra</string>
+    <string name="str_hint_start_time">Thời gian Bắt đầu *</string>
+    <string name="str_hint_end_time">Thời gian Kết thúc</string>
+    <string name="str_venue_section_label">📍 Địa điểm tổ chức</string>
+    <string name="str_hint_venue_name">Tên địa điểm (Vd: Sân vận động Mỹ Đình)</string>
+    <string name="str_hint_venue_address">Địa chỉ chi tiết</string>
+    <string name="str_hint_venue_city">Thành phố / Tỉnh</string>
+    <string name="str_organizer_form_section">🏢 Ban tổ chức *</string>
+    <string name="str_saved_organizer_tab">Đã lưu</string>
+    <string name="str_new_organizer_tab">Tạo mới</string>
+    <string name="str_hint_select_saved_organizer">Chọn Ban tổ chức đã lưu</string>
+    <string name="str_organizer_email_placeholder">Email: —</string>
+    <string name="str_organizer_phone_placeholder">SĐT: —</string>
+    <string name="str_organizer_web_placeholder">Web: —</string>
+    <string name="str_hint_organizer_name">Tên Ban tổ chức *</string>
+    <string name="str_hint_organizer_email">Email liên hệ *</string>
+    <string name="str_hint_organizer_phone">Số điện thoại *</string>
+    <string name="str_hint_organizer_website">Website / Fanpage</string>
+    <string name="str_preview_section_label">ℹ️ Xem trước thông tin</string>
+    <string name="str_preview_name_label">Tên:</string>
+    <string name="str_preview_time_label">Thời gian:</string>
+    <string name="str_preview_venue_label">Địa điểm:</string>
+    <string name="str_ticket_types_section_label">Loại vé</string>
+    <string name="str_add_ticket_type_hint">Thêm ít nhất 1 loại vé để gửi duyệt</string>
+    <string name="str_add_ticket_type_btn">+ Thêm loại vé</string>
+    <string name="str_no_ticket_types">Chưa có loại vé nào</string>
+    <string name="str_add_ticket_type_prompt">Nhấn \'+ Thêm loại vé\' để bắt đầu</string>
+    <string name="str_artists_section_label">Nghệ sĩ tham gia</string>
+    <string name="str_artists_optional_hint">Tuỳ chọn — có thể bỏ qua</string>
+    <string name="str_add_artist_btn">+ Thêm nghệ sĩ</string>
+    <string name="str_no_artists_yet">Chưa có nghệ sĩ nào</string>
+    <string name="str_artists_optional_note">Không bắt buộc — bạn có thể thêm sau</string>
+    <string name="str_save_draft_btn">💾 Lưu nháp</string>
+    <string name="str_submit_review_btn">🚀 Gửi duyệt</string>
+    <string name="str_back_btn">Quay lại</string>
+    <string name="str_next_btn">Tiếp theo</string>
+
+    <!-- Banner Promo Dialog -->
+    <string name="str_promo_badge">🎁 ƯU ĐÃI ĐẶC BIỆT</string>
+    <string name="str_promo_discount_headline">Giảm giá lên đến 30% OFF</string>
+    <string name="str_promo_discount_condition">Cho vé nhóm từ 3 người trở lên</string>
+    <string name="str_promo_conditions_header">ĐỀU KIỆN ÁP DỤNG</string>
+    <string name="str_promo_condition_1">✅  Mua từ 3 vé trở lên cùng lúc</string>
+    <string name="str_promo_condition_2">✅  Áp dụng cho tất cả sự kiện đang mở bán</string>
+    <string name="str_promo_condition_3">✅  Thanh toán qua MoMo / ZaloPay / VNPay</string>
+    <string name="str_promo_expiry">⏰  Hết hạn: 30/06/2026</string>
+    <string name="str_promo_dismiss_btn">Đóng</string>
+    <string name="str_promo_claim_btn">🎫 Nhận ngay →</string>
+
+    <!-- Item layout static labels -->
+    <string name="str_resale_ticket_badge">Vé bán lại</string>
+    <string name="str_resale_badge_caps">BÁN LẠI</string>
+    <string name="str_resale_price_label">Giá bán lại</string>
+    <string name="str_buy_resale_btn">Mua lại</string>
+    <string name="str_discount_value_label">Mức giảm</string>
+    <string name="str_discount_used_label">Đã dùng</string>
+    <string name="str_discount_disable_btn">Tắt áp dụng</string>
+    <string name="str_tickets_sold_stat_label">Vé đã bán</string>
+    <string name="str_revenue_stat_label">Doanh thu</string>
+    <string name="str_fan_bought_label">Fan đã mua vé</string>
+    <string name="str_conversion_rate_label">Tỷ lệ chuyển đổi</string>
+    <string name="str_order_total_label">Tổng tiền:</string>
+    <string name="str_approve_order_btn">Duyệt đơn hàng</string>
+    <string name="str_checked_in_label">Đã vào</string>
+
+    <!-- Staff / Ticket Type Management activities -->
+    <string name="str_staff_list_header">DANH SÁCH NHÂN SỰ</string>
+    <string name="str_staff_permission_label">Phân quyền quản lý</string>
+    <string name="str_total_count_label">TỔNG SỐ</string>
+    <string name="str_add_staff_empty_hint">Thêm nhân sự để hỗ trợ\nsự kiện của bạn</string>
+    <string name="str_total_tickets_sold_header">TỔNG VÉ ĐÃ BÁN</string>
+    <string name="str_ticket_types_count_header">SỐ LOẠI VÉ</string>
+    <string name="str_create_first_ticket_hint">Tạo loại vé đầu tiên\ncho sự kiện của bạn</string>
+    <!-- Organizer register -->
+    <string name="str_hint_organizer_brand_name">Tên ban tổ chức *</string>
+    <string name="str_hint_organizer_bio">Mô tả ban tổ chức *</string>
+    <string name="str_hint_organizer_website_optional">Website (không bắt buộc)</string>
+    <string name="str_organizer_review_notice">Đơn đăng ký sẽ được xem xét trong vòng 1–3 ngày làm việc. Chúng tôi sẽ thông báo qua email khi có kết quả.</string>
+    <!-- Thank you message on payment success -->
+    <string name="str_payment_success_thank_you">Cảm ơn bạn đã đặt vé cùng VibeTix.\nE-ticket đã được gửi đến email của bạn và lưu trong Vé của tôi.</string>
+
+    <!-- SecurityFragment toasts and labels -->
+    <string name="str_pin_set_status">Đã thiết lập</string>
+    <string name="str_pin_not_set_status">Chưa thiết lập</string>
+    <string name="str_toast_set_pin_first">Vui lòng thiết lập mã PIN trước</string>
+    <string name="str_toast_pin_incorrect">Mã PIN không đúng</string>
+    <string name="str_toast_old_pin_incorrect">Mã PIN cũ không đúng</string>
+    <string name="str_toast_pin_mismatch">Mã PIN mới không khớp, thử lại</string>
+    <string name="str_toast_pin_updated">✓ Mã PIN đã được cập nhật</string>
+    <string name="str_toast_pin_save_failed">Lưu PIN thất bại, thử lại sau</string>
+    <string name="str_toast_fill_all_fields">Vui lòng điền đầy đủ thông tin</string>
+    <string name="str_toast_password_too_short">Mật khẩu mới phải có ít nhất 6 ký tự</string>
+    <string name="str_toast_password_mismatch">Mật khẩu xác nhận không khớp</string>
+    <string name="str_toast_relogin_required">Vui lòng đăng nhập lại để đổi mật khẩu</string>
+    <string name="str_btn_processing">Đang xử lý...</string>
+    <string name="str_toast_password_changed">✓ Đổi mật khẩu thành công!</string>
+    <string name="str_toast_password_change_failed">Đổi mật khẩu thất bại. Thử lại sau.</string>
+    <string name="str_toast_current_password_wrong">Mật khẩu hiện tại không đúng</string>
+    <string name="str_toast_fetching_phone">Đang lấy số điện thoại...</string>
+    <string name="str_toast_cannot_get_account">Không thể lấy thông tin tài khoản</string>
+    <string name="str_toast_sending_otp">Đang gửi OTP đến %1$s…</string>
+    <string name="str_toast_otp_failed">Gửi OTP thất bại: %1$s</string>
+    <string name="str_hint_otp_input">Nhập mã OTP 6 chữ số</string>
+    <string name="str_dialog_title_sms_verify">Xác nhận qua SMS</string>
+    <string name="str_toast_otp_too_short">Mã OTP phải đủ 6 chữ số</string>
+    <string name="str_toast_otp_invalid">Mã OTP không đúng hoặc đã hết hạn</string>
+
+    <!-- MyTicketsFragment toasts and empty states -->
+    <string name="str_toast_resell_guide">Chọn vé bạn đã mua ở tab \'Vé đã mua\' rồi bấm \'Bán lại vé\' để đăng bán!</string>
+    <string name="str_toast_cancelling_resell">Đang huỷ đăng bán...</string>
+    <string name="str_toast_resell_cancelled">Đã huỷ đăng bán vé!</string>
+    <string name="str_toast_cancel_resell_failed">Huỷ thất bại: %1$s</string>
+    <string name="str_toast_load_ticket_error">Lỗi tải vé: %1$s</string>
+    <string name="str_empty_no_tickets_title">Bạn chưa có vé nào cả!</string>
+    <string name="str_empty_no_tickets_subtitle">Khám phá sự kiện và đặt vé cho những trải nghiệm đáng nhớ đang chờ bạn.</string>
+    <string name="str_empty_no_ended_title">Bạn chưa có vé nào đã kết thúc!</string>
+    <string name="str_empty_no_ended_subtitle">Lịch sử mua vé của bạn sẽ xuất hiện tại đây.</string>
+    <string name="str_empty_no_reselling_title">Bạn chưa đăng rao bán vé nào!</string>
+    <string name="str_empty_no_reselling_subtitle">Hãy bán lại vé để người khác có cơ hội tham gia sự kiện.</string>
+    <string name="str_empty_no_sold_title">Không có vé nào đã bán</string>
+    <string name="str_empty_no_sold_subtitle">Bạn chưa có vé nào đã được bán thành công.</string>
+    <string name="str_empty_no_cancelled_title">Không có vé nào đã hủy</string>
+    <string name="str_empty_no_cancelled_subtitle">Bạn chưa có vé nào đã hủy đăng bán.</string>
+    <string name="str_empty_no_expired_title">Không có vé nào hết hạn</string>
+    <string name="str_empty_no_expired_subtitle">Các vé đăng bán quá hạn sẽ hiển thị ở đây.</string>
+    <string name="str_resell_ticket_btn">Bán lại vé</string>
+    <!-- EventDetailFragment strings -->
+    <string name="str_toast_load_event_error">Lỗi tải sự kiện: %1$s</string>
+    <string name="str_event_format_label">Hình thức: %1$s</string>
+    <string name="str_age_restriction_label">Giới hạn tuổi: %1$s</string>
+    <string name="str_event_ended">Sự kiện đã kết thúc</string>
+    <string name="str_event_cancelled">Sự kiện đã huỷ</string>
+    
+    <string name="str_coming_soon">Sắp ra mắt</string>
+    <string name="str_book_tickets_now">Đặt vé ngay</string>
+    <string name="str_not_open_yet">Chưa mở bán</string>
+    <string name="str_free_price">Miễn phí</string>
+    <string name="str_see_more_expand_icon">Xem thêm ▼</string>
+    <string name="str_buy_now_caps">MUA VÉ NGAY</string>
+    <string name="str_toast_login_to_save">Vui lòng đăng nhập để lưu sự kiện yêu thích</string>
+    <!-- AccountInfoFragment strings -->
+    <string name="str_toast_processing_image">Đang xử lý ảnh...</string>
+    <string name="str_toast_cannot_read_image">Không đọc được ảnh, thử lại</string>
+    <string name="str_toast_avatar_updated">✓ Đã cập nhật ảnh đại diện</string>
+    <string name="str_toast_save_avatar_failed">Lỗi lưu ảnh đại diện: %1$s</string>
+    <string name="str_error_enter_full_name">Vui lòng nhập họ và tên</string>
+    <string name="str_btn_saving">Đang lưu...</string>
+    <string name="str_toast_info_saved">✓ Đã lưu thông tin</string>
+    <string name="str_toast_save_info_failed">Lưu thất bại: %1$s</string>
+    <!-- PassTicketDialogFragment strings -->
+    <string name="str_ticket_type_max_qty">%1$s (tối đa %2$d)</string>
+    <string name="str_vnd_label">VNĐ</string>
+    <string name="str_resale_price_tip">💡 Giá thấp hơn 10–20%% sẽ giúp bán nhanh hơn.</string>
+    <string name="str_toast_please_relogin">Vui lòng đăng nhập lại</string>
+    <string name="str_toast_enter_price_for">Vui lòng nhập giá cho %1$s</string>
+    <string name="str_toast_invalid_price_for">Giá không hợp lệ cho %1$s</string>
+    <string name="str_toast_price_must_be_positive">Giá phải lớn hơn 0 cho %1$s</string>
+    <string name="str_toast_select_at_least_one">Vui lòng chọn ít nhất 1 vé muốn bán</string>
+    <string name="str_toast_resell_success">Đã đăng bán lại vé thành công!</string>
+    <!-- EventDetailActivity strings -->
+    <string name="str_toast_cannot_load_event">Không thể tải sự kiện</string>
+    <string name="str_no_venue_yet">Chưa có địa điểm</string>
+    <string name="str_organizer_verified">✓ Đã xác minh</string>
+    <string name="str_toast_no_ticket_types">Chưa có loại vé nào</string>
+    <string name="str_toast_buy_coming_soon">Tính năng mua vé sẽ được bổ sung sớm!</string>
+    <string name="str_default_ticket_name">Vé</string>
+    <string name="str_ticket_status_upcoming">Sắp mở bán</string>
+    <string name="str_ticket_status_ended">Đã kết thúc bán</string>
+    <string name="str_ticket_status_sold_out">Hết vé</string>
+    <string name="str_ticket_status_on_sale">Đang mở bán</string>
+    <string name="str_tickets_remaining">Còn %1$d vé</string>
+    <!-- OrganizerProfileFragment strings -->
+    <string name="str_organizer_count_label">%1$d hồ sơ ban tổ chức</string>
+    <string name="str_cannot_load_profile">Không thể tải thông tin. Thử lại.</string>
+    <string name="str_organizer_deleted_toast">Đã xóa hồ sơ BTC</string>
+    <string name="str_organizer_type_label">Đơn vị tổ chức sự kiện</string>
+    <string name="str_verified_chip">● Đã xác thực</string>
+    <string name="str_pending_chip">● Chờ xác thực</string>
+    <!-- User OrganizerProfileFragment strings -->
+    <string name="str_status_pending_review">⏳ Đang chờ duyệt</string>
+    <string name="str_description_label">Mô tả</string>
+    <string name="str_default_label">Mặc định</string>
+    <string name="str_activated_label">Đã kích hoạt</string>
+    <string name="str_not_activated_label">Chưa kích hoạt</string>
+    <string name="str_set_default_org_toast">Đặt \"%1$s\" là ban tổ chức mặc định</string>
+    <string name="str_delete_org_btn">Xóa ban tổ chức này</string>
+    <string name="str_toast_enter_org_name">Vui lòng nhập tên ban tổ chức</string>
+    <string name="str_toast_org_deleted">Đã xóa \"%1$s\"</string>
+    <!-- SimulatedPaymentFragment strings -->
+    <string name="str_toast_no_discount_codes">Không có mã giảm giá khả dụng</string>
+    <string name="str_toast_no_matching_code">Không có mã phù hợp cho đơn này</string>
+    <string name="str_voucher_code_label">Mã: %1$s</string>
+    <string name="str_apply_btn">Áp dụng</string>
+    <string name="str_toast_error_loading_voucher">Lỗi tải voucher</string>
+    <!-- CreateOrganizerActivity strings -->
+    <string name="str_error_brand_name_empty">Tên thương hiệu không được trống</string>
+    <string name="str_toast_auth_error">Lỗi xác thực người dùng</string>
+    <string name="str_toast_org_profile_updated">Đã cập nhật hồ sơ BTC thành công.</string>
+    <string name="str_toast_update_error">Lỗi cập nhật: %1$s</string>
+    <string name="str_toast_org_profile_saved">Lưu hồ sơ Ban tổ chức thành công.</string>
+    <string name="str_toast_save_data_error">Lỗi lưu dữ liệu: %1$s</string>
+    <string name="str_btn_save_org_profile">Lưu Hồ Sơ</string>
+    <!-- TicketDetailActivity strings -->
+    <string name="str_toast_ticket_not_found">Không tìm thấy vé</string>
+    <string name="str_toast_load_info_error">Lỗi tải thông tin: %1$s</string>
+    <string name="str_toast_load_ticket_err">Lỗi tải vé: %1$s</string>
+    <string name="str_checked_in_status">Đã check-in</string>
+    <string name="str_not_checked_in_status">Chưa check-in</string>
+    <string name="str_ticket_code_label">Mã vé: #%1$s</string>
+    <!-- QrScannerActivity strings -->
+    <string name="str_qr_sync_count">Đồng bộ (%1$d)</string>
+    <string name="str_qr_loading_data">Đang tải dữ liệu...</string>
+    <string name="str_qr_load_success">Đã tải %1$d vé thành công</string>
+    <string name="str_qr_load_done_instruction">Tải hoàn tất. Đặt mã QR vào khung để quét</string>
+    <string name="str_qr_load_data_error">Lỗi tải dữ liệu</string>
+    <string name="str_qr_no_sync_needed">Không có dữ liệu cần đồng bộ</string>
+    <string name="str_qr_syncing">Đang đồng bộ...</string>
+    <string name="str_qr_sync_success">Đồng bộ thành công!</string>
+    <string name="str_qr_sync_success_instruction">Đồng bộ thành công</string>
+    <string name="str_qr_sync_error">Lỗi đồng bộ</string>
+    <string name="str_qr_hint_manual_code">Nhập mã hiển thị vé (display_code, VD: VTX-1234)</string>
+    <string name="str_qr_checking">Đang kiểm tra...</string>
+    <string name="str_qr_anonymous_guest">Khách ẩn danh</string>
+    <string name="str_qr_standard_ticket">Vé chuẩn</string>
+    <string name="str_qr_checking_offline">Đang kiểm tra offline...</string>
+    <string name="str_qr_invalid_code">Mã vé không hợp lệ</string>
+    <string name="str_qr_unknown">Không xác định</string>
+    <!-- StaffManagementActivity strings -->
+    <string name="str_toast_load_list_error">Lỗi tải danh sách: %1$s</string>
+    <string name="str_toast_load_user_error">Lỗi tải thông tin người dùng: %1$s</string>
+    <string name="str_staff_count_label">%1$d nhân viên</string>
+    <string name="str_error_enter_email">Vui lòng nhập email</string>
+    <string name="str_toast_staff_already_exists">Nhân sự này đã tồn tại trong sự kiện</string>
+    <string name="str_toast_staff_added">Đã thêm nhân sự thành công</string>
+    <string name="str_toast_add_staff_error">Lỗi thêm nhân sự</string>
+    <string name="str_toast_user_not_found">Không tìm thấy user với email này</string>
+    <string name="str_toast_staff_unlocked">Đã mở khóa nhân sự</string>
+    <string name="str_toast_staff_suspended">Đã tạm ngưng nhân sự</string>
+    <string name="str_toast_status_update_error">Lỗi khi cập nhật trạng thái</string>
+    <string name="str_toast_role_updated">Đã cập nhật vai trò</string>
+    <string name="str_toast_role_update_error">Lỗi cập nhật vai trò</string>
+    <string name="str_toast_staff_deleted">Đã xóa nhân sự</string>
+    <string name="str_toast_delete_error">Lỗi khi xóa</string>
+    <!-- DiscountManagementActivity strings -->
+    <string name="str_toast_event_info_not_found">Không tìm thấy thông tin sự kiện</string>
+    <string name="str_toast_load_discount_error">Lỗi tải mã giảm giá: %1$s</string>
+    <string name="str_edit_discount_title">Chỉnh sửa mã giảm giá</string>
+    <string name="str_add_discount_title">Thêm mã giảm giá</string>
+    <string name="str_error_enter_name">Vui lòng nhập tên</string>
+    <string name="str_error_enter_value">Vui lòng nhập giá trị</string>
+    <string name="str_toast_select_time">Vui lòng chọn thời gian</string>
+    <string name="str_toast_invalid_value">Giá trị không hợp lệ</string>
+    <string name="str_toast_percent_over_100">Phần trăm giảm không được vượt quá 100</string>
+    <string name="str_toast_invalid_date">Ngày không hợp lệ</string>
+    <string name="str_toast_end_before_start">Ngày kết thúc phải sau ngày bắt đầu</string>
+    <string name="str_toast_create_success">Tạo thành công</string>
+    <string name="str_toast_update_success">Cập nhật thành công</string>
+    <!-- TicketTypeManagementActivity strings -->
+    <string name="str_ticket_type_count_label">%1$d loại vé</string>
+    <string name="str_edit_ticket_type_title">Chỉnh sửa loại vé</string>
+    <string name="str_add_ticket_type_title">Thêm loại vé</string>
+    <string name="str_error_enter_ticket_name">Vui lòng nhập tên loại vé</string>
+    <string name="str_error_enter_ticket_price">Vui lòng nhập giá vé</string>
+    <string name="str_error_enter_ticket_qty">Vui lòng nhập số lượng vé</string>
+    <string name="str_error_enter_sale_start">Vui lòng chọn ngày bắt đầu bán</string>
+    <string name="str_error_enter_sale_end">Vui lòng chọn ngày kết thúc bán</string>
+    <string name="str_toast_end_date_before_start">Ngày kết thúc phải sau hoặc bằng ngày bắt đầu</string>
+    <string name="str_toast_invalid_price_qty">Giá hoặc số lượng không hợp lệ</string>
+    <string name="str_error_invalid_price">Giá không hợp lệ</string>
+    <string name="str_error_qty_must_be_positive">Số lượng phải lớn hơn 0</string>
+    <string name="str_toast_cannot_reduce_qty">Không thể giảm dưới số vé đã bán (%1$d vé)!</string>
+    <string name="str_btn_save_ticket_type">LƯU THÔNG TIN</string>
+    <string name="str_toast_ticket_type_created">Đã tạo loại vé thành công ✓</string>
+    <string name="str_toast_ticket_type_updated">Đã cập nhật loại vé ✓</string>
+    <string name="str_toast_cannot_check_orders">Không kiểm tra được đơn hàng</string>
+    <string name="str_toast_ticket_type_deleted">Đã xóa loại vé</string>
+    <string name="str_toast_update_failed">Cập nhật thất bại</string>
+    <string name="str_ticket_sold_fraction">%1$d / %2$d vé</string>
+    <string name="str_status_active">Hoạt động</string>
+    <string name="str_status_disabled">Tạm tắt</string>
+    <!-- CreateEditEventActivity strings -->
+    <string name="str_rejection_reason_label">Lý do: %1$s</string>
+    <string name="str_edit_ticket_type_sheet">Sửa loại vé</string>
+    <string name="str_add_ticket_type_sheet">Thêm loại vé</string>
+    <string name="str_toast_artist_already_added">Nghệ sĩ này đã được thêm</string>
+    <string name="str_btn_update">Cập nhật</string>
+    <string name="str_org_phone_label">SĐT: %1$s</string>
+    <string name="str_toast_select_event_format">Vui lòng chọn hình thức tổ chức</string>
+    <string name="str_toast_enter_online_link">Vui lòng nhập đường dẫn trực tuyến</string>
+    <string name="str_toast_select_age_limit">Vui lòng chọn giới hạn độ tuổi</string>
+    <string name="str_toast_enter_max_tickets">Vui lòng nhập số vé tối đa mỗi giao dịch</string>
+    <string name="str_toast_max_tickets_positive">Số vé tối đa phải lớn hơn 0</string>
+    <string name="str_toast_max_tickets_invalid">Số vé tối đa không hợp lệ</string>
+    <string name="str_toast_add_one_ticket_type">Vui lòng thêm ít nhất một loại vé</string>
+    <string name="str_toast_invalid_org_email">Email ban tổ chức không đúng định dạng</string>
+    <string name="str_toast_create_org_error">Lỗi tạo ban tổ chức: %1$s</string>
+    <string name="str_toast_upload_image_error">Lỗi tải ảnh lên: %1$s</string>
+    <string name="str_toast_save_venue_error">Lỗi lưu địa điểm: %1$s</string>
+    <string name="str_toast_save_error">Lỗi khi lưu: %1$s</string>
+    <string name="str_toast_save_ticket_artist_error">Lỗi lưu loại vé/nghệ sĩ: %1$s</string>
+    <string name="str_toast_cannot_load_image">Không tải được ảnh</string>
+    <string name="str_hint_display_name">Tên hiển thị</string>
+    <!-- TicketAdapter status labels -->
+    <string name="str_ticket_valid_badge">Còn hiệu lực</string>
+    <string name="str_ticket_reselling_badge">Đang rao bán</string>
+    <string name="str_ticket_used_badge">Đã sử dụng</string>
+    <string name="str_ticket_expired_badge">Hết hạn</string>
+    <string name="str_ticket_sold_badge">Đã bán</string>
+    <string name="str_ticket_cancelled_resell_badge">Đã huỷ bán</string>
+    <string name="str_btn_cancel_resell">Hủy bán</string>
+    <string name="str_btn_relist">Đăng bán lại</string>
+    <!-- OrganizerBlastActivity strings -->
+    <string name="str_toast_no_event_selected">Không có sự kiện được chọn</string>
+    <string name="str_toast_load_ticket_type_error">Lỗi tải loại vé</string>
+    <string name="str_toast_enter_title_and_content">Vui lòng nhập tiêu đề và nội dung</string>
+    <string name="str_toast_select_ticket_type">Vui lòng chọn loại vé</string>
+    <string name="str_toast_load_history_error">Lỗi tải lịch sử: %1$s</string>
+    <string name="str_toast_notification_cancelled">Đã hủy thông báo thành công</string>
+    <string name="str_recipients_count">%1$d người nhận</string>
+    <string name="str_status_sent">Đã gửi</string>
+    <string name="str_status_cancelled_label">Đã hủy</string>
+    <!-- EventStarManagementActivity strings -->
+    <string name="str_toast_event_not_found">Không tìm thấy sự kiện</string>
+    <string name="str_toast_update_error_msg">Lỗi cập nhật: %1$s</string>
+    <string name="str_toast_order_update_error">Lỗi cập nhật đơn hàng: %1$s</string>
+    <string name="str_toast_load_data_error">Lỗi tải dữ liệu</string>
+    <string name="str_toast_artist_already_in_list">Nghệ sĩ này đã có trong danh sách!</string>
+    <string name="str_toast_artist_added">Đã thêm nghệ sĩ thành công</string>
+    <string name="str_toast_failed_msg">Thất bại: %1$s</string>
+    <string name="str_hint_artist_role">Vai trò (VD: Headliner, MC...)</string>
+    <string name="str_toast_deleted_success">Đã xoá thành công</string>
+    <!-- StarDetailFragment strings -->
+    <string name="str_official_organizer_label">Ban tổ chức chính thức</string>
+    <string name="str_follower_count_label">%1$d người theo dõi</string>
+    <string name="str_toast_login_to_follow">Vui lòng đăng nhập để theo dõi</string>
+    <string name="str_toast_followed">Đã theo dõi!</string>
+    <string name="str_btn_following">Đang theo dõi</string>
+    <string name="str_btn_follow">+ Theo dõi</string>
+    <!-- SelectTicketFragment strings -->
+    <string name="str_tickets_remaining_qty">Còn %1$d vé</string>
+    <string name="str_btn_please_select_ticket">Vui lòng chọn vé</string>
+    <!-- ProfileFragment strings -->
+    <string name="str_default_username_label">Người dùng VibeTix</string>
+    <string name="str_member_since_label">Thành viên từ 2024</string>
+    <string name="str_toast_logout_success">Đăng xuất thành công</string>
+    <string name="str_default_org_label">Mặc định</string>
+    <!-- TicketDetailDialogFragment strings -->
+    <string name="str_discount_code_label">Mã giảm giá</string>
+    <!-- SearchFragment strings -->
+    <string name="str_all_dates_label">Tất cả các ngày</string>
+    <string name="str_toast_cannot_load_events">Không thể tải sự kiện</string>
+    <string name="str_search_results_count">Kết quả tìm kiếm (%1$d)</string>
+    <!-- Adapter status labels -->
+    <string name="str_discount_status_disabled">Đã tắt</string>
+    <string name="str_discount_status_upcoming">Sắp tới</string>
+    <string name="str_discount_status_expired">Hết hạn</string>
+    <string name="str_discount_status_running">Đang chạy</string>
+    <string name="str_discount_expiry_label">Hết hạn: %1$s</string>
+    <string name="str_btn_deactivate">Tắt áp dụng</string>
+    <string name="str_btn_activate">Kích hoạt</string>
+    <string name="str_attendee_unknown_name">Khách chưa rõ tên</string>
+    <string name="str_attendee_no_email">Không có email</string>
+    <string name="str_attendee_ticket_count">%1$d vé</string>
+    <string name="str_default_ticket_type">Vé mặc định</string>
+    <string name="str_checked_in_badge">Đã check-in ✓</string>
+    <string name="str_not_checked_in_badge">Chưa check-in</string>
+    <string name="str_resale_default_type">Vé bán lại</string>
+    <string name="str_resale_negotiate_price">Thương lượng</string>
+    <string name="str_resale_qty_label">Số lượng: 1</string>
+    <string name="str_resale_seller_label">Người bán: %1$s</string>
+    <!-- EventsFragment strings -->
+    <string name="str_cannot_load_data">Không thể tải dữ liệu</string>
+    <string name="str_event_not_found_label">Không tìm thấy sự kiện</string>
+    <string name="str_check_network_retry">Vui lòng kiểm tra kết nối mạng và thử lại.</string>
+    <string name="str_try_other_filter">Vui lòng thử chọn bộ lọc hoặc từ khóa khác.</string>
+    <string name="str_sort_latest">Mới nhất</string>
+    <string name="str_all_cities">Tất cả tỉnh thành</string>
+    <!-- MasterDataFragment strings -->
+    <string name="str_toast_category_added">Đã thêm danh mục: %1$s</string>
+    <string name="str_toast_venue_added">Đã thêm địa điểm: %1$s</string>
+    <string name="str_toast_save_error_short">Lỗi khi lưu</string>
+    <!-- EventHubActivity strings -->
+    <string name="str_toast_org_profile_coming_soon">Hồ sơ Ban tổ chức (sắp ra mắt)</string>
+    <string name="str_toast_event_cancelled_ok">Đã huỷ sự kiện thành công</string>
+    <string name="str_toast_cannot_load_event_info">Không thể tải thông tin sự kiện</string>
+    <!-- OrderManagementActivity strings -->
+    <string name="str_toast_load_data_err">Lỗi khi tải dữ liệu: %1$s</string>
+    <string name="str_toast_order_approved">Đã duyệt đơn hàng</string>
+    <!-- AttendeesActivity strings -->
+    <string name="str_toast_load_data_error_short">Lỗi tải dữ liệu</string>
+    <string name="str_toast_checkin_success">Check-in thành công!</string>
+    <!-- OrganizerRegisterFragment strings -->
+    <string name="str_error_enter_brand_name">Vui lòng nhập tên ban tổ chức</string>
+    <string name="str_error_enter_description">Vui lòng nhập mô tả</string>
+    <!-- PaymentMethodsFragment strings -->
+    <string name="str_toast_deleted_method">Đã xóa %1$s</string>
+    <string name="str_toast_select_method_type">Vui lòng chọn loại phương thức</string>
+    <string name="str_toast_method_added">Đã thêm %1$s</string>
+    <!-- TicketQrDialogFragment strings -->
+    <string name="str_ticket_tier_label">Hạng vé: %1$s</string>
+    <string name="str_toast_qr_error">Lỗi tạo mã QR</string>
+    <!-- StaffAdapter strings -->
+    <string name="str_vibetix_account">Tài khoản VibeTix</string>
+    <string name="str_role_manager_label">Quản lý</string>
+    <string name="str_role_checkin_label">Soát vé</string>
+    <string name="str_staff_active_label">Đang bật</string>
+    <string name="str_staff_suspended_label">Tạm ngưng</string>
+    <!-- OrganizerOrderAdapter strings -->
+    <string name="str_order_status_success">Thành công</string>
+    <string name="str_order_status_cancelled">Đã hủy</string>
+    <string name="str_order_status_refunded">Hoàn tiền</string>
+    <string name="str_order_status_pending">Chờ xử lý</string>
+    <!-- PaymentSuccessFragment strings -->
+    <string name="str_ticket_qty_label">%1$d vé</string>
+    <!-- ResaleEventDetailFragment strings -->
+    <string name="str_toast_login_to_buy">Vui lòng đăng nhập để mua vé</string>
+    <string name="str_toast_cannot_buy_own_ticket">Bạn không thể mua lại vé do chính mình đăng bán</string>
+    <!-- LoginFragment strings -->
+    <string name="str_toast_apple_not_supported">Đăng nhập bằng Apple chưa được hỗ trợ</string>
+    <!-- RegisterFragment strings -->
+    <string name="str_btn_complete_register">Hoàn tất đăng ký</string>
+    <!-- NotificationDetailActivity strings -->
+    <string name="str_btn_view_my_tickets">Xem vé của tôi</string>
+    <string name="str_btn_view_my_events">Xem sự kiện của tôi</string>
+    <!-- NotificationPopupHelper strings -->
+    <string name="str_no_notifications">Bạn chưa có thông báo nào.</string>
+    <!-- FillAttendeeInfoFragment -->
+    <string name="str_attendee_info_title_screen">Thông tin người tham dự</string>
+    <string name="str_nav_home_label">Trang chủ</string>
+    <string name="str_nav_events_label">Sự kiện</string>
+    <string name="str_nav_create_label">Tạo mới</string>
+    <string name="str_nav_tickets_label">Vé của tôi</string>
+    <string name="str_nav_profile_label">Hồ sơ</string>
+    <string name="str_select_time_title">Chọn thời gian</string>
+    <string name="str_tab_expired">Đã hết hạn</string>
 </resources>
+
+
+
+
+
+
+
+

@@ -30,14 +30,14 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
                 android:src="@drawable/ic_back" 
-                android:contentDescription="Quay lại" />
+                android:contentDescription="@string/str_back" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="sans-serif-medium"
-                android:text="Thanh toán"
+                android:text="@string/str_payment_title"
                 android:textColor="@color/clr_text_black"
                 android:textSize="18sp" />
         </RelativeLayout>
@@ -78,7 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Chọn vé"
+                android:text="@string/ticket_select_title"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -113,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Thông tin"
+                android:text="@string/str_step_info"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Thanh toán"
+                android:text="@string/str_payment_title"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -172,7 +172,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Hoàn tất"
+                android:text="@string/str_step_done"
                 android:textColor="@color/clr_grey_1"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -241,7 +241,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/event_live_non_song"
                         app:cornerRadius="8dp" 
-                        android:contentDescription="Ảnh sự kiện" />
+                        android:contentDescription="@string/str_cd_event_image" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -321,7 +321,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thông tin nhận vé"
+                            android:text="@string/str_email_receive_ticket_hint"
                             android:textColor="@color/clr_text_black"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -367,7 +367,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:fontFamily="sans-serif-medium"
-                        android:text="🎟  Mã giảm giá / Voucher"
+                        android:text="@string/str_voucher_label"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp" />
 
@@ -377,7 +377,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerInParent="true"
-                        android:text="Nhập mã giảm giá ›"
+                        android:text="@string/str_enter_voucher"
                         android:textColor="@color/clr_grey_2"
                         android:textSize="13sp" />
                 </RelativeLayout>
@@ -389,7 +389,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Phương thức thanh toán bảo mật"
+                android:text="@string/str_secure_payment_label"
                 android:textColor="@color/clr_text_black"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -416,7 +416,7 @@
                         android:checked="true"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Cổng thanh toán VNPay (Thanh toán qua ứng dụng ngân hàng)"
+                        android:text="@string/str_vnpay_desc"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
@@ -432,7 +432,7 @@
                         android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Chuyển khoản VietQR (Quét mã QR để thanh toán)"
+                        android:text="@string/str_vietqr_desc"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
@@ -448,7 +448,7 @@
                         android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Ví điện tử ZaloPay"
+                        android:text="@string/str_zalopay_wallet"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
@@ -464,7 +464,7 @@
                         android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Ví điện tử ShopeePay"
+                        android:text="@string/str_shopeepay_wallet"
                         android:textColor="@color/clr_text_black"
                         android:textSize="13sp" />
 
@@ -480,7 +480,7 @@
                         android:layout_height="64dp"
                         android:fontFamily="sans-serif"
                         android:paddingStart="12dp"
-                        android:text="Thẻ quốc tế Visa, Mastercard, JCB (Sắp ra mắt)"
+                        android:text="@string/str_visa_desc"
                         android:textColor="@color/clr_grey_1"
                         android:enabled="false"
                         android:textSize="13sp" />
@@ -505,7 +505,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Tóm tắt đơn hàng"
+                        android:text="@string/str_order_summary"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -538,7 +538,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Phí nền tảng ℹ"
+                            android:text="@string/str_platform_fee"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -558,7 +558,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Giảm giá"
+                            android:text="@string/str_discount_payment_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -584,7 +584,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif-medium"
-                            android:text="Tổng cộng"
+                            android:text="@string/str_total_amount_label"
                             android:textColor="@color/clr_text_black"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -622,7 +622,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:lineSpacingExtra="2dp"
-                    android:text="Tôi đã đọc và đồng ý với Quy chế hoạt động của VibeTix và Chính sách bảo mật."
+                    android:text="@string/str_agree_terms_full"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -651,7 +651,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tổng thanh toán"
+                android:text="@string/str_total_payment_label"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="11sp" />
 
@@ -672,10 +672,12 @@
             android:layout_height="48dp"
             android:backgroundTint="@color/clr_btn_blue"
             android:fontFamily="sans-serif-medium"
-            android:text="Thanh toán 🔒"
+            android:text="@string/str_payment_title"
             android:textColor="@color/clr_text_white"
             android:textSize="14sp"
             app:cornerRadius="8dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

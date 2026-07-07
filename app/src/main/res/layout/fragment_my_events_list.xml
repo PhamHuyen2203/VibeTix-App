@@ -12,7 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:gravity="center_horizontal"
         android:background="@drawable/bg_organizer_header"
+        android:fitsSystemWindows="true"
         android:paddingHorizontal="20dp"
         android:paddingTop="20dp"
         android:paddingBottom="24dp">
@@ -20,18 +22,20 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sự kiện của tôi"
+            android:text="@string/str_my_events_title"
             android:textColor="@color/clr_text_white"
             android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:gravity="center" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chọn sự kiện để bắt đầu quản lý"
+            android:text="@string/str_my_events_subtitle"
             android:textColor="@color/clr_text_white"
             android:textSize="13sp"
             android:alpha="0.85"
+            android:gravity="center"
             android:layout_marginTop="4dp" />
 
         <!-- Search Bar -->
@@ -39,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="8dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp">
             <LinearLayout
@@ -59,7 +64,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="Tìm kiếm sự kiện..."
+                    android:hint="@string/str_hint_search_my_events"
                     android:textSize="14sp"
                     android:background="@null"
                     android:singleLine="true"
@@ -99,7 +104,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chưa có sự kiện nào"
+                android:text="@string/str_no_events_yet"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/clr_text_black"
@@ -110,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Tạo sự kiện mới"
+                android:text="@string/str_create_event_title"
                 app:cornerRadius="8dp" />
         </LinearLayout>
 
@@ -128,7 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:text="Tạo sự kiện"
+            android:text="@string/str_create_new_event_action"
             app:icon="@drawable/ic_add_white"
             android:textColor="@color/clr_white"
             app:iconTint="@color/clr_white"
@@ -136,3 +141,4 @@
 
     </FrameLayout>
 </LinearLayout>
+

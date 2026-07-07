@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Thông báo"
+            android:text="@string/str_notification_popup_title"
             android:textColor="#1C1B1B"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:gravity="center"
-        android:text="Xem tất cả thông báo"
+        android:text="@string/str_view_all_notifications"
         android:textColor="@color/clr_primary_blue"
         android:textSize="13sp"
         android:textStyle="bold"
@@ -57,3 +57,4 @@
         android:focusable="true"
         android:background="?android:attr/selectableItemBackground" />
 </LinearLayout>
+

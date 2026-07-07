@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Thiết lập mã PIN"
+        android:text="@string/str_setup_pin"
         android:textColor="#1C1B1B"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -23,7 +23,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="Nhập mã PIN 6 số để bảo vệ trang Chi tiết vé"
+        android:text="@string/str_protect_with_pin"
         android:textColor="#808E92"
         android:textSize="13sp" />
 
@@ -95,3 +95,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+

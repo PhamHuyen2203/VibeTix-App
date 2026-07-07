@@ -140,7 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Sự kiện"
+                    android:text="@string/str_events_count_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -171,7 +171,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Vé bán"
+                    android:text="@string/str_tickets_sold_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -202,7 +202,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Doanh thu"
+                    android:text="@string/str_revenue_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -225,7 +225,7 @@
                 android:layout_weight="1"
                 android:insetBottom="0dp"
                 android:insetTop="0dp"
-                android:text="Chỉnh sửa"
+                android:text="@string/str_edit_profile"
                 android:textAllCaps="false"
                 android:textSize="13sp"
                 app:cornerRadius="8dp"
@@ -240,7 +240,7 @@
                 android:layout_weight="1"
                 android:insetBottom="0dp"
                 android:insetTop="0dp"
-                android:text="Xóa"
+                android:text="@string/str_no_data"
                 android:textAllCaps="false"
                 android:textColor="@color/clr_error"
                 android:textSize="13sp"
@@ -257,3 +257,4 @@
             android:background="@color/clr_primary_blue" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

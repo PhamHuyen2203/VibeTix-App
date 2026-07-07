@@ -184,10 +184,10 @@ public class EventsFragment extends Fragment {
         if (layoutErrorEmptyState != null) {
             layoutErrorEmptyState.setVisibility(View.VISIBLE);
             if (txtErrorEmptyTitle != null) {
-                txtErrorEmptyTitle.setText(isError ? "Không thể tải dữ liệu" : "Không tìm thấy sự kiện");
+                txtErrorEmptyTitle.setText(isError ? getString(R.string.str_cannot_load_data) : getString(R.string.str_event_not_found_label));
             }
             if (txtErrorEmptySub != null) {
-                txtErrorEmptySub.setText(message != null ? message : (isError ? "Vui lòng kiểm tra kết nối mạng và thử lại." : "Vui lòng thử chọn bộ lọc hoặc từ khóa khác."));
+                txtErrorEmptySub.setText(message != null ? message : (isError ? getString(R.string.str_check_network_retry) : getString(R.string.str_try_other_filter)));
             }
             if (btnRetryEvents != null) {
                 btnRetryEvents.setVisibility(isError ? View.VISIBLE : View.GONE);
@@ -447,7 +447,7 @@ public class EventsFragment extends Fragment {
             },
             () -> { // Xóa sắp xếp
                 activeSort = "newest";
-                txtFilterSort.setText("Mới nhất");
+                txtFilterSort.setText(getString(R.string.str_sort_latest));
                 applyFilters();
                 sheet.dismiss();
             });
@@ -461,14 +461,14 @@ public class EventsFragment extends Fragment {
         android.view.View v = buildOptionSheet("Chọn tỉnh thành", CITY_LABELS, getActiveCityIndex(),
             which -> {
                 activeCity      = CITY_KEYWORDS[which];
-                activeCityLabel = which == 0 ? "Tất cả tỉnh thành" : CITY_LABELS[which];
+                activeCityLabel = which == 0 ? getString(R.string.str_all_cities) : CITY_LABELS[which];
                 txtFilterCity.setText(activeCityLabel);
                 applyFilters();
                 sheet.dismiss();
             },
             () -> { // Xóa bộ lọc thành phố
-                activeCity = ""; activeCityLabel = "Tất cả tỉnh thành";
-                txtFilterCity.setText("Tất cả tỉnh thành");
+                activeCity = ""; activeCityLabel = getString(R.string.str_all_cities);
+                txtFilterCity.setText(getString(R.string.str_all_cities));
                 applyFilters();
                 sheet.dismiss();
             });
@@ -625,7 +625,7 @@ public class EventsFragment extends Fragment {
         displayList.addAll(filteredFullList.subList(0, end));
         adapter.notifyDataSetChanged();
         if (displayList.isEmpty()) {
-            showErrorOrEmptyState(false, "Không tìm thấy sự kiện nào phù hợp với bộ lọc.");
+            showErrorOrEmptyState(false, getString(R.string.str_try_other_filter));
         } else {
             showSuccessState();
         }

@@ -47,9 +47,9 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AttendeeGroup group = list.get(position);
         
-        holder.tvAttendeeName.setText(group.userName != null && !group.userName.isEmpty() ? group.userName : "Khách chưa rõ tên");
-        holder.tvAttendeeEmail.setText(group.userEmail != null ? group.userEmail : "Không có email");
-        holder.tvTicketCount.setText(group.tickets.size() + " vé");
+        holder.tvAttendeeName.setText(group.userName != null && !group.userName.isEmpty() ? group.userName : holder.itemView.getContext().getString(R.string.str_attendee_unknown_name));
+        holder.tvAttendeeEmail.setText(group.userEmail != null ? group.userEmail : holder.itemView.getContext().getString(R.string.str_attendee_no_email));
+        holder.tvTicketCount.setText(holder.itemView.getContext().getString(R.string.str_attendee_ticket_count, group.tickets.size()));
         
         // Expand/Collapse logic
         holder.llTicketsContainer.setVisibility(group.isExpanded ? View.VISIBLE : View.GONE);
@@ -71,7 +71,7 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
             TextView tvTicketStatus = ticketView.findViewById(R.id.tvTicketStatus);
             MaterialButton btnCheckIn = ticketView.findViewById(R.id.btnCheckIn);
             
-            tvTicketType.setText(t.getTicketTypeName() != null ? t.getTicketTypeName() : "Vé mặc định");
+            tvTicketType.setText(t.getTicketTypeName() != null ? t.getTicketTypeName() : ticketView.getContext().getString(R.string.str_default_ticket_type));
             
             String displayCode = t.getDisplayCode();
             if (displayCode == null || displayCode.isEmpty()) {
@@ -82,11 +82,11 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
 
             boolean isUsed = UserTicket.Status.USED.equals(t.getStatus());
             if (isUsed) {
-                tvTicketStatus.setText("Đã check-in ✓");
+                tvTicketStatus.setText(ticketView.getContext().getString(R.string.str_checked_in_badge));
                 tvTicketStatus.setTextColor(ticketView.getContext().getColor(R.color.clr_success));
                 btnCheckIn.setVisibility(View.GONE);
             } else {
-                tvTicketStatus.setText("Chưa check-in");
+                tvTicketStatus.setText(ticketView.getContext().getString(R.string.str_not_checked_in_badge));
                 tvTicketStatus.setTextColor(ticketView.getContext().getColor(R.color.clr_warning));
                 btnCheckIn.setVisibility(View.VISIBLE);
                 btnCheckIn.setOnClickListener(v -> {

@@ -58,31 +58,31 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.ViewHo
         if (d.getExpiryDate() != null) expiryTime = d.getExpiryDate().toDate().getTime();
 
         if (!d.isActive()) {
-            holder.tvStatus.setText("Đã tắt");
+            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_discount_status_disabled));
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
         } else if (startTime > 0 && now < startTime) {
-            holder.tvStatus.setText("Sắp tới");
+            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_discount_status_upcoming));
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(R.color.clr_warning));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
         } else if (expiryTime > 0 && now > expiryTime) {
-            holder.tvStatus.setText("Hết hạn");
+            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_discount_status_expired));
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
         } else {
-            holder.tvStatus.setText("Đang chạy");
+            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.str_discount_status_running));
             holder.tvStatus.setTextColor(holder.itemView.getContext().getColor(R.color.clr_success));
             holder.tvStatus.setBackgroundResource(R.drawable.bg_ticket_type_active);
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        holder.tvExpiry.setText("Hết hạn: " + (expiryTime > 0 ? sdf.format(new Date(expiryTime)) : "N/A"));
+        holder.tvExpiry.setText(holder.itemView.getContext().getString(R.string.str_discount_expiry_label, expiryTime > 0 ? sdf.format(new Date(expiryTime)) : "N/A"));
 
         if (d.isActive()) {
-            holder.btnToggleActive.setText("Tắt áp dụng");
+            holder.btnToggleActive.setText(holder.itemView.getContext().getString(R.string.str_btn_deactivate));
             holder.btnToggleActive.setTextColor(holder.itemView.getContext().getColor(R.color.clr_error));
         } else {
-            holder.btnToggleActive.setText("Kích hoạt");
+            holder.btnToggleActive.setText(holder.itemView.getContext().getString(R.string.str_btn_activate));
             holder.btnToggleActive.setTextColor(holder.itemView.getContext().getColor(R.color.clr_success));
         }
 

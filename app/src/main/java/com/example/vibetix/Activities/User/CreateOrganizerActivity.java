@@ -78,7 +78,7 @@ public class CreateOrganizerActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(editMode ? "Chỉnh sửa hồ sơ BTC" : "Hồ sơ Ban tổ chức");
         }
         binding.toolbar.setNavigationOnClickListener(v -> finish());
-        if (editMode) binding.btnSubmit.setText("Lưu thay đổi");
+        if (editMode) binding.btnSubmit.setText(getString(R.string.str_save_changes));
     }
 
     private void prefillFields() {
@@ -122,18 +122,18 @@ public class CreateOrganizerActivity extends AppCompatActivity {
         String desc = binding.etDescription.getText().toString().trim();
 
         if (brandName.isEmpty()) {
-            binding.etBrandName.setError("Tên thương hiệu không được trống");
+            binding.etBrandName.setError(getString(R.string.str_error_brand_name_empty));
             binding.etBrandName.requestFocus();
             return;
         }
 
         if (userId == null) {
-            Toast.makeText(this, "Lỗi xác thực người dùng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_auth_error), Toast.LENGTH_SHORT).show();
             return;
         }
 
         binding.btnSubmit.setEnabled(false);
-        binding.btnSubmit.setText("Đang lưu...");
+        binding.btnSubmit.setText(getString(R.string.str_btn_saving));
 
         if (editMode) {
             uploadLogoAndEdit(brandName, website, desc);
@@ -159,13 +159,13 @@ public class CreateOrganizerActivity extends AppCompatActivity {
                 .document(editOrganizer.getOrganizerId())
                 .update(data)
                 .addOnSuccessListener(v -> {
-                    Toast.makeText(this, "Đã cập nhật hồ sơ BTC thành công.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.str_toast_org_profile_updated), Toast.LENGTH_LONG).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
                     binding.btnSubmit.setEnabled(true);
-                    binding.btnSubmit.setText("Lưu thay đổi");
-                    Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    binding.btnSubmit.setText(getString(R.string.str_save_changes));
+                    Toast.makeText(this, getString(R.string.str_toast_update_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -212,12 +212,12 @@ public class CreateOrganizerActivity extends AppCompatActivity {
 
     private void finishSuccess(boolean success, Exception e) {
         if (success) {
-            Toast.makeText(this, "Lưu hồ sơ Ban tổ chức thành công.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.str_toast_org_profile_saved), Toast.LENGTH_LONG).show();
             finish();
         } else {
             binding.btnSubmit.setEnabled(true);
-            binding.btnSubmit.setText("Lưu Hồ Sơ");
-            Toast.makeText(this, "Lỗi lưu dữ liệu: " + (e != null ? e.getMessage() : ""), Toast.LENGTH_SHORT).show();
+            binding.btnSubmit.setText(getString(R.string.str_btn_save_org_profile));
+            Toast.makeText(this, getString(R.string.str_toast_save_data_error, e != null ? e.getMessage() : ""), Toast.LENGTH_SHORT).show();
         }
     }
 }

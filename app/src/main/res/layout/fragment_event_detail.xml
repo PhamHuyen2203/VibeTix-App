@@ -30,14 +30,14 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
                 android:src="@drawable/ic_back" 
-                android:contentDescription="Quay lại" />
+                android:contentDescription="@string/str_back" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:fontFamily="sans-serif-medium"
-                android:text="Chi tiết sự kiện"
+                android:text="@string/str_event_detail_title"
                 android:textColor="@color/clr_text_black"
                 android:textSize="18sp" />
 
@@ -51,7 +51,7 @@
                 android:padding="4dp"
                 android:src="@drawable/ic_heart_small"
                 app:tint="@color/clr_grey_1" 
-                android:contentDescription="Yêu thích sự kiện" />
+                android:contentDescription="@string/str_favorites" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -75,7 +75,7 @@
                 android:layout_height="220dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/event_live_non_song" 
-                android:contentDescription="Ảnh poster sự kiện" />
+                android:contentDescription="@string/str_cd_event_image" />
 
             <!-- Event Details Body -->
             <LinearLayout
@@ -139,7 +139,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
-                        android:text="Tổ chức bởi "
+                        android:text="@string/str_organized_by"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="13sp" />
 
@@ -270,7 +270,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Giới thiệu sự kiện"
+                    android:text="@string/str_about_event"
                     android:textColor="@color/clr_text_black"
                     android:textSize="16sp" />
 
@@ -301,7 +301,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Xem thêm ▼"
+                    android:text="@string/str_see_more_expand"
                     android:textColor="@color/clr_primary_blue"
                     android:textSize="14sp" />
 
@@ -324,7 +324,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Lịch diễn"
+                        android:text="@string/str_schedule"
                         android:textColor="@color/clr_text_black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -370,7 +370,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Ban tổ chức"
+                    android:text="@string/str_organizer_section_title"
                     android:textColor="@color/clr_text_black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -398,7 +398,7 @@
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:src="@drawable/img_mascot_wave" 
-                            android:contentDescription="Ảnh đại diện ban tổ chức" />
+                            android:contentDescription="@string/str_cd_event_image" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -420,7 +420,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Đơn vị tổ chức chính thức"
+                                android:text="@string/str_official_organizer"
                                 android:textColor="@color/clr_text_secondary"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -473,7 +473,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Có thể bạn cũng thích"
+                        android:text="@string/str_more_like_this"
                         android:textColor="@color/clr_text_black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -482,7 +482,7 @@
                         android:id="@+id/txtRelatedSeeMore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Xem thêm"
+                        android:text="@string/str_see_more_action"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -525,7 +525,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Giá vé từ"
+                android:text="@string/str_price_from_label"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="12sp" />
 
@@ -547,10 +547,11 @@
             android:backgroundTint="@color/clr_btn_blue"
             android:fontFamily="sans-serif-medium"
             android:paddingHorizontal="24dp"
-            android:text="Đặt vé ngay"
+            android:text="@string/str_book_now"
             android:textColor="@color/clr_text_white"
             android:textSize="16sp"
             app:cornerRadius="8dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

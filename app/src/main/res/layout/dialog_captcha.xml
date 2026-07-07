@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Xác Minh Người Dùng"
+                android:text="@string/str_captcha_title"
                 android:textColor="@color/clr_text_black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Chống bot tự động mua vé"
+                android:text="@string/str_captcha_subtitle"
                 android:textColor="@color/clr_text_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -53,16 +53,47 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:text="Kéo mảnh ghép vào đúng vị trí để hoàn thiện bức hình"
+        android:text="@string/str_captcha_instruction"
         android:textColor="@color/clr_text_secondary"
         android:textSize="13sp" />
 
-    <!-- Puzzle view -->
-    <com.example.vibetix.Views.PuzzleCaptchaView
-        android:id="@+id/puzzleCaptchaView"
+    <!-- Puzzle view + loading overlay -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:clipToOutline="true" />
+        android:layout_height="160dp">
+
+        <com.example.vibetix.Views.PuzzleCaptchaView
+            android:id="@+id/puzzleCaptchaView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToOutline="true" />
+
+        <LinearLayout
+            android:id="@+id/layoutCaptchaLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#CC000000"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/str_captcha_loading"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txtCaptchaCountdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- Slider track label -->
     <TextView
@@ -70,7 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="← Kéo sang phải để ghép hình →"
+        android:text="@string/str_captcha_slider_hint"
         android:textColor="@color/clr_text_secondary"
         android:textSize="12sp" />
 
@@ -118,9 +149,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="Tải lại"
+            android:text="@string/str_captcha_reload"
             android:textColor="@color/clr_text_secondary"
             android:textSize="13sp" />
     </LinearLayout>
 
 </LinearLayout>
+

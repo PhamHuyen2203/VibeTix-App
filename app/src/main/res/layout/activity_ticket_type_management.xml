@@ -83,7 +83,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TỔNG VÉ ĐÃ BÁN"
+                            android:text="@string/str_total_tickets_sold_header"
                             android:textColor="#E2E8F0"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -106,7 +106,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="SỐ LOẠI VÉ"
+                            android:text="@string/str_ticket_types_count_header"
                             android:textColor="#E2E8F0"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -170,7 +170,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Chưa có loại vé nào"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -180,7 +180,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Tạo loại vé đầu tiên\ncho sự kiện của bạn"
+                    android:text="@string/str_create_first_ticket_hint"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="14sp"
                     android:gravity="center" />
@@ -198,10 +198,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:text="Thêm loại vé"
+        android:text="@string/toast_add_ticket_type"
         app:icon="@drawable/ic_plus"
         app:iconTint="@color/clr_text_white"
         app:backgroundTint="@color/clr_primary"
         android:textColor="@color/clr_text_white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

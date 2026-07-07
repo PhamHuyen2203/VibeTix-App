@@ -39,10 +39,10 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         EventStaff staff = staffList.get(position);
         ItemStaffRowBinding b = holder.binding;
 
-        b.tvStaffName.setText(staff.getStaffName() != null ? staff.getStaffName() : "Tài khoản VibeTix");
+        b.tvStaffName.setText(staff.getStaffName() != null ? staff.getStaffName() : b.getRoot().getContext().getString(R.string.str_vibetix_account));
         b.tvStaffEmail.setText(staff.getStaffEmail() != null ? staff.getStaffEmail() : "No email");
         
-        b.tvRoleBadge.setText(staff.getRole() == EventStaff.Role.MANAGER ? "Quản lý" : "Soát vé");
+        b.tvRoleBadge.setText(staff.getRole() == EventStaff.Role.MANAGER ? b.getRoot().getContext().getString(R.string.str_role_manager_label) : b.getRoot().getContext().getString(R.string.str_role_checkin_label));
         
         // Cập nhật giao diện theo role
         if (staff.getRole() == EventStaff.Role.MANAGER) {
@@ -64,7 +64,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         b.swStaffActive.setOnCheckedChangeListener(null);
         
         b.swStaffActive.setChecked(staff.isActive());
-        b.swStaffActive.setText(staff.isActive() ? "Đang bật" : "Tạm ngưng");
+        b.swStaffActive.setText(staff.isActive() ? b.getRoot().getContext().getString(R.string.str_staff_active_label) : b.getRoot().getContext().getString(R.string.str_staff_suspended_label));
         if (!staff.isActive()) {
             b.ivStaffAvatar.setImageTintList(android.content.res.ColorStateList.valueOf(b.getRoot().getContext().getColor(R.color.clr_grey_1)));
             b.tvStaffName.setTextColor(b.getRoot().getContext().getColor(R.color.clr_grey_1));

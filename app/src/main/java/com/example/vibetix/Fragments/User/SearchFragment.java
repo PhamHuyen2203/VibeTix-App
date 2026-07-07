@@ -240,7 +240,7 @@ public class SearchFragment extends Fragment {
                 if (startDate == null && endDate == null) {
                     // Reset ngày
                     filterDateStart = null; filterDateEnd = null; filterDateLabel = "";
-                    txtDateFilterLabel.setText("Tất cả các ngày");
+                    txtDateFilterLabel.setText(getString(R.string.str_all_dates_label));
                 } else {
                     filterDateStart = startDate; filterDateEnd = endDate;
                     filterDateLabel = label;
@@ -317,7 +317,7 @@ public class SearchFragment extends Fragment {
             })
             .addOnFailureListener(e -> {
                 if (isAdded())
-                    Toast.makeText(requireContext(), "Không thể tải sự kiện", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_cannot_load_events), Toast.LENGTH_SHORT).show();
             });
     }
 
@@ -436,9 +436,9 @@ public class SearchFragment extends Fragment {
             sectionRecentSearch.setVisibility(View.GONE);
         if (txtSuggestionsTitle != null) {
             if (active) {
-                txtSuggestionsTitle.setText("Kết quả tìm kiếm (" + filteredFullEvents.size() + ")");
+                txtSuggestionsTitle.setText(getString(R.string.str_search_results_count, filteredFullEvents.size()));
             } else {
-                txtSuggestionsTitle.setText("Gợi ý dành cho bạn");
+                txtSuggestionsTitle.setText(getString(R.string.str_suggestions_for_you));
                 loadRecentSearches(); // Hiện lại recent khi xóa hết filter
             }
         }
@@ -479,7 +479,7 @@ public class SearchFragment extends Fragment {
         if (filterDateStart != null && !filterDateLabel.isEmpty()) {
             addFilterChip("📅 " + filterDateLabel, () -> {
                 filterDateStart = null; filterDateEnd = null; filterDateLabel = "";
-                if (txtDateFilterLabel != null) txtDateFilterLabel.setText("Tất cả các ngày");
+                if (txtDateFilterLabel != null) txtDateFilterLabel.setText(getString(R.string.str_all_dates_label));
                 applyAllFilters();
             });
             hasChip = true;

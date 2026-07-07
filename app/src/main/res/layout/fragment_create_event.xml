@@ -29,14 +29,14 @@
                 android:padding="10dp"
                 android:background="@drawable/bg_back_btn"
                 android:src="@drawable/ic_back"
-                android:contentDescription="Quay lại" />
+                android:contentDescription="@string/str_back" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Tạo sự kiện mới"
+                android:text="@string/str_create_event_title"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:text="Tính năng Tạo sự kiện"
+            android:text="@string/str_create_event_feature_title"
             android:textColor="#1C1B1B"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -89,10 +89,11 @@
             android:gravity="center"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:text="Đăng ký Ban tổ chức →"
+            android:text="@string/str_register_organizer_action"
             android:textColor="@color/clr_primary_blue"
             android:textSize="14sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 </LinearLayout>
+

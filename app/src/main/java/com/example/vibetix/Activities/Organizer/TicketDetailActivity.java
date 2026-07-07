@@ -61,7 +61,7 @@ public class TicketDetailActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         ticketId = getIntent().getStringExtra(EXTRA_TICKET_ID);
         if (ticketId == null) {
-            Toast.makeText(this, "Không tìm thấy vé", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_ticket_not_found), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -113,7 +113,7 @@ public class TicketDetailActivity extends AppCompatActivity {
                 .addOnSuccessListener(ticketDoc -> {
                     if (!ticketDoc.exists()) {
                         showLoading(false);
-                        Toast.makeText(this, "Không tìm thấy vé", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_ticket_not_found), Toast.LENGTH_SHORT).show();
                         finish();
                         return;
                     }
@@ -200,12 +200,12 @@ public class TicketDetailActivity extends AppCompatActivity {
                             })
                             .addOnFailureListener(e -> {
                                 showLoading(false);
-                                Toast.makeText(this, "Lỗi tải thông tin: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.str_toast_load_info_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                             });
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
-                    Toast.makeText(this, "Lỗi tải vé: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_ticket_err, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -213,9 +213,9 @@ public class TicketDetailActivity extends AppCompatActivity {
         boolean isUsed = ticket.isUsed();
         if (isUsed) {
             tvStatusIcon.setText("✅");
-            tvTicketStatus.setText("Đã check-in");
+            tvTicketStatus.setText(getString(R.string.str_checked_in_status));
             tvTicketStatus.setTextColor(getColor(R.color.clr_success));
-            tvCheckinStatus.setText("Đã check-in");
+            tvCheckinStatus.setText(getString(R.string.str_checked_in_status));
             tvCheckinStatus.setTextColor(getColor(R.color.clr_success));
 
             // Check-in time
@@ -228,7 +228,7 @@ public class TicketDetailActivity extends AppCompatActivity {
             tvStatusIcon.setText("🎟️");
             tvTicketStatus.setText("Hợp lệ");
             tvTicketStatus.setTextColor(getColor(R.color.clr_primary_blue));
-            tvCheckinStatus.setText("Chưa check-in");
+            tvCheckinStatus.setText(getString(R.string.str_not_checked_in_status));
             tvCheckinStatus.setTextColor(getColor(R.color.clr_warning));
         }
 
@@ -236,7 +236,7 @@ public class TicketDetailActivity extends AppCompatActivity {
         String code = ticket.getDisplayCode() != null ? ticket.getDisplayCode() :
                 (ticket.getUserTicketId() != null && ticket.getUserTicketId().length() >= 8
                         ? ticket.getUserTicketId().substring(0, 8).toUpperCase() : ticket.getUserTicketId());
-        tvTicketCode.setText("Mã vé: #" + (code != null ? code : "—"));
+        tvTicketCode.setText(getString(R.string.str_ticket_code_label, code != null ? code : "—"));
 
         // Owner ID
         tvCustomerUserId.setText(ticket.getOwnerId() != null ? ticket.getOwnerId() : "—");

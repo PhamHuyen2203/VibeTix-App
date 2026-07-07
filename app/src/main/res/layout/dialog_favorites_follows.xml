@@ -20,7 +20,7 @@
         android:id="@+id/txtSheetTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Yêu thích"
+        android:text="@string/str_favorites"
         android:textColor="@color/clr_text_black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -31,7 +31,7 @@
         android:id="@+id/txtHeaderFavorites"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sự kiện yêu thích"
+        android:text="@string/str_suggestions_for_you"
         android:textColor="#808E92"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="Chưa có sự kiện yêu thích"
+        android:text="@string/str_no_data"
         android:textColor="#B0B8C1"
         android:textSize="13sp"
         android:visibility="gone" />
@@ -68,7 +68,7 @@
         android:id="@+id/txtHeaderFollowing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đang theo dõi"
+        android:text="@string/str_following"
         android:textColor="#808E92"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -87,7 +87,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="Chưa theo dõi ai"
+        android:text="@string/str_no_data"
         android:textColor="#B0B8C1"
         android:textSize="13sp"
         android:visibility="gone" />
@@ -98,3 +98,4 @@
         android:layout_height="16dp" />
 
 </LinearLayout>
+

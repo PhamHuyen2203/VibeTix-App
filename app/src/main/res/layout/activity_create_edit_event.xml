@@ -55,7 +55,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sự kiện bị từ chối"
+                android:text="@string/str_rejected_event_label"
                 android:textColor="#C0392B"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -91,7 +91,7 @@
             android:id="@+id/tvStepIndicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bước 1/3: Thông tin cơ bản"
+            android:text="@string/str_step_basic_info"
             android:textColor="@color/clr_primary_blue"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -159,7 +159,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Nhấn để tải ảnh lên"
+                                android:text="@string/str_upload_poster_hint"
                                 android:textColor="@color/clr_primary_blue"
                                 android:textStyle="bold"
                                 android:layout_marginTop="8dp" />
@@ -182,7 +182,7 @@
                     android:id="@+id/tilTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Tiêu đề sự kiện *"
+                    android:hint="@string/str_hint_event_title"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -201,27 +201,178 @@
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
+                <!-- Rich Text Description Editor -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Mô tả sự kiện"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:textColorHint="#757575"
-                    app:hintTextColor="@color/clr_primary_blue"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    android:layout_marginBottom="16dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etEventDescription"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_rich_editor_container">
+
+                    <!-- Floating label -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/str_event_description_label"
+                        android:textColor="@color/clr_primary_blue"
+                        android:textSize="12sp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@color/clr_bg_light"
+                        android:paddingHorizontal="4dp" />
+
+                    <!-- Formatting Toolbar -->
+                    <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textMultiLine"
-                        android:minLines="4"
-                        android:textColor="@color/clr_text_black"
-                        android:textSize="16sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:scrollbars="none"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageButton
+                                android:id="@+id/btnRichBold"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_bold"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="In đậm"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichItalic"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_italic"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="In nghiêng"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichUnderline"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_underline"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Gạch chân"
+                                android:layout_marginEnd="4dp" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="20dp"
+                                android:background="#DDDDDD"
+                                android:layout_marginHorizontal="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichH1"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_h1"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Tiêu đề lớn"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichH2"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_h2"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Tiêu đề vừa"
+                                android:layout_marginEnd="4dp" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="20dp"
+                                android:background="#DDDDDD"
+                                android:layout_marginHorizontal="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichBullet"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_list_bullet"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Danh sách"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichOrdered"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_list_numbered"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Danh sách số"
+                                android:layout_marginEnd="4dp" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="20dp"
+                                android:background="#DDDDDD"
+                                android:layout_marginHorizontal="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichIndent"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_indent_increase"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Thụt lề"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichOutdent"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_indent_decrease"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Giảm thụt lề"
+                                android:layout_marginEnd="4dp" />
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="20dp"
+                                android:background="#DDDDDD"
+                                android:layout_marginHorizontal="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichInsertImage"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_image"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Chèn ảnh"
+                                android:layout_marginEnd="4dp" />
+
+                            <ImageButton
+                                android:id="@+id/btnRichInsertLink"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:src="@drawable/ic_format_link"
+                                android:background="@drawable/bg_rich_format_btn"
+                                android:contentDescription="Chèn link" />
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0" />
+
+                    <!-- RichEditor -->
+                    <jp.wasabeef.richeditor.RichEditor
+                        android:id="@+id/richEditorDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:background="@android:color/white" />
+
+                </LinearLayout>
 
                 <!-- Side-by-side Category & Event Type -->
                 <LinearLayout
@@ -235,7 +386,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Chọn danh mục"
+                        android:hint="@string/str_hint_category"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:textColorHint="#757575"
                         app:hintTextColor="@color/clr_primary_blue"
@@ -258,7 +409,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:hint="Hình thức tổ chức *"
+                        android:hint="@string/str_hint_event_format"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:textColorHint="#757575"
                         app:hintTextColor="@color/clr_primary_blue"
@@ -284,7 +435,7 @@
                     android:id="@+id/swIsFree"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Sự kiện miễn phí"
+                    android:text="@string/str_free_event_label"
                     android:textSize="16sp"
                     android:textColor="@color/clr_text_black"
                     android:layout_marginTop="8dp"
@@ -295,7 +446,7 @@
                     android:id="@+id/tilOnlineLink"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Đường dẫn trực tuyến (Zoom, Google Meet...)"
+                    android:hint="@string/str_hint_online_link"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -318,7 +469,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Giới hạn độ tuổi *"
+                    android:hint="@string/str_hint_age_limit"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -341,7 +492,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Số vé tối đa mỗi giao dịch *"
+                    android:hint="@string/str_hint_max_tickets_per_order"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -385,7 +536,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="⏰ Thời gian diễn ra"
+                            android:text="@string/str_time_section_label"
                             android:textColor="@color/clr_primary_blue"
                             android:textStyle="bold"
                             android:textSize="16sp"
@@ -395,7 +546,7 @@
                             android:id="@+id/tilStartTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Thời gian Bắt đầu *"
+                            android:hint="@string/str_hint_start_time"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -417,7 +568,7 @@
                             android:id="@+id/tilEndTime"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Thời gian Kết thúc"
+                            android:hint="@string/str_hint_end_time"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -454,7 +605,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📍 Địa điểm tổ chức"
+                            android:text="@string/str_venue_section_label"
                             android:textColor="@color/clr_primary_blue"
                             android:textStyle="bold"
                             android:textSize="16sp"
@@ -464,7 +615,7 @@
                             android:id="@+id/tilVenueName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Tên địa điểm (Vd: Sân vận động Mỹ Đình)"
+                            android:hint="@string/str_hint_venue_name"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -484,7 +635,7 @@
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Địa chỉ chi tiết"
+                            android:hint="@string/str_hint_venue_address"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
@@ -505,7 +656,7 @@
                             android:id="@+id/tilVenueCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Thành phố / Tỉnh"
+                            android:hint="@string/str_hint_venue_city"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:textColorHint="#757575"
                             app:hintTextColor="@color/clr_primary_blue"
@@ -550,7 +701,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="🏢 Ban tổ chức *"
+                            android:text="@string/str_organizer_form_section"
                             android:textStyle="bold"
                             android:textSize="16sp"
                             android:textColor="@color/clr_primary_blue"
@@ -567,14 +718,14 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Đã lưu"
+                                android:text="@string/str_saved_organizer_tab"
                                 android:checked="true" />
                             <RadioButton
                                 android:id="@+id/rbNewOrganizer"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Tạo mới" />
+                                android:text="@string/str_new_organizer_tab" />
                         </RadioGroup>
 
                         <!-- MODE 1: Saved Organizer -->
@@ -587,7 +738,7 @@
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Chọn Ban tổ chức đã lưu"
+                                android:hint="@string/str_hint_select_saved_organizer"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:textColorHint="#757575"
                                 app:hintTextColor="@color/clr_primary_blue"
@@ -625,14 +776,14 @@
                                         android:id="@+id/tvSelectedOrgEmail"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Email: —"
+                                        android:text="@string/str_organizer_email_placeholder"
                                         android:textColor="@color/clr_text_secondary"
                                         android:textSize="14sp" />
                                     <TextView
                                         android:id="@+id/tvSelectedOrgPhone"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="SĐT: —"
+                                        android:text="@string/str_organizer_phone_placeholder"
                                         android:textColor="@color/clr_text_secondary"
                                         android:textSize="14sp"
                                         android:layout_marginTop="4dp" />
@@ -640,7 +791,7 @@
                                         android:id="@+id/tvSelectedOrgWebsite"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Web: —"
+                                        android:text="@string/str_organizer_web_placeholder"
                                         android:textColor="@color/clr_text_secondary"
                                         android:textSize="14sp"
                                         android:layout_marginTop="4dp" />
@@ -660,7 +811,7 @@
                                 android:id="@+id/tilNewOrgName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Tên Ban tổ chức *"
+                                android:hint="@string/str_hint_organizer_name"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                                 android:textColorHint="#757575"
                                 app:hintTextColor="@color/clr_primary_blue"
@@ -681,7 +832,7 @@
                                 android:id="@+id/tilNewOrgEmail"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Email liên hệ *"
+                                android:hint="@string/str_hint_organizer_email"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                                 android:textColorHint="#757575"
                                 app:hintTextColor="@color/clr_primary_blue"
@@ -703,7 +854,7 @@
                                 android:id="@+id/tilNewOrgPhone"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Số điện thoại *"
+                                android:hint="@string/str_hint_organizer_phone"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                                 android:textColorHint="#757575"
                                 app:hintTextColor="@color/clr_primary_blue"
@@ -724,7 +875,7 @@
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Website / Fanpage"
+                                android:hint="@string/str_hint_organizer_website"
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                                 android:textColorHint="#757575"
                                 app:hintTextColor="@color/clr_primary_blue"
@@ -766,7 +917,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ℹ️ Xem trước thông tin"
+                            android:text="@string/str_preview_section_label"
                             android:textStyle="bold"
                             android:textSize="15sp"
                             android:textColor="@color/clr_primary_blue"
@@ -780,7 +931,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="Tên:"
+                                android:text="@string/str_preview_name_label"
                                 android:textColor="@color/clr_text_secondary"
                                 android:textSize="14sp" />
                             <TextView
@@ -804,7 +955,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="Thời gian:"
+                                android:text="@string/str_preview_time_label"
                                 android:textColor="@color/clr_text_secondary"
                                 android:textSize="14sp" />
                             <TextView
@@ -824,7 +975,7 @@
                             <TextView
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
-                                android:text="Địa điểm:"
+                                android:text="@string/str_preview_venue_label"
                                 android:textColor="@color/clr_text_secondary"
                                 android:textSize="14sp" />
                             <TextView
@@ -863,14 +1014,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Loại vé"
+                            android:text="@string/str_ticket_types_section_label"
                             android:textColor="@color/clr_text_black"
                             android:textSize="20sp"
                             android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thêm ít nhất 1 loại vé để gửi duyệt"
+                            android:text="@string/str_add_ticket_type_hint"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp"
                             android:layout_marginTop="2dp" />
@@ -880,7 +1031,7 @@
                         android:id="@+id/btnAddTicketType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+ Thêm loại vé"
+                        android:text="@string/str_add_ticket_type_btn"
                         android:textSize="13sp"
                         app:cornerRadius="20dp"
                         app:backgroundTint="@color/clr_primary_blue"
@@ -908,7 +1059,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chưa có loại vé nào"
+                        android:text="@string/str_no_ticket_types"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="15sp"
                         android:textStyle="bold"
@@ -916,7 +1067,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nhấn '+ Thêm loại vé' để bắt đầu"
+                        android:text="@string/str_add_ticket_type_prompt"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="13sp"
                         android:gravity="center" />
@@ -954,14 +1105,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nghệ sĩ tham gia"
+                            android:text="@string/str_artists_section_label"
                             android:textColor="@color/clr_text_black"
                             android:textSize="20sp"
                             android:textStyle="bold" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tuỳ chọn — có thể bỏ qua"
+                            android:text="@string/str_artists_optional_hint"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp"
                             android:layout_marginTop="2dp" />
@@ -971,7 +1122,7 @@
                         android:id="@+id/btnAddStar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+ Thêm nghệ sĩ"
+                        android:text="@string/str_add_artist_btn"
                         android:textSize="13sp"
                         app:cornerRadius="20dp"
                         app:backgroundTint="#7C3AED"
@@ -999,7 +1150,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chưa có nghệ sĩ nào"
+                        android:text="@string/str_no_artists_yet"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -1007,7 +1158,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Không bắt buộc — bạn có thể thêm sau"
+                        android:text="@string/str_artists_optional_note"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="12sp"
                         android:gravity="center" />
@@ -1033,7 +1184,7 @@
                     android:id="@+id/btnSaveDraft"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="💾 Lưu nháp"
+                    android:text="@string/str_save_draft_btn"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:cornerRadius="16dp"
                     app:strokeColor="@color/clr_primary_blue"
@@ -1044,7 +1195,7 @@
                     android:id="@+id/btnSubmitForApproval"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="🚀 Gửi duyệt"
+                    android:text="@string/str_submit_review_btn"
                     app:cornerRadius="16dp"
                     app:backgroundTint="@color/clr_primary_blue"
                     style="@style/Widget.MaterialComponents.Button" />
@@ -1069,7 +1220,7 @@
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="Quay lại"
+            android:text="@string/str_back_btn"
             android:textColor="@color/clr_text_secondary"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_marginEnd="12dp"
@@ -1080,7 +1231,7 @@
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="Tiếp theo"
+            android:text="@string/str_next_btn"
             app:cornerRadius="16dp"
             app:backgroundTint="@color/clr_primary_blue"
             style="@style/Widget.MaterialComponents.Button" />
@@ -1089,3 +1240,4 @@
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

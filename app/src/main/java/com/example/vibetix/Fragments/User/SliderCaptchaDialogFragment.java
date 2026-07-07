@@ -46,6 +46,9 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
         return inflater.inflate(R.layout.dialog_captcha, container, false);
     }
 
+    private Handler countdownHandler;
+    private Runnable countdownRunnable;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -55,11 +58,24 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
         TextView txtResult = view.findViewById(R.id.txtCaptchaResult);
         View btnClose = view.findViewById(R.id.btnCaptchaClose);
         View btnReload = view.findViewById(R.id.btnCaptchaReload);
+        View layoutLoading = view.findViewById(R.id.layoutCaptchaLoading);
+        TextView txtCountdown = view.findViewById(R.id.txtCaptchaCountdown);
+
+        // Disable seekbar until puzzle is ready and countdown finishes
+        seekBar.setEnabled(false);
+
+        puzzleView.setOnPuzzleReadyListener(() -> {
+            if (!isAdded()) return;
+            startCountdown(layoutLoading, txtCountdown, seekBar);
+        });
 
         btnClose.setOnClickListener(v -> dismiss());
 
         btnReload.setOnClickListener(v -> {
             seekBar.setProgress(0);
+            seekBar.setEnabled(false);
+            if (layoutLoading != null) layoutLoading.setVisibility(View.VISIBLE);
+            if (txtCountdown != null) txtCountdown.setText("");
             puzzleView.regenerate();
             txtResult.setVisibility(View.INVISIBLE);
         });
@@ -80,7 +96,7 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
             @Override
             public void onStopTrackingTouch(SeekBar sb) {
                 if (puzzleView.isAligned()) {
-                    txtResult.setText("✓ Xác minh thành công!");
+                    txtResult.setText(getString(R.string.str_captcha_success));
                     txtResult.setTextColor(0xFF22C55E);
                     txtResult.setVisibility(View.VISIBLE);
                     seekBar.setEnabled(false);
@@ -91,7 +107,7 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
                         }
                     }, 600);
                 } else {
-                    txtResult.setText("✗ Chưa đúng, thử lại");
+                    txtResult.setText(getString(R.string.str_captcha_fail));
                     txtResult.setTextColor(0xFFF04438);
                     txtResult.setVisibility(View.VISIBLE);
                     new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -102,6 +118,36 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
                 }
             }
         });
+    }
+
+    private void startCountdown(View layoutLoading, TextView txtCountdown, SeekBar seekBar) {
+        if (countdownHandler != null) countdownHandler.removeCallbacks(countdownRunnable);
+        countdownHandler = new Handler(Looper.getMainLooper());
+        final int[] count = {3};
+        txtCountdown.setText(String.valueOf(count[0]));
+        countdownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isAdded()) return;
+                count[0]--;
+                if (count[0] > 0) {
+                    txtCountdown.setText(String.valueOf(count[0]));
+                    countdownHandler.postDelayed(this, 1000);
+                } else {
+                    layoutLoading.setVisibility(View.GONE);
+                    seekBar.setEnabled(true);
+                }
+            }
+        };
+        countdownHandler.postDelayed(countdownRunnable, 1000);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (countdownHandler != null && countdownRunnable != null) {
+            countdownHandler.removeCallbacks(countdownRunnable);
+        }
     }
 
     @Override
@@ -115,3 +161,4 @@ public class SliderCaptchaDialogFragment extends DialogFragment {
         }
     }
 }
+

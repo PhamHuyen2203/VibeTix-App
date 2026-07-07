@@ -38,14 +38,14 @@
                         android:padding="10dp"
                         android:background="@drawable/bg_back_btn"
                         android:src="@drawable/ic_back"
-                        android:contentDescription="Quay lại" />
+                        android:contentDescription="@string/str_back" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Phương thức thanh toán"
+                        android:text="@string/str_payment_methods_title"
                         android:textColor="#FFFFFF"
                         android:textSize="17sp"
                         android:textStyle="bold" />
@@ -70,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="PHƯƠNG THỨC ĐÃ LƯU"
+                    android:text="@string/str_saved_payment_methods"
                     android:textColor="#808E92"
                     android:textSize="12sp"
                     android:textAllCaps="true" />
@@ -93,7 +93,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chưa có phương thức thanh toán"
+                        android:text="@string/str_no_payment_methods"
                         android:textColor="#808E92"
                         android:textSize="14sp" />
 
@@ -101,7 +101,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Thêm phương thức để thanh toán nhanh hơn"
+                        android:text="@string/str_add_payment_faster"
                         android:textColor="#B0B8BC"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -120,7 +120,7 @@
                 android:gravity="center"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="+ Thêm phương thức mới"
+                android:text="@string/str_add_new_method"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -150,7 +150,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Thêm phương thức"
+                android:text="@string/str_add_method_title"
                 android:textColor="#1C1B1B"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -169,7 +169,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Chọn loại phương thức"
+            android:text="@string/str_choose_method_type"
             android:textColor="#808E92"
             android:textSize="12sp"
             android:textAllCaps="true" />
@@ -194,7 +194,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MoMo"
+                    android:text="@string/str_method_momo"
                     android:textColor="#A50064"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -214,7 +214,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ZaloPay"
+                    android:text="@string/str_method_zalopay"
                     android:textColor="#0068FF"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -234,7 +234,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Visa"
+                    android:text="@string/str_method_visa"
                     android:textColor="#1A1F71"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -253,7 +253,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ATM"
+                    android:text="@string/str_method_atm"
                     android:textColor="#E65100"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -275,7 +275,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="6dp"
             android:background="@drawable/bg_input_normal"
-            android:hint="VD: 098****123"
+            android:hint="@string/str_hint_account_card_number"
             android:inputType="phone"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
@@ -289,7 +289,7 @@
             android:layout_height="52dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/bg_btn_primary"
-            android:text="Thêm phương thức"
+            android:text="@string/str_add_method_title"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"

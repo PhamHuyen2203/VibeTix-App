@@ -46,28 +46,44 @@ public class TicketRepository {
 
     /** Upcoming tab: valid + used-but-event-not-yet-ended */
     public void getActiveTickets(String userId, OnTicketsLoadedListener listener) {
-        ticketsRef.whereEqualTo("user_id", userId)
-                .whereIn("status", Arrays.asList("valid", "used"))
-                .get()
-                .addOnSuccessListener(snap -> {
-                    List<RawUserTicket> rawTickets = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snap) rawTickets.add(parseRawTicket(doc));
-                    joinAndBuild(rawTickets, true, listener);
-                })
-                .addOnFailureListener(listener::onFailure);
+        loadTicketsCacheFirst(userId, Arrays.asList("valid", "used"), true, listener);
     }
 
     /** Ended tab: used (event ended) + expired */
     public void getEndedTickets(String userId, OnTicketsLoadedListener listener) {
-        ticketsRef.whereEqualTo("user_id", userId)
-                .whereIn("status", Arrays.asList("used", "expired"))
-                .get()
+        loadTicketsCacheFirst(userId, Arrays.asList("used", "expired"), false, listener);
+    }
+
+    /**
+     * Cache-first: hiển thị dữ liệu cache ngay lập tức, sau đó cập nhật từ server.
+     * Nếu không có cache (lần đầu) thì chỉ load từ server.
+     */
+    private void loadTicketsCacheFirst(String userId, List<String> statuses,
+                                        boolean isActiveTab, OnTicketsLoadedListener listener) {
+        com.google.firebase.firestore.Query query = ticketsRef
+                .whereEqualTo("user_id", userId)
+                .whereIn("status", statuses);
+
+        // Bước 1: thử cache trước — hiển thị ngay nếu có
+        query.get(com.google.firebase.firestore.Source.CACHE)
                 .addOnSuccessListener(snap -> {
-                    List<RawUserTicket> rawTickets = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snap) rawTickets.add(parseRawTicket(doc));
-                    joinAndBuild(rawTickets, false, listener);
+                    if (!snap.isEmpty()) {
+                        List<RawUserTicket> raw = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : snap) raw.add(parseRawTicket(doc));
+                        joinAndBuild(raw, isActiveTab, listener);
+                    }
+                });
+
+        // Bước 2: luôn fetch từ server để cập nhật dữ liệu mới nhất
+        query.get(com.google.firebase.firestore.Source.SERVER)
+                .addOnSuccessListener(snap -> {
+                    List<RawUserTicket> raw = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snap) raw.add(parseRawTicket(doc));
+                    joinAndBuild(raw, isActiveTab, listener);
                 })
-                .addOnFailureListener(listener::onFailure);
+                .addOnFailureListener(e -> {
+                    // Server fail nhưng đã hiển thị cache ở trên → không cần báo lỗi
+                });
     }
 
     public void saveTicket(Ticket ticket, OnTicketActionListener listener) {
@@ -176,10 +192,24 @@ public class TicketRepository {
             List<String> allIds = new ArrayList<>();
             for (RawUserTicket r : rawTickets) if (r.userTicketId != null) allIds.add(r.userTicketId);
 
-            fetchEvents(new ArrayList<>(eventIds), 0, new HashMap<>(), eventMap ->
-                fetchTicketTypeNames(new ArrayList<>(typeIds), 0, new HashMap<>(), new HashMap<>(),
-                        (typeNameMap, typeTransferMap) ->
-                    checkPendingTransfers(allIds, pendingIds -> {
+            // ── Parallel fetch: events + ticketTypes + pendingTransfers ──────────
+            // Dùng mảng giữ kết quả để biết khi nào cả 3 xong
+            @SuppressWarnings("unchecked")
+            Map<String, Event>[] eventMapHolder    = new Map[]{null};
+            Map<String, String>[] nameMapHolder    = new Map[]{null};
+            Map<String, Boolean>[] transferHolder  = new Map[]{null};
+            Set<String>[] pendingHolder            = new Set[]{null};
+            int[] doneCount = {0};
+
+            Runnable tryBuild = () -> {
+                synchronized (doneCount) {
+                    doneCount[0]++;
+                    if (doneCount[0] < 3) return; // chờ cả 3 xong
+                }
+                Map<String, Event>   eventMap       = eventMapHolder[0];
+                Map<String, String>  typeNameMap    = nameMapHolder[0];
+                Map<String, Boolean> typeTransferMap = transferHolder[0];
+                Set<String>          pendingIds      = pendingHolder[0];
 
                         Date now = new Date();
                         List<Ticket> result = new ArrayList<>();
@@ -232,10 +262,26 @@ public class TicketRepository {
                             result.add(t);
                         }
 
-                        finishSort(result, listener);
-                    })
-                )
-            );
+                finishSort(result, listener);
+            };
+
+            // Khởi động 3 fetch song song
+            fetchEvents(new ArrayList<>(eventIds), 0, new HashMap<>(), evMap -> {
+                eventMapHolder[0] = evMap;
+                tryBuild.run();
+            });
+
+            fetchTicketTypeNames(new ArrayList<>(typeIds), 0, new HashMap<>(), new HashMap<>(),
+                    (nameMap, trMap) -> {
+                nameMapHolder[0] = nameMap;
+                transferHolder[0] = trMap;
+                tryBuild.run();
+            });
+
+            checkPendingTransfers(allIds, pending -> {
+                pendingHolder[0] = pending;
+                tryBuild.run();
+            });
         });
     }
 

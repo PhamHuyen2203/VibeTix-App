@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="Mới nhất"
+                android:text="@string/str_sort_newest"
                 android:textColor="#226CEB"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -104,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="Tất cả tỉnh thành"
+                android:text="@string/str_all_provinces"
                 android:textColor="#808E92"
                 android:textSize="12sp" />
 
@@ -156,7 +156,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Không tìm thấy sự kiện"
+            android:text="@string/str_no_events_found"
             android:textColor="#1C1B1B"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -167,7 +167,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Vui lòng kiểm tra lại kết nối mạng hoặc thử lọc lại danh mục khác."
+            android:text="@string/str_no_events_network_msg"
             android:textColor="#808E92"
             android:textSize="14sp" />
 
@@ -181,7 +181,7 @@
             android:paddingEnd="24dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Thử lại"
+            android:text="@string/str_retry"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -203,3 +203,4 @@
         android:visibility="gone" />
 
 </LinearLayout>
+

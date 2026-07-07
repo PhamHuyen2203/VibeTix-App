@@ -75,7 +75,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Số lượng:"
+                        android:text="@string/str_quantity_label"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="12sp" />
 
@@ -97,7 +97,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Mở bán"
+                        android:text="@string/str_no_data"
                         android:textSize="12sp" />
                 </LinearLayout>
 
@@ -121,7 +121,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Chỉnh sửa"
+                android:text="@string/str_edit_profile"
                 android:textColor="@color/clr_primary"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -138,7 +138,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Xoá"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_error"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -148,3 +148,4 @@
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

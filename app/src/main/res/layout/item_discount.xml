@@ -71,7 +71,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mức giảm"
+                    android:text="@string/str_discount_value_label"
                     android:textSize="12sp"
                     android:textColor="@color/clr_text_secondary" />
                 <TextView
@@ -99,7 +99,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Đã dùng"
+                    android:text="@string/str_discount_used_label"
                     android:textSize="12sp"
                     android:textColor="@color/clr_text_secondary" />
                 <TextView
@@ -127,7 +127,7 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tắt áp dụng"
+                android:text="@string/str_discount_disable_btn"
                 android:textSize="12sp"
                 android:textColor="@color/clr_error"
                 android:minWidth="0dp"
@@ -150,3 +150,4 @@
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

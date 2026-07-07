@@ -39,7 +39,7 @@
         android:layout_marginTop="0dp"
         android:gravity="center"
         android:paddingHorizontal="32dp"
-        android:text="Đặt mã QR vào khung để quét"
+        android:text="@string/str_qr_frame_hint"
         android:textColor="@color/clr_text_white"
         android:textSize="14sp"
         android:layout_marginBottom="0dp"
@@ -67,7 +67,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/ic_back"
             android:tint="@color/clr_text_white"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/str_back"
             android:padding="10dp" />
 
     </FrameLayout>
@@ -105,12 +105,12 @@
                     android:layout_height="26dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_flashlight"
-                    android:contentDescription="Bật/Tắt đèn flash" />
+                    android:contentDescription="@string/str_qr_flash" />
             </FrameLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đèn Flash"
+                android:text="@string/str_qr_flash"
                 android:textColor="@color/clr_text_on_primary"
                 android:textSize="12sp"
                 android:layout_marginTop="8dp" />
@@ -142,7 +142,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nhập tay"
+                android:text="@string/str_qr_manual_input"
                 android:textColor="@color/clr_text_white"
                 android:textSize="12sp"
                 android:layout_marginTop="8dp" />
@@ -155,7 +155,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="24dp"
-        android:text="Quét vé"
+        android:text="@string/str_qr_scan_ticket"
         android:textColor="@color/clr_text_white"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -173,7 +173,7 @@
             android:id="@+id/switchOffline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Offline Mode "
+            android:text="@string/str_qr_offline_mode"
             android:textColor="@color/clr_text_white"
             android:textSize="12sp"
             android:theme="@style/Theme.AppCompat.DayNight" />
@@ -190,7 +190,7 @@
                 android:id="@+id/btnDownloadData"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Tải DB"
+                android:text="@string/str_qr_load_db"
                 android:textSize="10sp"
                 android:backgroundTint="@color/clr_primary"
                 android:layout_marginEnd="4dp"/>
@@ -264,7 +264,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="Check-in thành công!"
+            android:text="@string/str_qr_checkin_success"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/clr_success" />
@@ -274,7 +274,7 @@
             android:id="@+id/btnScanNext"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Quét vé tiếp theo"
+            android:text="@string/str_qr_next_ticket"
             android:textSize="15sp"
             android:textColor="@color/clr_text_white"
             app:backgroundTint="@color/clr_primary"
@@ -283,3 +283,4 @@
     </LinearLayout>
 
 </FrameLayout>
+

@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Chưa gửi thông báo nào"
+                android:text="@string/str_no_data"
                 android:textColor="@color/clr_text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -96,3 +96,4 @@
         app:elevation="6dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

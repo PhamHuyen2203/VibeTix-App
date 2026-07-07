@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="sans-serif-medium"
-            android:text="Hoàn tất"
+            android:text="@string/str_step_done"
             android:textColor="@color/clr_text_black"
             android:textSize="18sp" />
     </RelativeLayout>
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Chọn vé"
+                android:text="@string/ticket_select_title"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Thông tin"
+                android:text="@string/str_step_info"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -114,7 +114,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Thanh toán"
+                android:text="@string/str_step_payment"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Hoàn tất"
+                android:text="@string/str_step_done"
                 android:textColor="@color/clr_primary_blue"
                 android:textSize="11sp" />
         </LinearLayout>
@@ -187,7 +187,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Thanh toán thành công!"
+                        android:text="@string/str_payment_success_title"
                         android:textColor="@color/clr_text_black"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -197,7 +197,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center"
-                        android:text="Cảm ơn bạn đã đặt vé cùng VibeTix.\nE-ticket đã được gửi đến email của bạn và lưu trong Vé của tôi."
+                        android:text="@string/str_payment_success_thank_you"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -221,7 +221,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Thông tin đơn hàng"
+                        android:text="@string/str_order_info_title"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -234,7 +234,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mã đơn hàng"
+                            android:text="@string/str_order_number_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -256,7 +256,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Phương thức thanh toán"
+                            android:text="@string/str_payment_method_row_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -277,7 +277,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Loại vé"
+                            android:text="@string/str_ticket_type_row_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -298,7 +298,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Số lượng"
+                            android:text="@string/str_quantity_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -319,7 +319,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tổng thanh toán"
+                            android:text="@string/str_total_payment_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -341,7 +341,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thời gian đặt"
+                            android:text="@string/str_order_time_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -362,7 +362,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Email nhận vé"
+                            android:text="@string/str_email_ticket_label"
                             android:textColor="@color/clr_text_secondary"
                             android:textSize="13sp" />
                         <TextView
@@ -459,7 +459,7 @@
             android:layout_height="48dp"
             android:backgroundTint="@color/clr_btn_blue"
             android:fontFamily="sans-serif-medium"
-            android:text="Xem vé của tôi 🎟"
+            android:text="@string/str_view_my_tickets_action"
             android:textColor="@color/clr_text_white"
             android:textSize="15sp"
             app:cornerRadius="8dp" />
@@ -471,7 +471,7 @@
             android:layout_marginTop="10dp"
             android:background="@android:color/transparent"
             android:fontFamily="sans-serif-medium"
-            android:text="Về trang chủ"
+            android:text="@string/str_back_to_home"
             android:textColor="@color/clr_primary_blue"
             android:textSize="15sp"
             app:strokeColor="@color/clr_primary_blue"
@@ -480,3 +480,7 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+

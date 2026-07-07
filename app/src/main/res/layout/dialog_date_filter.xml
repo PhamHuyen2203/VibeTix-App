@@ -35,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Chọn thời gian"
+                android:text="@string/str_select_time_title"
                 android:textStyle="bold"
                 android:textSize="17sp"
                 android:textColor="#1C1B1B" />
@@ -72,7 +72,7 @@
                     android:id="@+id/chipAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tất cả"
+                    android:text="@string/str_filter_chip_all"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip_active"
@@ -88,7 +88,7 @@
                     android:id="@+id/chipToday"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hôm nay"
+                    android:text="@string/str_date_today"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -104,7 +104,7 @@
                     android:id="@+id/chipTomorrow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ngày mai"
+                    android:text="@string/str_date_tomorrow"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -120,7 +120,7 @@
                     android:id="@+id/chipWeekend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cuối tuần"
+                    android:text="@string/str_date_weekend"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -136,7 +136,7 @@
                     android:id="@+id/chipMonth"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tháng này"
+                    android:text="@string/str_date_this_month"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -319,7 +319,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
-                android:text="Đặt lại"
+                android:text="@string/str_date_reset"
                 android:textColor="#226CEB"
                 app:strokeColor="#226CEB" />
 
@@ -330,7 +330,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
-                android:text="Áp dụng"
+                android:text="@string/str_date_apply"
                 android:textColor="#FFFFFF"
                 app:backgroundTint="#226CEB" />
 
@@ -338,3 +338,4 @@
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+

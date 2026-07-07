@@ -91,9 +91,10 @@
             android:background="@drawable/bg_status_badge_success"
             android:paddingHorizontal="10dp"
             android:paddingVertical="6dp"
-            android:text="Đã vào"
+            android:text="@string/str_checked_in_label"
             android:textColor="#2E7D32"
             android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

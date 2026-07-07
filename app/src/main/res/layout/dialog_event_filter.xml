@@ -35,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Bộ lọc"
+                android:text="@string/str_filter_title_dialog"
                 android:textStyle="bold"
                 android:textSize="17sp"
                 android:textColor="#1C1B1B" />
@@ -72,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Địa điểm"
+                android:text="@string/str_filter_location"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="#1C1B1B"
@@ -88,7 +88,7 @@
                     android:id="@+id/rbNational"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Toàn quốc"
+                    android:text="@string/str_filter_all_nation"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B"
                     android:paddingTop="8dp"
@@ -100,7 +100,7 @@
                     android:id="@+id/rbHCMC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="TP. Hồ Chí Minh"
+                    android:text="@string/str_filter_hcmc"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B"
                     android:paddingTop="8dp"
@@ -111,7 +111,7 @@
                     android:id="@+id/rbHanoi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hà Nội"
+                    android:text="@string/str_filter_hanoi"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B"
                     android:paddingTop="8dp"
@@ -122,7 +122,7 @@
                     android:id="@+id/rbDaLat"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Đà Lạt"
+                    android:text="@string/str_filter_dalat"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B"
                     android:paddingTop="8dp"
@@ -133,7 +133,7 @@
                     android:id="@+id/rbDaNang"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Đà Nẵng"
+                    android:text="@string/str_filter_danang"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B"
                     android:paddingTop="8dp"
@@ -163,7 +163,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Giá vé"
+                android:text="@string/str_filter_price"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="#1C1B1B"
@@ -181,7 +181,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Chỉ sự kiện miễn phí"
+                    android:text="@string/str_filter_free_only_label"
                     android:textSize="14sp"
                     android:textColor="#1C1B1B" />
 
@@ -287,7 +287,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thể loại"
+                android:text="@string/str_filter_genre"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="#1C1B1B"
@@ -304,7 +304,7 @@
                     android:id="@+id/chipCatMusic"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nhạc sống"
+                    android:text="@string/str_filter_live_music"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -320,7 +320,7 @@
                     android:id="@+id/chipCatArts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nghệ thuật"
+                    android:text="@string/str_filter_arts"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -336,7 +336,7 @@
                     android:id="@+id/chipCatWorkshop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Workshop"
+                    android:text="@string/str_filter_workshop"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -359,7 +359,7 @@
                     android:id="@+id/chipCatTour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tour"
+                    android:text="@string/str_filter_tour"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -375,7 +375,7 @@
                     android:id="@+id/chipCatSports"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thể thao"
+                    android:text="@string/str_filter_sports"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -391,7 +391,7 @@
                     android:id="@+id/chipCatFestival"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lễ hội"
+                    android:text="@string/str_filter_festival"
                     android:textSize="13sp"
                     android:textColor="#1C1B1B"
                     android:background="@drawable/bg_quick_chip"
@@ -427,7 +427,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="6dp"
-                android:text="Đặt lại"
+                android:text="@string/str_filter_reset"
                 android:textColor="#226CEB"
                 app:strokeColor="#226CEB" />
 
@@ -438,7 +438,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="6dp"
-                android:text="Áp dụng"
+                android:text="@string/str_filter_apply"
                 android:textColor="#FFFFFF"
                 app:backgroundTint="#226CEB" />
 
@@ -446,3 +446,4 @@
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+

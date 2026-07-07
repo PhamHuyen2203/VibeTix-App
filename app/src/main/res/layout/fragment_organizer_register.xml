@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên ban tổ chức *"
+            android:text="@string/str_hint_organizer_brand_name"
             android:textColor="#1C1B1B"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -32,7 +32,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
             android:background="@drawable/bg_input_normal"
-            android:hint="VD: Công ty Sự kiện ABC"
+            android:hint="@string/str_hint_org_name"
             android:inputType="textCapWords"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mô tả ban tổ chức *"
+            android:text="@string/str_hint_organizer_bio"
             android:textColor="#1C1B1B"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -56,7 +56,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
             android:background="@drawable/bg_input_normal"
-            android:hint="Giới thiệu về ban tổ chức của bạn..."
+            android:hint="@string/str_hint_org_name"
             android:inputType="textMultiLine"
             android:gravity="top|start"
             android:paddingStart="14dp"
@@ -71,7 +71,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Website (không bắt buộc)"
+            android:text="@string/str_hint_organizer_website_optional"
             android:textColor="#1C1B1B"
             android:textSize="13sp"
             android:textStyle="bold" />
@@ -83,7 +83,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginBottom="14dp"
             android:background="@drawable/bg_input_normal"
-            android:hint="https://your-website.com"
+            android:hint="@string/org_profile_website"
             android:inputType="textWebEmailAddress"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
@@ -116,7 +116,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quy trình xét duyệt"
+                    android:text="@string/str_no_data"
                     android:textColor="#226CEB"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -125,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
-                    android:text="Đơn đăng ký sẽ được xem xét trong vòng 1–3 ngày làm việc. Chúng tôi sẽ thông báo qua email khi có kết quả."
+                    android:text="@string/str_organizer_review_notice"
                     android:textColor="#226CEB"
                     android:textSize="11sp"
                     android:lineSpacingMultiplier="1.4" />
@@ -134,3 +134,5 @@
 
     </LinearLayout>
 </ScrollView>
+
+

@@ -46,7 +46,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Chi tiết doanh thu"
+                    android:text="@string/str_revenue_label"
                     android:textColor="@color/clr_text_white"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -114,7 +114,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Doanh thu"
+                        android:text="@string/str_revenue_label"
                         android:textColor="#CCFFFFFF"
                         android:textSize="10sp" />
 
@@ -146,7 +146,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Vé đã bán"
+                        android:text="@string/str_tickets_sold_label"
                         android:textColor="#CCFFFFFF"
                         android:textSize="10sp" />
 
@@ -178,7 +178,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Đơn hàng"
+                        android:text="@string/str_my_orders"
                         android:textColor="#CCFFFFFF"
                         android:textSize="10sp" />
 
@@ -235,7 +235,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="Phân loại vé"
+                        android:text="@string/str_ticket_type_row_label"
                         android:textColor="@color/clr_text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -269,7 +269,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="Doanh thu theo ngày (7 ngày gần nhất)"
+                        android:text="@string/dash_revenue_compare"
                         android:textColor="@color/clr_text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -305,10 +305,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Chưa có đơn hàng nào"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_secondary"
             android:textSize="14sp" />
 
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

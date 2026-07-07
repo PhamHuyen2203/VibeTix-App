@@ -65,7 +65,7 @@ public class OrderManagementActivity extends AppCompatActivity {
 
         eventId = getIntent().getStringExtra("EXTRA_EVENT_ID");
         if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "Không có sự kiện được chọn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_event_not_found_label), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -222,7 +222,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     binding.pbLoading.setVisibility(View.GONE);
                     binding.swipeRefresh.setRefreshing(false);
-                    Toast.makeText(this, "Lỗi khi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_load_data_err, e.getMessage()), Toast.LENGTH_SHORT).show();
                     showEmptyState();
                 });
     }
@@ -353,7 +353,7 @@ public class OrderManagementActivity extends AppCompatActivity {
                 db.collection(FirebaseCollections.ORDERS).document(o.getOrderId())
                         .update("status", "confirmed")
                         .addOnSuccessListener(unused -> {
-                            Toast.makeText(this, "Đã duyệt đơn hàng", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.str_toast_order_approved), Toast.LENGTH_SHORT).show();
                             NotificationTriggerManager.triggerOrderConfirmed(o.getUserId(), o.getOrderId());
                             loadOrders();
                         })

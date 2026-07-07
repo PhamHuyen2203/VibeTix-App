@@ -96,7 +96,9 @@ public class CreateEditEventActivity extends AppCompatActivity {
     private TextView tvRejectionReason;
 
     // ─── Step 1: Basic Info ──────────────────────────────────────────────────
-    private TextInputEditText etTitle, etDescription;
+    private TextInputEditText etTitle;
+    private jp.wasabeef.richeditor.RichEditor richEditorDescription;
+    private String descriptionHtml = "";
     private AutoCompleteTextView ddCategory;
     private ShapeableImageView ivEventPoster;
     private com.google.android.material.switchmaterial.SwitchMaterial swIsFree;
@@ -223,7 +225,18 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
         // Step 1
         etTitle       = findViewById(R.id.etEventTitle);
-        etDescription = findViewById(R.id.etEventDescription);
+        richEditorDescription = findViewById(R.id.richEditorDescription);
+        if (richEditorDescription != null) {
+            richEditorDescription.setPlaceholder("Mô tả chi tiết về sự kiện...");
+            richEditorDescription.setEditorFontSize(15);
+            richEditorDescription.setEditorFontColor(android.graphics.Color.parseColor("#212121"));
+            richEditorDescription.setPadding(12, 12, 12, 12);
+            // Đặt chiều cao tối thiểu cho vùng soạn thảo (px)
+            int editorHeightPx = (int)(200 * getResources().getDisplayMetrics().density);
+            richEditorDescription.setEditorHeight(editorHeightPx);
+            richEditorDescription.setOnTextChangeListener(text -> descriptionHtml = text);
+            setupRichEditorToolbar();
+        }
         ddCategory    = findViewById(R.id.ddCategory);
         ivEventPoster = findViewById(R.id.ivEventPoster);
         swIsFree      = findViewById(R.id.swIsFree);
@@ -328,7 +341,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
         if (bannerRejection != null) {
             bannerRejection.setVisibility(View.VISIBLE);
             if (dividerRejection != null) dividerRejection.setVisibility(View.VISIBLE);
-            if (tvRejectionReason != null) tvRejectionReason.setText("Lý do: " + reason);
+            if (tvRejectionReason != null) tvRejectionReason.setText(getString(R.string.str_rejection_reason_label, reason));
         }
     }
 
@@ -520,7 +533,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
         // Title
         TextView tvTitle = sheetView.findViewById(R.id.tvBottomSheetTitle);
-        if (tvTitle != null) tvTitle.setText(existing == null ? "Thêm loại vé" : "Sửa loại vé");
+        if (tvTitle != null) tvTitle.setText(existing == null ? getString(R.string.str_add_ticket_type_sheet) : getString(R.string.str_edit_ticket_type_sheet));
 
         TextInputEditText etName     = sheetView.findViewById(R.id.etTicketName);
         TextInputEditText etDesc     = sheetView.findViewById(R.id.etTicketDesc);
@@ -567,7 +580,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 String qtyStr   = etQty   != null && etQty.getText() != null   ? etQty.getText().toString().trim()   : "0";
 
                 if (name.isEmpty()) {
-                    if (etName != null) etName.setError("Vui lòng nhập tên loại vé");
+                    if (etName != null) etName.setError(getString(R.string.str_error_enter_ticket_name));
                     return;
                 }
 
@@ -649,7 +662,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
             // Kiểm tra đã thêm chưa
             for (Star s : draftStars) {
                 if (s.getStarId() != null && s.getStarId().equals(star.getStarId())) {
-                    Toast.makeText(this, "Nghệ sĩ này đã được thêm", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_artist_already_added), Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
@@ -962,7 +975,10 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
     private void populateForm(Event event) {
         if (etTitle != null) etTitle.setText(event.getTitle());
-        if (etDescription != null) etDescription.setText(event.getDescription());
+        if (richEditorDescription != null && event.getDescription() != null) {
+            descriptionHtml = event.getDescription();
+            richEditorDescription.setHtml(event.getDescription());
+        }
         if (etStartTime != null && event.getStartTime() != null) etStartTime.setText(event.getStartTime());
         if (etEndTime != null && event.getEndTime() != null)   etEndTime.setText(event.getEndTime());
 
@@ -1063,7 +1079,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
         if ("approved".equals(status) || "ongoing".equals(status)) {
             if (btnSaveDraft != null) btnSaveDraft.setVisibility(View.GONE);
             if (btnSubmitForApproval != null) {
-                btnSubmitForApproval.setText("Cập nhật");
+                btnSubmitForApproval.setText(getString(R.string.str_btn_update));
                 btnSubmitForApproval.setOnClickListener(v -> saveEvent(status));
             }
         }
@@ -1093,7 +1109,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
             if (tvSelectedOrgPhone != null) {
                 String phone = org.getContactPhone();
                 if (phone != null && !phone.trim().isEmpty()) {
-                    tvSelectedOrgPhone.setText("SĐT: " + phone);
+                    tvSelectedOrgPhone.setText(getString(R.string.str_org_phone_label, phone));
                     tvSelectedOrgPhone.setVisibility(View.VISIBLE);
                 } else {
                     tvSelectedOrgPhone.setVisibility(View.GONE);
@@ -1113,7 +1129,8 @@ public class CreateEditEventActivity extends AppCompatActivity {
 
     // ── Disable all fields (read-only mode) ───────────────────────────────────
     private void disableAllFields() {
-        TextInputEditText[] fields = {etTitle, etDescription, etStartTime, etEndTime,
+        if (richEditorDescription != null) richEditorDescription.setEnabled(false);
+        TextInputEditText[] fields = {etTitle, etStartTime, etEndTime,
                 etVenueName, etVenueAddress,
                 etNewOrgName, etNewOrgEmail, etNewOrgPhone, etNewOrgWebsite,
                 etOnlineLink, etMaxTicketsPerTransaction};
@@ -1236,26 +1253,26 @@ public class CreateEditEventActivity extends AppCompatActivity {
         }
 
         if (ddEventType == null || ddEventType.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn hình thức tổ chức", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_select_event_format), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         String evType = ddEventType.getText().toString().trim().toLowerCase();
         if (evType.contains("online") || evType.contains("tuyến")) {
             if (etOnlineLink == null || etOnlineLink.getText() == null || etOnlineLink.getText().toString().trim().isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đường dẫn trực tuyến", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_enter_online_link), Toast.LENGTH_SHORT).show();
                 if (etOnlineLink != null) etOnlineLink.requestFocus();
                 return false;
             }
         }
 
         if (ddAgeRestriction == null || ddAgeRestriction.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn giới hạn độ tuổi", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_select_age_limit), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (etMaxTicketsPerTransaction == null || etMaxTicketsPerTransaction.getText() == null || etMaxTicketsPerTransaction.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập số vé tối đa mỗi giao dịch", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_enter_max_tickets), Toast.LENGTH_SHORT).show();
             if (etMaxTicketsPerTransaction != null) etMaxTicketsPerTransaction.requestFocus();
             return false;
         }
@@ -1263,12 +1280,12 @@ public class CreateEditEventActivity extends AppCompatActivity {
         try {
             int maxTickets = Integer.parseInt(etMaxTicketsPerTransaction.getText().toString().trim());
             if (maxTickets <= 0) {
-                Toast.makeText(this, "Số vé tối đa phải lớn hơn 0", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_max_tickets_positive), Toast.LENGTH_SHORT).show();
                 if (etMaxTicketsPerTransaction != null) etMaxTicketsPerTransaction.requestFocus();
                 return false;
             }
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Số vé tối đa không hợp lệ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_max_tickets_invalid), Toast.LENGTH_SHORT).show();
             if (etMaxTicketsPerTransaction != null) etMaxTicketsPerTransaction.requestFocus();
             return false;
         }
@@ -1291,7 +1308,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
             currentStep = 3;
             viewFlipper.setDisplayedChild(currentStep);
             updateStepperUI();
-            Toast.makeText(this, "Vui lòng thêm ít nhất một loại vé", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.str_toast_add_one_ticket_type), Toast.LENGTH_LONG).show();
             return false;
         }
 
@@ -1306,7 +1323,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
         if (title.isEmpty() && "draft".equals(status))
             title = getString(R.string.default_event_title_draft);
 
-        String description = etDescription != null && etDescription.getText() != null ? etDescription.getText().toString().trim() : "";
+        String description = descriptionHtml != null ? descriptionHtml.trim() : "";
         String venueName   = etVenueName   != null && etVenueName.getText() != null   ? etVenueName.getText().toString().trim()   : "";
         String venueAddr   = etVenueAddress!= null && etVenueAddress.getText() != null? etVenueAddress.getText().toString().trim(): "";
         String venueCity   = etVenueCity   != null && etVenueCity.getText() != null   ? etVenueCity.getText().toString().trim()   : "";
@@ -1328,7 +1345,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
             }
             // E3: kiểm tra định dạng email ban tổ chức
             if (!newOrgEmail.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(newOrgEmail).matches()) {
-                Toast.makeText(this, "Email ban tổ chức không đúng định dạng", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_invalid_org_email), Toast.LENGTH_SHORT).show();
                 if (etNewOrgEmail != null) etNewOrgEmail.requestFocus();
                 return;
             }
@@ -1369,7 +1386,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     setButtonsEnabled(true);
-                    Toast.makeText(this, "Lỗi tạo Ban tổ chức: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_create_org_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -1400,7 +1417,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                         startTime, endTime, status, uri.toString()))
                 .addOnFailureListener(e -> {
                     setButtonsEnabled(true);
-                    Toast.makeText(this, "Lỗi upload ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_upload_image_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -1423,7 +1440,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                         saveEventObject(finalEventId, finalVenueId, title, desc, venueName, venueAddr, venueCity,
                                 startTime, endTime, status, posterUrl))
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi lưu địa điểm: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_save_venue_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                     setButtonsEnabled(true);
                 });
     }
@@ -1520,7 +1537,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                     saveTicketTypesAndStars(eventId, isNewEvent, userId, finalFinalStatus);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_save_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                     setButtonsEnabled(true);
                 });
     }
@@ -1585,7 +1602,7 @@ public class CreateEditEventActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     // Event đã lưu rồi — chỉ báo lỗi nhẹ
-                    Toast.makeText(this, "Lưu loại vé/nghệ sĩ lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_save_ticket_artist_error, e.getMessage()), Toast.LENGTH_SHORT).show();
                     finishSaving(status);
                 });
     }
@@ -1749,5 +1766,88 @@ public class CreateEditEventActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setupRichEditorToolbar() {
+        android.widget.ImageButton btnBold        = findViewById(R.id.btnRichBold);
+        android.widget.ImageButton btnItalic      = findViewById(R.id.btnRichItalic);
+        android.widget.ImageButton btnUnderline   = findViewById(R.id.btnRichUnderline);
+        android.widget.ImageButton btnH1          = findViewById(R.id.btnRichH1);
+        android.widget.ImageButton btnH2          = findViewById(R.id.btnRichH2);
+        android.widget.ImageButton btnBullet      = findViewById(R.id.btnRichBullet);
+        android.widget.ImageButton btnOrdered     = findViewById(R.id.btnRichOrdered);
+        android.widget.ImageButton btnIndent      = findViewById(R.id.btnRichIndent);
+        android.widget.ImageButton btnOutdent     = findViewById(R.id.btnRichOutdent);
+        android.widget.ImageButton btnInsertImage = findViewById(R.id.btnRichInsertImage);
+        android.widget.ImageButton btnInsertLink  = findViewById(R.id.btnRichInsertLink);
+
+        if (btnBold        != null) btnBold.setOnClickListener(v -> richEditorDescription.setBold());
+        if (btnItalic      != null) btnItalic.setOnClickListener(v -> richEditorDescription.setItalic());
+        if (btnUnderline   != null) btnUnderline.setOnClickListener(v -> richEditorDescription.setUnderline());
+        if (btnH1          != null) btnH1.setOnClickListener(v -> richEditorDescription.setHeading(1));
+        if (btnH2          != null) btnH2.setOnClickListener(v -> richEditorDescription.setHeading(2));
+        if (btnBullet      != null) btnBullet.setOnClickListener(v -> richEditorDescription.setBullets());
+        if (btnOrdered     != null) btnOrdered.setOnClickListener(v -> richEditorDescription.setNumbers());
+        if (btnIndent      != null) btnIndent.setOnClickListener(v -> richEditorDescription.setIndent());
+        if (btnOutdent     != null) btnOutdent.setOnClickListener(v -> richEditorDescription.setOutdent());
+        if (btnInsertImage != null) btnInsertImage.setOnClickListener(v -> pickImageForDescription());
+        if (btnInsertLink  != null) btnInsertLink.setOnClickListener(v -> showInsertLinkDialog());
+    }
+
+    private void pickImageForDescription() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), REQ_RICH_IMAGE);
+    }
+
+    private static final int REQ_RICH_IMAGE = 9901;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_RICH_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            android.net.Uri imageUri = data.getData();
+            com.google.firebase.storage.StorageReference ref = com.google.firebase.storage.FirebaseStorage.getInstance()
+                    .getReference("event_descriptions/" + java.util.UUID.randomUUID() + ".jpg");
+            ref.putFile(imageUri)
+                    .addOnSuccessListener(snap -> ref.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                if (richEditorDescription != null)
+                                    richEditorDescription.insertImage(uri.toString(), "ảnh mô tả", 320);
+                            }))
+                    .addOnFailureListener(e ->
+                            android.widget.Toast.makeText(this, getString(R.string.str_toast_cannot_load_image), android.widget.Toast.LENGTH_SHORT).show());
+        }
+    }
+
+    private void showInsertLinkDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Chèn đường dẫn");
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int pad = (int)(16 * getResources().getDisplayMetrics().density);
+        layout.setPadding(pad, pad / 2, pad, 0);
+
+        android.widget.EditText etLinkText = new android.widget.EditText(this);
+        etLinkText.setHint(getString(R.string.str_hint_display_name));
+        layout.addView(etLinkText);
+
+        android.widget.EditText etLinkUrl = new android.widget.EditText(this);
+        etLinkUrl.setHint("https://...");
+        etLinkUrl.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        layout.addView(etLinkUrl);
+
+        builder.setView(layout);
+        builder.setPositiveButton("Chèn", (dialog, which) -> {
+            String text = etLinkText.getText().toString().trim();
+            String url  = etLinkUrl.getText().toString().trim();
+            if (!url.isEmpty() && richEditorDescription != null) {
+                if (text.isEmpty()) text = url;
+                richEditorDescription.insertLink(url, text);
+            }
+        });
+        builder.setNegativeButton("Huỷ", null);
+        builder.show();
     }
 }

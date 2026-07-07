@@ -56,7 +56,7 @@
             android:id="@+id/etSearchStar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Tìm tên nghệ sĩ..."
+            android:hint="@string/search_hint"
             android:inputType="text"
             android:paddingVertical="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -85,9 +85,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Không tìm thấy nghệ sĩ nào"
+            android:text="@string/str_no_data"
             android:textColor="@color/clr_text_secondary"
             android:visibility="gone" />
     </FrameLayout>
 
 </LinearLayout>
+

@@ -33,14 +33,14 @@
                     android:padding="10dp"
                     android:background="@drawable/bg_back_btn"
                     android:src="@drawable/ic_back"
-                    android:contentDescription="Quay lại" />
+                    android:contentDescription="@string/str_back" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Bảo mật &amp; Mật khẩu"
+                    android:text="@string/str_security_password"
                     android:textColor="#FFFFFF"
                     android:textSize="17sp"
                     android:textStyle="bold" />
@@ -77,7 +77,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="4dp"
-                        android:text="MÃ PIN"
+                        android:text="@string/str_section_pin"
                         android:textColor="#808E92"
                         android:textSize="11sp"
                         android:textStyle="bold"
@@ -104,7 +104,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
-                            android:text="Thiết lập mã PIN"
+                            android:text="@string/str_setup_pin"
                             android:textColor="#1C1B1B"
                             android:textSize="14sp" />
 
@@ -113,7 +113,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:text="Chưa thiết lập"
+                            android:text="@string/str_pin_not_set"
                             android:textColor="#808E92"
                             android:textSize="12sp" />
 
@@ -132,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="44dp"
                         android:layout_marginBottom="10dp"
-                        android:text="Quên mã PIN? Xác nhận qua SMS"
+                        android:text="@string/str_forgot_pin_sms"
                         android:textColor="@color/clr_primary_blue"
                         android:textSize="12sp"
                         android:clickable="true"
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
-                            android:text="Bảo vệ trang Chi tiết vé bằng PIN"
+                            android:text="@string/str_protect_with_pin"
                             android:textColor="#1C1B1B"
                             android:textSize="14sp" />
 
@@ -192,7 +192,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="4dp"
-                        android:text="MẬT KHẨU"
+                        android:text="@string/str_section_password"
                         android:textColor="#808E92"
                         android:textSize="11sp"
                         android:textStyle="bold"
@@ -219,7 +219,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
-                            android:text="Đổi mật khẩu"
+                            android:text="@string/str_change_password"
                             android:textColor="#1C1B1B"
                             android:textSize="14sp" />
 
@@ -250,13 +250,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        android:text="Đổi mật khẩu"
+                        android:text="@string/str_change_password"
                         android:textColor="#1C1B1B"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:layout_marginBottom="6dp" android:text="Mật khẩu hiện tại"
+                        android:layout_marginBottom="6dp" android:text="@string/str_current_password_label"
                         android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
@@ -267,7 +267,7 @@
                         <EditText android:id="@+id/edtCurrentPassword" android:layout_width="0dp"
                             android:layout_height="match_parent" android:layout_weight="1"
                             android:layout_marginStart="10dp" android:background="@null"
-                            android:hint="Nhập mật khẩu hiện tại" android:inputType="textPassword"
+                            android:hint="@string/str_hint_current_password" android:inputType="textPassword"
                             android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
                         <ImageView android:id="@+id/btnToggleCurrent" android:layout_width="36dp"
                             android:layout_height="36dp" android:padding="8dp"
@@ -276,7 +276,7 @@
 
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_marginTop="12dp" android:layout_marginBottom="6dp"
-                        android:text="Mật khẩu mới" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
+                        android:text="@string/str_new_password_label" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
                         android:background="@drawable/bg_input_normal" android:gravity="center_vertical"
@@ -286,7 +286,7 @@
                         <EditText android:id="@+id/edtNewPassword" android:layout_width="0dp"
                             android:layout_height="match_parent" android:layout_weight="1"
                             android:layout_marginStart="10dp" android:background="@null"
-                            android:hint="Tối thiểu 6 ký tự" android:inputType="textPassword"
+                            android:hint="@string/str_hint_min_6_chars" android:inputType="textPassword"
                             android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
                         <ImageView android:id="@+id/btnToggleNew" android:layout_width="36dp"
                             android:layout_height="36dp" android:padding="8dp"
@@ -295,7 +295,7 @@
 
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                         android:layout_marginTop="12dp" android:layout_marginBottom="6dp"
-                        android:text="Xác nhận mật khẩu mới" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
+                        android:text="@string/str_confirm_new_password_label" android:textColor="#1C1B1B" android:textSize="13sp" android:textStyle="bold"/>
 
                     <LinearLayout android:layout_width="match_parent" android:layout_height="52dp"
                         android:background="@drawable/bg_input_normal" android:gravity="center_vertical"
@@ -305,14 +305,14 @@
                         <EditText android:id="@+id/edtConfirmNewPassword" android:layout_width="0dp"
                             android:layout_height="match_parent" android:layout_weight="1"
                             android:layout_marginStart="10dp" android:background="@null"
-                            android:hint="Nhập lại mật khẩu mới" android:inputType="textPassword"
+                            android:hint="@string/str_hint_re_enter_password" android:inputType="textPassword"
                             android:singleLine="true" android:textColor="#1C1B1B" android:textColorHint="@color/clr_grey_2" android:textSize="14sp"/>
                     </LinearLayout>
 
                     <Button android:id="@+id/btnSaveNewPassword"
                         android:layout_width="match_parent" android:layout_height="48dp"
                         android:layout_marginTop="16dp" android:background="@drawable/bg_btn_primary"
-                        android:text="Lưu mật khẩu mới" android:textColor="#FFFFFF"
+                        android:text="@string/str_save_new_password" android:textColor="#FFFFFF"
                         android:textSize="14sp" android:textStyle="bold" android:stateListAnimator="@null"/>
                 </LinearLayout>
 
@@ -321,3 +321,4 @@
 
     </LinearLayout>
 </FrameLayout>
+

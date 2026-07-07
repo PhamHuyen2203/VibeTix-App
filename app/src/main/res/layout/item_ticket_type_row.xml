@@ -56,7 +56,7 @@
                     android:layout_marginStart="8dp"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
-                    android:text="Hoạt động"
+                    android:text="@string/label_active"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/clr_success"
@@ -88,7 +88,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Đã bán"
+                    android:text="@string/str_tickets_sold_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="13sp" />
 
@@ -146,7 +146,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="Kích hoạt"
+                        android:text="@string/str_no_data"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="14sp" />
 
@@ -184,3 +184,4 @@
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

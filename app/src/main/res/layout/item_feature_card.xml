@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Không có quyền"
+            android:text="@string/str_no_data"
             android:textSize="9sp"
             android:textColor="@color/clr_grey_1"
             android:visibility="gone" />
@@ -51,3 +51,4 @@
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
+

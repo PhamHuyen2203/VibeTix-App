@@ -80,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="16dp"
-                android:text="Xem vé của tôi"
+                android:text="@string/str_view_my_tickets_action"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/clr_text_white"
@@ -92,3 +92,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

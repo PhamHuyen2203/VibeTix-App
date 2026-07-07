@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
-            android:text="Bán lại vé (Pass vé) 🎫"
+            android:text="@string/str_pass_ticket_title"
             android:textColor="@color/clr_text_black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -84,7 +84,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chọn loại vé muốn bán *"
+                android:text="@string/str_choose_ticket_to_sell"
                 android:textColor="@color/clr_text_black"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -104,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Lời nhắn cho người mua (tuỳ chọn)"
+            android:text="@string/str_message_for_buyer"
             android:textColor="@color/clr_text_black"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -116,7 +116,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_input_normal"
             android:gravity="top"
-            android:hint="Ví dụ: Vé chính chủ, sang nhượng do bận việc..."
+            android:hint="@string/str_message_for_buyer"
             android:inputType="textMultiLine"
             android:minLines="2"
             android:maxLines="4"
@@ -138,7 +138,7 @@
                 android:layout_height="52dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="Để sau"
+                android:text="@string/str_pass_later"
                 android:textColor="@color/clr_grey_1" />
 
             <Button
@@ -149,9 +149,10 @@
                 android:layout_marginStart="8dp"
                 android:backgroundTint="@color/clr_btn_blue"
                 android:fontFamily="sans-serif-medium"
-                android:text="Xác nhận đăng bán"
+                android:text="@string/str_confirm_list_for_sale"
                 android:textColor="@color/clr_text_white"
                 app:cornerRadius="12dp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+

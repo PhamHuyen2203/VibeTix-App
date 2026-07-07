@@ -136,7 +136,7 @@ public class PassTicketDialogFragment extends DialogFragment {
         txtPassDialogEventTitle.setText(ticket.getEventTitle());
         long original = ticket.getPurchasePrice();
         if (original > 0) {
-            txtPassDialogOriginalPrice.setText("Giá mua gốc: " + priceFormatter.format(original) + " đ");
+            txtPassDialogOriginalPrice.setText(getString(R.string.str_original_price_label, priceFormatter.format(original)));
             txtPassDialogOriginalPrice.setVisibility(View.VISIBLE);
         } else {
             txtPassDialogOriginalPrice.setVisibility(View.GONE);
@@ -200,7 +200,7 @@ public class PassTicketDialogFragment extends DialogFragment {
             LinearLayout.LayoutParams nameLp = new LinearLayout.LayoutParams(0,
                     LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
             tvName.setLayoutParams(nameLp);
-            tvName.setText(maxQty > 1 ? typeName + " (tối đa " + maxQty + ")" : typeName);
+            tvName.setText(maxQty > 1 ? getString(R.string.str_ticket_type_max_qty, typeName, maxQty) : typeName);
             tvName.setTextSize(14f);
             tvName.setTextColor(0xFF111827);
             tvName.setTypeface(null, Typeface.BOLD);
@@ -272,7 +272,7 @@ public class PassTicketDialogFragment extends DialogFragment {
             etLp.addRule(RelativeLayout.CENTER_VERTICAL);
             etLp.setMarginEnd(dp(40));
             etPrice.setLayoutParams(etLp);
-            etPrice.setHint("Giá bán (VNĐ)");
+            etPrice.setHint(getString(R.string.str_hint_resale_price));
             etPrice.setInputType(InputType.TYPE_CLASS_NUMBER);
             etPrice.setBackground(null);
             etPrice.setTextSize(14f);
@@ -287,7 +287,7 @@ public class PassTicketDialogFragment extends DialogFragment {
             vndLp.addRule(RelativeLayout.ALIGN_PARENT_END);
             vndLp.addRule(RelativeLayout.CENTER_VERTICAL);
             tvVnd.setLayoutParams(vndLp);
-            tvVnd.setText("VNĐ");
+            tvVnd.setText(getString(R.string.str_vnd_label));
             tvVnd.setTextSize(12f);
             tvVnd.setTextColor(0xFF9CA3AF);
 
@@ -305,7 +305,7 @@ public class PassTicketDialogFragment extends DialogFragment {
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         tipLp.setMargins(0, dp(4), 0, 0);
         tvTip.setLayoutParams(tipLp);
-        tvTip.setText("💡 Giá thấp hơn 10-20% sẽ giúp bán nhanh hơn.");
+        tvTip.setText(getString(R.string.str_resale_price_tip));
         tvTip.setTextSize(12f);
         tvTip.setTextColor(0xFF2563EB);
         containerTypeRows.addView(tvTip);
@@ -319,7 +319,7 @@ public class PassTicketDialogFragment extends DialogFragment {
         btnPassConfirm.setOnClickListener(v -> {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser == null) {
-                Toast.makeText(requireContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_please_relogin), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -338,17 +338,17 @@ public class PassTicketDialogFragment extends DialogFragment {
                 String priceStr = et != null ? et.getText().toString().trim().replaceAll("[^0-9]", "") : "";
                 if (priceStr.isEmpty()) {
                     Toast.makeText(requireContext(),
-                            "Vui lòng nhập giá bán cho " + typeName, Toast.LENGTH_SHORT).show();
+                            getString(R.string.str_toast_enter_price_for, typeName), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 long price;
                 try { price = Long.parseLong(priceStr); }
                 catch (NumberFormatException ex) {
-                    Toast.makeText(requireContext(), "Giá không hợp lệ cho " + typeName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_invalid_price_for, typeName), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (price <= 0) {
-                    Toast.makeText(requireContext(), "Giá phải lớn hơn 0 cho " + typeName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_price_must_be_positive, typeName), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -362,12 +362,12 @@ public class PassTicketDialogFragment extends DialogFragment {
             }
 
             if (idsToSell.isEmpty()) {
-                Toast.makeText(requireContext(), "Vui lòng chọn ít nhất 1 vé muốn bán", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_select_at_least_one), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             btnPassConfirm.setEnabled(false);
-            Toast.makeText(requireContext(), "Đang xử lý...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_btn_processing), Toast.LENGTH_SHORT).show();
 
             String msg = etPassMessage != null ? etPassMessage.getText().toString().trim() : "";
             if (msg.isEmpty()) msg = "Đăng bán lại vé";
@@ -388,7 +388,7 @@ public class PassTicketDialogFragment extends DialogFragment {
                                        String message, Timestamp expiresAt, int index) {
         if (index >= ticketIds.size()) {
             if (isAdded()) {
-                Toast.makeText(requireContext(), "Đã đăng bán lại vé thành công!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_resell_success), Toast.LENGTH_SHORT).show();
                 if (listener != null) listener.onTicketPassed();
                 dismiss();
             }

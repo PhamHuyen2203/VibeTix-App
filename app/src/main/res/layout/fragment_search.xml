@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tìm kiếm sự kiện"
+                android:text="@string/str_search_events_title"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold"
@@ -98,7 +98,7 @@
                         android:layout_weight="1"
                         android:background="@null"
                         android:padding="12dp"
-                        android:hint="Tìm kiếm sự kiện, nghệ sĩ…"
+                        android:hint="@string/str_search_hint"
                         android:textColorHint="#808E92"
                         android:textSize="14sp"
                         android:textColor="#1C1B1B"
@@ -157,7 +157,7 @@
                         android:id="@+id/txtDateFilterLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tất cả các ngày"
+                        android:text="@string/str_all_dates"
                         android:textColor="#226CEB"
                         android:textSize="12sp" />
 
@@ -202,7 +202,7 @@
                         android:id="@+id/txtFilterLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bộ lọc"
+                        android:text="@string/str_filter"
                         android:textColor="#226CEB"
                         android:textSize="12sp" />
 
@@ -240,7 +240,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tìm kiếm gần đây"
+                        android:text="@string/str_recent_searches"
                         android:textStyle="bold"
                         android:textSize="15sp"
                         android:textColor="#1C1B1B" />
@@ -303,7 +303,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
-                    android:text="Khám phá theo Thể loại"
+                    android:text="@string/str_discover_by_category"
                     android:textStyle="bold"
                     android:textSize="15sp"
                     android:textColor="#1C1B1B"
@@ -332,7 +332,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
-                    android:text="Khám phá theo Thành phố"
+                    android:text="@string/str_discover_by_city"
                     android:textStyle="bold"
                     android:textSize="15sp"
                     android:textColor="#1C1B1B"
@@ -361,7 +361,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Gợi ý dành cho bạn"
+                    android:text="@string/str_suggestions"
                     android:textStyle="bold"
                     android:textSize="15sp"
                     android:textColor="#1C1B1B"
@@ -382,3 +382,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
+

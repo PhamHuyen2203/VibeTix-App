@@ -76,10 +76,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Cần quyền Owner"
+            android:text="@string/role_owner"
             android:textSize="10sp"
             android:textColor="@color/clr_text_secondary"
             android:visibility="gone" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

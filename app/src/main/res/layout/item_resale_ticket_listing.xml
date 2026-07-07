@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Vé bán lại"
+                android:text="@string/str_resale_ticket_badge"
                 android:textColor="@color/clr_text_black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -38,7 +38,7 @@
                 android:background="@drawable/bg_resale_badge"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
-                android:text="RE-SALE"
+                android:text="@string/str_resale_badge_caps"
                 android:textColor="@color/clr_text_white"
                 android:textSize="10sp"
                 android:textStyle="bold" />
@@ -103,7 +103,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Giá bán lại"
+                    android:text="@string/str_resale_price_label"
                     android:textColor="@color/clr_grey_1"
                     android:textSize="11sp" />
 
@@ -123,9 +123,10 @@
                 android:layout_height="44dp"
                 android:backgroundTint="@color/clr_btn_blue"
                 android:paddingHorizontal="24dp"
-                android:text="Mua lại"
+                android:text="@string/str_buy_resale_btn"
                 android:textColor="@color/clr_text_white"
                 app:cornerRadius="10dp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
+

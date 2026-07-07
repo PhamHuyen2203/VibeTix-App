@@ -160,7 +160,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
 
                     // Update header stats
-                    binding.tvTicketTypeCount.setText(ticketTypes.size() + " loại vé");
+                    binding.tvTicketTypeCount.setText(getString(R.string.str_ticket_type_count_label, ticketTypes.size()));
 
                     com.example.vibetix.Firebase.FirestoreHelper.calculateEventStats(eventId, (totalTickets, totalRevenue) -> {
                         if (binding.tvTotalSoldTickets != null) {
@@ -231,7 +231,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
         dialog.getBehavior().setPeekHeight(700);
 
         boolean isEdit = (existing != null);
-        sheetBinding.tvBottomSheetTitle.setText(isEdit ? "Chỉnh sửa loại vé" : "Thêm loại vé");
+        sheetBinding.tvBottomSheetTitle.setText(isEdit ? getString(R.string.str_edit_ticket_type_title) : getString(R.string.str_add_ticket_type_title));
 
         // Pre-fill for edit
         if (isEdit) {
@@ -273,23 +273,23 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
 
             // Validate
             if (TextUtils.isEmpty(name)) {
-                sheetBinding.etTicketName.setError("Vui lòng nhập tên loại vé");
+                sheetBinding.etTicketName.setError(getString(R.string.str_error_enter_ticket_name));
                 return;
             }
             if (TextUtils.isEmpty(priceStr)) {
-                sheetBinding.etTicketPrice.setError("Vui lòng nhập giá vé");
+                sheetBinding.etTicketPrice.setError(getString(R.string.str_error_enter_ticket_price));
                 return;
             }
             if (TextUtils.isEmpty(qtyStr)) {
-                sheetBinding.etTotalQty.setError("Vui lòng nhập số lượng vé");
+                sheetBinding.etTotalQty.setError(getString(R.string.str_error_enter_ticket_qty));
                 return;
             }
             if (TextUtils.isEmpty(saleStart)) {
-                sheetBinding.etSaleStart.setError("Vui lòng chọn ngày bắt đầu bán");
+                sheetBinding.etSaleStart.setError(getString(R.string.str_error_enter_sale_start));
                 return;
             }
             if (TextUtils.isEmpty(saleEnd)) {
-                sheetBinding.etSaleEnd.setError("Vui lòng chọn ngày kết thúc bán");
+                sheetBinding.etSaleEnd.setError(getString(R.string.str_error_enter_sale_end));
                 return;
             }
             
@@ -299,7 +299,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 java.util.Date endDate = dispFmt.parse(saleEnd);
                 if (endDate != null && startDate != null && endDate.before(startDate)) {
                     sheetBinding.etSaleEnd.setError("Lỗi thời gian");
-                    Toast.makeText(this, "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_end_date_before_start), Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (Exception e) {
@@ -312,22 +312,22 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 price = Long.parseLong(priceStr);
                 qty   = Long.parseLong(qtyStr);
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Giá hoặc số lượng không hợp lệ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.str_toast_invalid_price_qty), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (price < 0) { sheetBinding.etTicketPrice.setError("Giá không hợp lệ"); return; }
-            if (qty <= 0)  { sheetBinding.etTotalQty.setError("Số lượng phải lớn hơn 0"); return; }
+            if (price < 0) { sheetBinding.etTicketPrice.setError(getString(R.string.str_error_invalid_price)); return; }
+            if (qty <= 0)  { sheetBinding.etTotalQty.setError(getString(R.string.str_error_qty_must_be_positive)); return; }
 
             sheetBinding.btnSaveTicketType.setEnabled(false);
-            sheetBinding.btnSaveTicketType.setText("Đang lưu…");
+            sheetBinding.btnSaveTicketType.setText(getString(R.string.str_btn_saving));
 
             if (isEdit) {
                 if (qty < existing.getSoldCount()) {
-                    sheetBinding.etTotalQty.setError("Không thể giảm số lượng xuống dưới số vé đã bán (" + existing.getSoldCount() + " vé)!");
+                    sheetBinding.etTotalQty.setError(getString(R.string.str_toast_cannot_reduce_qty, existing.getSoldCount()));
                     sheetBinding.etTotalQty.requestFocus();
                     sheetBinding.btnSaveTicketType.setEnabled(true);
-                    sheetBinding.btnSaveTicketType.setText("LƯU THÔNG TIN");
+                    sheetBinding.btnSaveTicketType.setText(getString(R.string.str_btn_save_ticket_type));
                     return;
                 }
                 updateTicketType(existing, name, price, qty, desc, saleStart, saleEnd,
@@ -355,7 +355,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 .set(data)
                 .addOnSuccessListener(v -> {
                     dialog.dismiss();
-                    Toast.makeText(this, "Đã tạo loại vé thành công ✓", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_ticket_type_created), Toast.LENGTH_SHORT).show();
                     loadTicketTypes();
                 })
                 .addOnFailureListener(e -> {
@@ -386,7 +386,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 .update(updates)
                 .addOnSuccessListener(v -> {
                     dialog.dismiss();
-                    Toast.makeText(this, "Đã cập nhật loại vé ✓", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_ticket_type_updated), Toast.LENGTH_SHORT).show();
                     loadTicketTypes();
                 })
                 .addOnFailureListener(e -> {
@@ -438,7 +438,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Không kiểm tra được đơn hàng", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, getString(R.string.str_toast_cannot_check_orders), Toast.LENGTH_SHORT).show());
     }
 
     private void confirmDelete(TicketType tt) {
@@ -450,7 +450,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                             .document(tt.getTicketTypeId())
                             .delete()
                             .addOnSuccessListener(v -> {
-                                Toast.makeText(this, "Đã xóa loại vé", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getString(R.string.str_toast_ticket_type_deleted), Toast.LENGTH_SHORT).show();
                                 loadTicketTypes();
                             })
                             .addOnFailureListener(e ->
@@ -472,7 +472,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     // Revert switch on failure
-                    Toast.makeText(this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.str_toast_update_failed), Toast.LENGTH_SHORT).show();
                     int idx = ticketTypes.indexOf(tt);
                     if (idx >= 0) adapter.notifyItemChanged(idx);
                 });
@@ -583,7 +583,7 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
             // Price
             long priceVal = (long) tt.getPrice();
             if (priceVal == 0) {
-                b.tvTicketPrice.setText("Miễn phí");
+                b.tvTicketPrice.setText(vh.itemView.getContext().getString(R.string.str_free_price));
             } else {
                 b.tvTicketPrice.setText(vndFmt.format(priceVal) + " ₫");
             }
@@ -591,19 +591,19 @@ public class TicketTypeManagementActivity extends AppCompatActivity {
             // Sold / total progress
             long sold  = tt.getSoldCount();
             long total = tt.getTotalQuantity();
-            b.tvSoldCount.setText(sold + " / " + total + " vé");
+            b.tvSoldCount.setText(vh.itemView.getContext().getString(R.string.str_ticket_sold_fraction, sold, total));
             int progress = (total > 0) ? (int) ((sold * 100f) / total) : 0;
             b.pbTicketSales.setMax(100);
             b.pbTicketSales.setProgress(progress);
 
             // Status badge
             if (tt.isActive()) {
-                b.tvStatusBadge.setText("Hoạt động");
-                b.tvStatusBadge.setTextColor(context.getColor(R.color.clr_success));
+                b.tvStatusBadge.setText(vh.itemView.getContext().getString(R.string.str_status_active));
+                b.tvStatusBadge.setTextColor(vh.itemView.getContext().getColor(R.color.clr_success));
                 b.tvStatusBadge.setBackgroundResource(R.drawable.bg_ticket_type_active);
             } else {
-                b.tvStatusBadge.setText("Tạm tắt");
-                b.tvStatusBadge.setTextColor(context.getColor(R.color.clr_error));
+                b.tvStatusBadge.setText(vh.itemView.getContext().getString(R.string.str_status_disabled));
+                b.tvStatusBadge.setTextColor(vh.itemView.getContext().getColor(R.color.clr_error));
                 b.tvStatusBadge.setBackgroundResource(R.drawable.bg_ticket_type_inactive);
             }
 

@@ -83,7 +83,7 @@ public class EventHubActivity extends AppCompatActivity {
         role    = getIntent().getStringExtra(EXTRA_ROLE);
 
         if (eventId == null || eventId.isEmpty()) {
-            Toast.makeText(this, "Không tìm thấy sự kiện", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_event_not_found_label), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -162,7 +162,7 @@ public class EventHubActivity extends AppCompatActivity {
             return true;
         }
         if (item.getItemId() == 2) {
-            Toast.makeText(this, "Hồ sơ Ban tổ chức (sắp ra mắt)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.str_toast_org_profile_coming_soon), Toast.LENGTH_SHORT).show();
             return true;
         }
         if (item.getItemId() == 3) {
@@ -180,7 +180,7 @@ public class EventHubActivity extends AppCompatActivity {
                 db.collection(FirebaseCollections.EVENTS).document(eventId)
                     .update("status", "cancelled")
                     .addOnSuccessListener(unused -> {
-                        Toast.makeText(this, "Đã huỷ sự kiện thành công", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.str_toast_event_cancelled_ok), Toast.LENGTH_SHORT).show();
                         String title = tvEventTitle != null ? tvEventTitle.getText().toString() : "Sự kiện";
                         NotificationTriggerManager.triggerEventCancelled(eventId, title);
                         loadEventDetails();
@@ -413,7 +413,7 @@ public class EventHubActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Không thể tải thông tin sự kiện", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, getString(R.string.str_toast_cannot_load_event_info), Toast.LENGTH_SHORT).show());
     }
 
     private void applyStatusBadge(String status) {

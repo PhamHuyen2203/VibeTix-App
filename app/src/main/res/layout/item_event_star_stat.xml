@@ -87,7 +87,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Fan đã mua vé"
+                    android:text="@string/str_fan_bought_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -116,7 +116,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tỷ lệ chuyển đổi"
+                    android:text="@string/str_conversion_rate_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -124,3 +124,4 @@
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

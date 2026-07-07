@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,8 +41,8 @@ public class NotificationsActivity extends AppCompatActivity {
         rvNotifications = findViewById(R.id.rvNotifications);
         txtEmpty        = findViewById(R.id.txtEmpty);
 
-        ImageButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         adapter = new NotifListAdapter(items, this::onItemClick);
         rvNotifications.setLayoutManager(new LinearLayoutManager(this));

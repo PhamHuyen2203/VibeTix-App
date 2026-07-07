@@ -139,7 +139,7 @@ public class SecurityFragment extends Fragment {
         boolean pinEnabled = profilePrefs.getBoolean(KEY_PIN_FOR_TICKETS, false);
 
         if (txtPinStatus != null)
-            txtPinStatus.setText(hasPin ? "Đã thiết lập" : "Chưa thiết lập");
+            txtPinStatus.setText(hasPin ? getString(R.string.str_pin_set_status) : getString(R.string.str_pin_not_set_status));
         if (switchPinForTickets != null)
             switchPinForTickets.setChecked(pinEnabled && hasPin);
 
@@ -219,7 +219,7 @@ public class SecurityFragment extends Fragment {
             btn.setOnCheckedChangeListener(null);
             btn.setChecked(false);
             btn.setOnCheckedChangeListener(this::onSwitchChanged);
-            Toast.makeText(requireContext(), "Vui lòng thiết lập mã PIN trước", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_set_pin_first), Toast.LENGTH_SHORT).show();
             return;
         }
         btn.setOnCheckedChangeListener(null);
@@ -233,7 +233,7 @@ public class SecurityFragment extends Fragment {
         showPinInputDialog(title, subtitle, "Xác nhận", enteredPin -> {
             String storedHash = profilePrefs.getString(KEY_PIN_HASH, "");
             if (!SecurityFragment.sha256(enteredPin).equals(storedHash)) {
-                Toast.makeText(requireContext(), "Mã PIN không đúng", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_pin_incorrect), Toast.LENGTH_SHORT).show();
                 return;
             }
             profilePrefs.edit().putBoolean(KEY_PIN_FOR_TICKETS, checked).apply();
@@ -289,7 +289,7 @@ public class SecurityFragment extends Fragment {
                     String oldHash = sha256(oldPin);
                     String storedHash = profilePrefs.getString(KEY_PIN_HASH, "");
                     if (!oldHash.equals(storedHash)) {
-                        Toast.makeText(requireContext(), "Mã PIN cũ không đúng", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.str_toast_old_pin_incorrect), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     // Bước 2: Nhập PIN mới
@@ -301,7 +301,7 @@ public class SecurityFragment extends Fragment {
                                         confirmPin -> {
                                             if (!newPin.equals(confirmPin)) {
                                                 Toast.makeText(requireContext(),
-                                                        "Mã PIN mới không khớp, thử lại", Toast.LENGTH_SHORT).show();
+                                                        getString(R.string.str_toast_pin_mismatch), Toast.LENGTH_SHORT).show();
                                                 return;
                                             }
                                             savePinHash(sha256(newPin));
@@ -358,14 +358,14 @@ public class SecurityFragment extends Fragment {
                 .update("pin", hash)
                 .addOnSuccessListener(v -> {
                     if (!isAdded()) return;
-                    Toast.makeText(requireContext(), "✓ Mã PIN đã được cập nhật", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_pin_updated), Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     if (!isAdded()) return;
-                    Toast.makeText(requireContext(), "Lưu PIN thất bại, thử lại sau", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_pin_save_failed), Toast.LENGTH_SHORT).show();
                 });
         } else {
-            Toast.makeText(requireContext(), "✓ Mã PIN đã được cập nhật", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_pin_updated), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -435,47 +435,47 @@ public class SecurityFragment extends Fragment {
         String confirm = edtConfirmNewPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(current) || TextUtils.isEmpty(newPw) || TextUtils.isEmpty(confirm)) {
-            Toast.makeText(requireContext(), "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_fill_all_fields), Toast.LENGTH_SHORT).show();
             return;
         }
         if (newPw.length() < 6) {
-            Toast.makeText(requireContext(), "Mật khẩu mới phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_password_too_short), Toast.LENGTH_SHORT).show();
             return;
         }
         if (!newPw.equals(confirm)) {
-            Toast.makeText(requireContext(), "Mật khẩu xác nhận không khớp", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_password_mismatch), Toast.LENGTH_SHORT).show();
             return;
         }
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null || user.getEmail() == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập lại để đổi mật khẩu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.str_toast_relogin_required), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(false); btnSaveNewPassword.setText("Đang xử lý..."); }
+        if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(false); btnSaveNewPassword.setText(getString(R.string.str_btn_processing)); }
 
         AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), current);
         user.reauthenticate(credential)
             .addOnSuccessListener(v -> user.updatePassword(newPw)
                 .addOnSuccessListener(v2 -> {
                     if (!isAdded()) return;
-                    Toast.makeText(requireContext(), "✓ Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_password_changed), Toast.LENGTH_SHORT).show();
                     if (sectionChangePassword != null) sectionChangePassword.setVisibility(View.GONE);
                     if (edtCurrentPassword    != null) edtCurrentPassword.setText("");
                     if (edtNewPassword        != null) edtNewPassword.setText("");
                     if (edtConfirmNewPassword != null) edtConfirmNewPassword.setText("");
-                    if (btnSaveNewPassword    != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText("Lưu mật khẩu mới"); }
+                    if (btnSaveNewPassword    != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText(getString(R.string.str_save_new_password)); }
                 })
                 .addOnFailureListener(e -> {
                     if (!isAdded()) return;
-                    if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText("Lưu mật khẩu mới"); }
-                    Toast.makeText(requireContext(), "Đổi mật khẩu thất bại. Thử lại sau.", Toast.LENGTH_SHORT).show();
+                    if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText(getString(R.string.str_save_new_password)); }
+                    Toast.makeText(requireContext(), getString(R.string.str_toast_password_change_failed), Toast.LENGTH_SHORT).show();
                 }))
             .addOnFailureListener(e -> {
                 if (!isAdded()) return;
-                if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText("Lưu mật khẩu mới"); }
-                Toast.makeText(requireContext(), "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
+                if (btnSaveNewPassword != null) { btnSaveNewPassword.setEnabled(true); btnSaveNewPassword.setText(getString(R.string.str_save_new_password)); }
+                Toast.makeText(requireContext(), getString(R.string.str_toast_current_password_wrong), Toast.LENGTH_SHORT).show();
             });
     }
 
@@ -486,7 +486,7 @@ public class SecurityFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
-        Toast.makeText(requireContext(), "Đang lấy số điện thoại...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.str_toast_fetching_phone), Toast.LENGTH_SHORT).show();
 
         FirebaseFirestore.getInstance()
             .collection("users").document(user.getUid())
@@ -506,13 +506,13 @@ public class SecurityFragment extends Fragment {
             })
             .addOnFailureListener(e -> {
                 if (!isAdded()) return;
-                Toast.makeText(requireContext(), "Không thể lấy thông tin tài khoản", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getString(R.string.str_toast_cannot_get_account), Toast.LENGTH_SHORT).show();
             });
     }
 
     private void sendOtpToPhone(String e164Phone) {
         if (!isAdded()) return;
-        Toast.makeText(requireContext(), "Đang gửi mã OTP đến " + e164Phone + "...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.str_toast_sending_otp, e164Phone), Toast.LENGTH_SHORT).show();
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(FirebaseAuth.getInstance())
                 .setPhoneNumber(e164Phone)
@@ -530,7 +530,7 @@ public class SecurityFragment extends Fragment {
                     public void onVerificationFailed(@NonNull FirebaseException e) {
                         if (!isAdded()) return;
                         Toast.makeText(requireContext(),
-                                "Gửi OTP thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                getString(R.string.str_toast_otp_failed, e.getMessage()), Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -548,18 +548,18 @@ public class SecurityFragment extends Fragment {
 
     private void showOtpInputDialog() {
         android.widget.EditText edtOtp = new android.widget.EditText(requireContext());
-        edtOtp.setHint("Nhập mã OTP 6 chữ số");
+        edtOtp.setHint(getString(R.string.str_hint_otp_input));
         edtOtp.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         edtOtp.setPadding(48, 32, 48, 16);
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Xác nhận qua SMS")
+                .setTitle(getString(R.string.str_dialog_title_sms_verify))
                 .setMessage("Nhập mã OTP đã gửi về số điện thoại của bạn.")
                 .setView(edtOtp)
                 .setPositiveButton("Xác nhận", (dialog, which) -> {
                     String code = edtOtp.getText().toString().trim();
                     if (code.length() < 6) {
-                        Toast.makeText(requireContext(), "Mã OTP phải đủ 6 chữ số", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), getString(R.string.str_toast_otp_too_short), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     if (mVerificationId == null) return;
@@ -580,7 +580,7 @@ public class SecurityFragment extends Fragment {
                                     showNewPinAfterOtp();
                                 } else {
                                     Toast.makeText(requireContext(),
-                                            "Mã OTP không đúng hoặc đã hết hạn", Toast.LENGTH_SHORT).show();
+                                            getString(R.string.str_toast_otp_invalid), Toast.LENGTH_SHORT).show();
                                 }
                             });
                 })
@@ -610,3 +610,4 @@ public class SecurityFragment extends Fragment {
     interface OnPinConfirmed { void onConfirmed(String hash); }
     interface OnPinRaw       { void onRaw(String plainPin); }
 }
+

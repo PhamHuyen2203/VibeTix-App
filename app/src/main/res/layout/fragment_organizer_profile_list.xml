@@ -7,71 +7,74 @@
     android:background="@color/clr_bg_light"
     android:orientation="vertical">
 
-    <!-- ── HEADER ─────────────────────────────────────── -->
+    <!-- ── HEADER — cùng style Toolbar như các trang client ────── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_auth_header"
+        android:background="@color/clr_primary"
+        android:fitsSystemWindows="true"
         android:orientation="vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="28dp">
+        android:elevation="4dp">
 
-        <!-- Row: greeting + add button -->
+        <!-- Toolbar row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/actionBarSize"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp">
+
+            <!-- Back button -->
+            <ImageButton
+                android:id="@+id/btnBackOrgProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_btn_back_circle"
+                android:src="@drawable/ic_back"
+                android:contentDescription="@string/str_back"
+                app:tint="@color/clr_text_white" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Xin chào,"
-                    android:textColor="#AAFFFFFF"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/tvUserDisplayName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:text="@string/str_org_profile_list_title"
                     android:textColor="@color/clr_text_white"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    tools:text="Nguyễn Văn A" />
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvOrgCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="#AAFFFFFF"
+                    android:textColor="#CCFFFFFF"
                     android:textSize="12sp"
-                    tools:text="2 hồ sơ ban tổ chức" />
+                    tools:text="3 hồ sơ ban tổ chức" />
+
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddOrgProfile"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
+                android:layout_height="36dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:text="+ Thêm mới"
+                android:text="@string/str_add_new_action"
                 android:textAllCaps="false"
                 android:textColor="@color/clr_text_white"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                app:cornerRadius="20dp"
+                app:cornerRadius="18dp"
                 app:strokeColor="@color/clr_text_white"
                 app:strokeWidth="1.5dp" />
+
         </LinearLayout>
     </LinearLayout>
 
@@ -102,7 +105,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Hồ sơ ban tổ chức"
+                    android:text="@string/str_org_profile_list_title"
                     android:textColor="@color/clr_text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -133,17 +136,17 @@
                 android:paddingVertical="48dp"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏢"
-                    android:textSize="52sp" />
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:src="@drawable/ic_role_building"
+                    app:tint="@color/clr_grey_2" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:text="Chưa có hồ sơ ban tổ chức"
+                    android:text="@string/str_no_org_profiles"
                     android:textColor="@color/clr_text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -173,3 +176,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
+

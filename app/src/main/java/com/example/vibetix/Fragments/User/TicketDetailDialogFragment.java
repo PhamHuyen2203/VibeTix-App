@@ -212,7 +212,7 @@ public class TicketDetailDialogFragment extends DialogFragment {
                     TextView lblDisc = new TextView(requireContext());
                     lblDisc.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
                             0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-                    lblDisc.setText("Mã giảm giá");
+                    lblDisc.setText(getString(R.string.str_discount_code_label));
                     lblDisc.setTextSize(14f);
                     lblDisc.setTextColor(getResources().getColor(com.example.vibetix.R.color.clr_success));
                     discountRow.addView(lblDisc);

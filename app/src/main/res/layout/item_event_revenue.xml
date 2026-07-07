@@ -129,7 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Vé bán"
+                    android:text="@string/str_tickets_sold_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -160,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Doanh thu"
+                    android:text="@string/str_revenue_label"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
@@ -191,10 +191,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Đơn hàng"
+                    android:text="@string/str_my_orders"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="11sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
+

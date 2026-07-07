@@ -37,12 +37,12 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đơn hàng" />
+                android:text="@string/str_my_orders" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Doanh thu" />
+                android:text="@string/str_revenue_label" />
         </com.google.android.material.tabs.TabLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -75,7 +75,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TỔNG QUAN DOANH THU"
+                    android:text="@string/str_revenue_label"
                     android:textColor="#E2E8F0"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -111,7 +111,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TỔNG ĐƠN HÀNG"
+                            android:text="@string/str_my_orders"
                             android:textColor="#E2E8F0"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -137,7 +137,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="SỐ VÉ ĐÃ BÁN"
+                            android:text="@string/str_tickets_sold_label"
                             android:textColor="#E2E8F0"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -178,7 +178,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="8dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:hint="Tìm mã đơn hàng..."
+                    android:hint="@string/search_hint"
                     android:textColorHint="#757575"
                     app:hintTextColor="@color/clr_primary_blue"
                     app:boxCornerRadiusBottomEnd="12dp"
@@ -219,28 +219,28 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:text="Tất cả" />
+                            android:text="@string/status_all" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipSuccess"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thành công" />
+                            android:text="@string/status_approved" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipPending"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chờ xử lý" />
+                            android:text="@string/status_pending" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chipCancelled"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Đã hủy" />
+                            android:text="@string/status_cancelled" />
                     </com.google.android.material.chip.ChipGroup>
                 </HorizontalScrollView>
 
@@ -287,7 +287,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Doanh thu 7 ngày gần nhất"
+                            android:text="@string/dash_revenue_compare"
                             android:textColor="@color/clr_text_black"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -330,7 +330,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Chưa có đơn hàng nào"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_black"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -340,7 +340,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Các đơn hàng sẽ hiện khi có người mua vé"
+                    android:text="@string/str_no_data"
                     android:textColor="@color/clr_text_secondary"
                     android:textSize="14sp"
                     android:gravity="center" />
@@ -351,4 +351,6 @@
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
 

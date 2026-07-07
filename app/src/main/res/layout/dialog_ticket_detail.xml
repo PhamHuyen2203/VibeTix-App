@@ -41,7 +41,7 @@
                     android:background="@drawable/bg_quick_chip"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="3dp"
-                    android:text="Còn hiệu lực"
+                    android:text="@string/str_ticket_active"
                     android:textColor="@color/clr_success"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -89,7 +89,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="THÔNG TIN VÉ"
+                    android:text="@string/str_ticket_info_section"
                     android:textColor="@color/clr_grey_1"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -118,7 +118,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tổng đơn hàng"
+                        android:text="@string/str_total_order_amount"
                         android:textColor="@color/clr_text_black"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -143,7 +143,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Người tham dự"
+                        android:text="@string/str_attendee_label_row"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="14sp" />
 
@@ -167,7 +167,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Mã đơn hàng"
+                        android:text="@string/str_order_number_label"
                         android:textColor="@color/clr_text_secondary"
                         android:textSize="14sp" />
 
@@ -195,7 +195,7 @@
                         android:layout_height="52dp"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:text="Đóng"
+                        android:text="@string/str_close"
                         android:textColor="@color/clr_grey_1" />
 
                     <Button
@@ -205,7 +205,7 @@
                         android:layout_marginStart="8dp"
                         android:layout_weight="1.5"
                         android:backgroundTint="@color/clr_btn_blue"
-                        android:text="Xem mã QR"
+                        android:text="@string/str_show_qr"
                         android:textColor="@color/clr_text_white"
                         app:cornerRadius="12dp" />
                 </LinearLayout>
@@ -213,3 +213,4 @@
         </LinearLayout>
     </ScrollView>
 </androidx.cardview.widget.CardView>
+

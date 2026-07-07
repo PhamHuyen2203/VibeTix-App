@@ -224,7 +224,7 @@ public class SelectTicketFragment extends Fragment {
             left.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
             TextView tvName = new TextView(requireContext());
-            tvName.setText(t.getName() != null ? t.getName() : "Vé");
+            tvName.setText(t.getName() != null ? t.getName() : getString(R.string.str_default_ticket_name));
             tvName.setTextColor(0xFF1A2533);
             tvName.setTextSize(15f);
             tvName.setTypeface(null, Typeface.BOLD);
@@ -239,10 +239,10 @@ public class SelectTicketFragment extends Fragment {
 
             TextView tvRemaining = new TextView(requireContext());
             if (t.getAvailableQuantity() > 0) {
-                tvRemaining.setText("Còn " + t.getAvailableQuantity() + " vé");
+                tvRemaining.setText(getString(R.string.str_tickets_remaining_qty, t.getAvailableQuantity()));
                 tvRemaining.setTextColor(0xFF808E92);
             } else {
-                tvRemaining.setText("Hết vé");
+                tvRemaining.setText(getString(R.string.str_sold_out));
                 tvRemaining.setTextColor(0xFFEF4444);
                 tvRemaining.setTypeface(null, Typeface.BOLD);
             }
@@ -344,7 +344,7 @@ public class SelectTicketFragment extends Fragment {
                 btnSelectNext.setBackgroundTintList(ColorStateList.valueOf(0xFF22C55E));
             } else {
                 btnSelectNext.setEnabled(false);
-                btnSelectNext.setText("Vui lòng chọn vé");
+                btnSelectNext.setText(getString(R.string.str_btn_please_select_ticket));
                 btnSelectNext.setBackgroundTintList(ColorStateList.valueOf(0xFF9CA3AF));
             }
         }

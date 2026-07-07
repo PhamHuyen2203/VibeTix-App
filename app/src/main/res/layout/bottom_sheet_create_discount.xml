@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tạo mã giảm giá"
+        android:text="@string/create_discount_title"
         android:textColor="@color/clr_text_black"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -62,13 +62,13 @@
                     android:id="@+id/rbPercentage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Theo phần trăm (%)"
+                    android:text="@string/type_percentage"
                     android:checked="true" />
                 <RadioButton
                     android:id="@+id/rbFixed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Số tiền cố định (đ)"
+                    android:text="@string/type_fixed"
                     android:layout_marginStart="16dp" />
             </RadioGroup>
 
@@ -137,8 +137,9 @@
         android:id="@+id/btnSubmitDiscount"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        android:text="Tạo mã giảm giá"
+        android:text="@string/create_discount_title"
         app:cornerRadius="8dp"
         android:layout_marginTop="8dp" />
 
 </LinearLayout>
+

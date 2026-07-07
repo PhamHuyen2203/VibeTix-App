@@ -101,9 +101,9 @@ public class MasterDataFragment extends Fragment {
             category.setSlug(slug);
 
             categoryRepository.addCategory(category).addOnSuccessListener(doc -> {
-                Toast.makeText(getContext(), "Đã thêm danh mục: " + name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.str_toast_category_added, name), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
-            }).addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi khi lưu", Toast.LENGTH_SHORT).show());
+            }).addOnFailureListener(e -> Toast.makeText(getContext(), getString(R.string.str_toast_save_error_short), Toast.LENGTH_SHORT).show());
         });
     }
 
@@ -141,9 +141,9 @@ public class MasterDataFragment extends Fragment {
             try {
                 dest.setCapacity(Integer.parseInt(capacityStr));
                 destinationRepository.addDestination(dest).addOnSuccessListener(doc -> {
-                    Toast.makeText(getContext(), "Đã thêm địa điểm: " + name, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.str_toast_venue_added, name), Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
-                }).addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi khi lưu", Toast.LENGTH_SHORT).show());
+                }).addOnFailureListener(e -> Toast.makeText(getContext(), getString(R.string.str_toast_save_error_short), Toast.LENGTH_SHORT).show());
             } catch (NumberFormatException e) {
                 Toast.makeText(getContext(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
             }
