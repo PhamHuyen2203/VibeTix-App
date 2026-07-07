@@ -239,6 +239,16 @@ public class EventDetailFragment extends Fragment {
      * Hiển thị toàn bộ thông tin sự kiện lên UI.
      */
     private void populateEventUI(Event event) {
+        // Báo cho Accessibility Assistant biết sự kiện đang xem
+        // (để lệnh "đọc chi tiết" / "mô tả poster" / "đặt vé" hoạt động
+        //  cả khi user tự bấm mở sự kiện thay vì dùng giọng nói)
+        if (getActivity() instanceof com.example.vibetix.Activities.User.UserMainActivity) {
+            com.example.vibetix.Accessibility.AccessibilityAssistantManager mgr =
+                    ((com.example.vibetix.Activities.User.UserMainActivity) getActivity())
+                            .getAssistantManager();
+            if (mgr != null) mgr.setCurrentEvent(event);
+        }
+
         // ── Title ───────────────────────────────────────────────────────
         txtDetailEventTitle.setText(event.getTitle());
 

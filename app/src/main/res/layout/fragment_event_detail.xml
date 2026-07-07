@@ -29,7 +29,8 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back" 
+                android:contentDescription="Quay lại" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -49,7 +50,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
                 android:src="@drawable/ic_heart_small"
-                app:tint="@color/clr_grey_1" />
+                app:tint="@color/clr_grey_1" 
+                android:contentDescription="Yêu thích sự kiện" />
         </RelativeLayout>
     </LinearLayout>
 
@@ -72,7 +74,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/event_live_non_song" />
+                android:src="@drawable/event_live_non_song" 
+                android:contentDescription="Ảnh poster sự kiện" />
 
             <!-- Event Details Body -->
             <LinearLayout
@@ -162,7 +165,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_calendar_small"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:importantForAccessibility="no" />
 
                     <TextView
                         android:id="@+id/txtDetailEventDate"
@@ -187,7 +191,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_location_small"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:importantForAccessibility="no" />
 
                     <TextView
                         android:id="@+id/txtDetailEventLocation"
@@ -214,7 +219,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_info"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:importantForAccessibility="no" />
 
                     <TextView
                         android:id="@+id/txtDetailEventType"
@@ -240,7 +246,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_shield"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:importantForAccessibility="no" />
 
                     <TextView
                         android:id="@+id/txtDetailAgeRestriction"
@@ -331,7 +338,8 @@
                         android:focusable="true"
                         android:padding="4dp"
                         android:src="@drawable/ic_calendar_small"
-                        app:tint="@color/clr_primary_blue" />
+                        app:tint="@color/clr_primary_blue" 
+                        android:contentDescription="Thêm lịch diễn vào lịch của bạn" />
                 </LinearLayout>
 
                 <TextView
@@ -389,7 +397,8 @@
                             android:id="@+id/imvOrganizerAvatar"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:src="@drawable/img_mascot_wave" />
+                            android:src="@drawable/img_mascot_wave" 
+                            android:contentDescription="Ảnh đại diện ban tổ chức" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -423,13 +432,15 @@
                             android:layout_marginEnd="8dp"
                             android:src="@drawable/ic_check"
                             android:visibility="gone"
-                            app:tint="@color/clr_primary_blue" />
+                            app:tint="@color/clr_primary_blue" 
+                            android:contentDescription="Ban tổ chức đã được xác minh" />
 
                         <ImageView
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@drawable/ic_chevron_right"
-                            app:tint="@color/clr_grey_1" />
+                            app:tint="@color/clr_grey_1" 
+                            android:importantForAccessibility="no" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

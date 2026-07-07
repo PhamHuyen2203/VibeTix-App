@@ -25,7 +25,8 @@
                 android:layout_height="80dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/event_live_non_song"
-                app:cornerRadius="8dp" />
+                app:cornerRadius="8dp" 
+                android:contentDescription="Ảnh sự kiện" />
 
             <LinearLayout
                 android:layout_width="0dp"

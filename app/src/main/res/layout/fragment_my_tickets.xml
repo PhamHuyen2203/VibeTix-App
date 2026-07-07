@@ -44,7 +44,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/app_icon" />
+                    android:src="@drawable/app_icon" 
+                    android:importantForAccessibility="no" />
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
 
@@ -344,7 +345,8 @@
                     android:layout_height="match_parent"
                     android:padding="10dp"
                     android:src="@drawable/ic_filter"
-                    app:tint="@color/clr_primary_blue" />
+                    app:tint="@color/clr_primary_blue" 
+                    android:importantForAccessibility="no" />
             </androidx.cardview.widget.CardView>
 
             <!-- Red Notification Dot -->
@@ -407,7 +409,8 @@
                             android:id="@+id/imvEmptyStateMascot"
                             android:layout_width="140dp"
                             android:layout_height="140dp"
-                            android:src="@drawable/img_vibetix_mascot" />
+                            android:src="@drawable/img_vibetix_mascot" 
+                            android:importantForAccessibility="no" />
 
                         <TextView
                             android:id="@+id/txtEmptyStateTitle"

@@ -385,6 +385,44 @@
                 <View android:layout_width="match_parent" android:layout_height="1dp"
                     android:layout_marginStart="44dp" android:background="#F0F0F0" />
 
+                <!-- Row: Trợ lý giọng nói (Accessibility Assistant) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_mic"
+                        android:tint="#808E92"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="Trợ lý giọng nói"
+                        android:textColor="#1C1B1B"
+                        android:textSize="14sp" />
+
+                    <Switch
+                        android:id="@+id/switchVoiceAssistant"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:contentDescription="Bật hoặc tắt trợ lý giọng nói cho người khiếm thị"
+                        android:thumbTint="@color/clr_primary_blue"
+                        android:trackTint="#BBD4F8" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginStart="44dp" android:background="#F0F0F0" />
+
                 <!-- Row: Trung tâm trợ giúp -->
                 <LinearLayout
                     android:id="@+id/rowHelpCenter"
