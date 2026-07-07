@@ -3,10 +3,10 @@ package com.example.vibetix.Activities.User;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.vibetix.Activities.Organizer.EventHubActivity;
 import com.example.vibetix.R;
@@ -18,8 +18,8 @@ public class NotificationDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification_detail);
 
-        ImageButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         TextView txtTitle = findViewById(R.id.txtDetailTitle);
         TextView txtBody  = findViewById(R.id.txtDetailBody);

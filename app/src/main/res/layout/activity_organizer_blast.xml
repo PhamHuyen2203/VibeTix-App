@@ -1,79 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/clr_bg_light">
 
-    <LinearLayout
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:elevation="4dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/clr_primary"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/clr_text_white"
+            app:title="Gửi thông báo"
+            app:titleTextColor="@color/clr_text_white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Header -->
-        <com.google.android.material.appbar.AppBarLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvBlastHistory"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="88dp" />
+
+        <ProgressBar
+            android:id="@+id/pbLoading"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/clr_bg_white"
-            app:elevation="2dp">
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title="Gửi thông báo"
-                app:titleTextColor="@color/clr_text_black" />
-        </com.google.android.material.appbar.AppBarLayout>
+        <LinearLayout
+            android:id="@+id/layoutEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
 
-        <!-- Sent list/history -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@drawable/ic_notification"
+                app:tint="@color/clr_grey_2" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBlastHistory"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="16dp"
-                android:paddingBottom="88dp" />
-
-            <ProgressBar
-                android:id="@+id/pbLoading"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone" />
+                android:layout_marginTop="16dp"
+                android:text="Chưa gửi thông báo nào"
+                android:textColor="@color/clr_text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center" />
 
-            <!-- Empty State -->
-            <LinearLayout
-                android:id="@+id/layoutEmpty"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:visibility="gone">
+                android:layout_marginTop="8dp"
+                android:text="Nhấn nút + để gửi thông báo tới người mua vé"
+                android:textColor="@color/clr_text_secondary"
+                android:textSize="13sp"
+                android:gravity="center" />
 
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/clr_grey_2" />
+        </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Chưa gửi thông báo nào"
-                    android:textColor="@color/clr_text_secondary"
-                    android:textSize="16sp" />
-            </LinearLayout>
+    </FrameLayout>
 
-        </FrameLayout>
-    </LinearLayout>
-
-    <!-- Add notification FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddBlast"
         android:layout_width="wrap_content"

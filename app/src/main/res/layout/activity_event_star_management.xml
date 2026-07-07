@@ -59,10 +59,10 @@
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/ic_staff"
-                app:tint="@color/clr_grey_1" />
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@drawable/ic_star_rating"
+                app:tint="@color/clr_grey_2" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -94,7 +94,7 @@
         android:backgroundTint="@color/clr_primary"
         android:text="Thêm Nghệ sĩ"
         android:textColor="@color/clr_text_white"
-        app:icon="@android:drawable/ic_input_add"
+        app:icon="@drawable/ic_plus"
         app:iconTint="@color/clr_text_white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

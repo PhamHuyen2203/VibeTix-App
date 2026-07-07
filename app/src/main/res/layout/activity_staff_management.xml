@@ -198,9 +198,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:text="Thêm nhân sự"
-        app:icon="@android:drawable/ic_input_add"
+        app:icon="@drawable/ic_plus"
+        app:iconTint="@color/clr_text_white"
         app:backgroundTint="@color/clr_primary"
-        app:tint="@color/clr_text_white"
         android:textColor="@color/clr_text_white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

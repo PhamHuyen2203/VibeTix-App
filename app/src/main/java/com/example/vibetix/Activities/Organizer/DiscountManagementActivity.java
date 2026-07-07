@@ -6,7 +6,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import androidx.appcompat.widget.Toolbar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +36,7 @@ import java.util.UUID;
 public class DiscountManagementActivity extends AppCompatActivity {
     public static final String EXTRA_EVENT_ID = "EXTRA_EVENT_ID";
 
-    private ImageView btnBack;
+    private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView rvDiscounts;
     private FloatingActionButton fabAddDiscount;
@@ -61,13 +61,13 @@ public class DiscountManagementActivity extends AppCompatActivity {
 
         eventId = getIntent().getStringExtra(EXTRA_EVENT_ID);
 
-        btnBack = findViewById(R.id.btnBack);
+        toolbar = findViewById(R.id.toolbar);
         tabLayout = findViewById(R.id.tabLayout);
         rvDiscounts = findViewById(R.id.rvDiscounts);
         fabAddDiscount = findViewById(R.id.fabAddDiscount);
         layoutEmpty = findViewById(R.id.layoutEmpty);
 
-        btnBack.setOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> finish());
         
         rvDiscounts.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DiscountAdapter(new ArrayList<>(), new DiscountAdapter.Listener() {
