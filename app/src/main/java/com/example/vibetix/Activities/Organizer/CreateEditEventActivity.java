@@ -979,8 +979,20 @@ public class CreateEditEventActivity extends AppCompatActivity {
             descriptionHtml = event.getDescription();
             richEditorDescription.setHtml(event.getDescription());
         }
-        if (etStartTime != null && event.getStartTime() != null) etStartTime.setText(event.getStartTime());
-        if (etEndTime != null && event.getEndTime() != null)   etEndTime.setText(event.getEndTime());
+        if (etStartTime != null && event.getStartTime() != null) {
+            etStartTime.setText(event.getStartTime());
+            try {
+                java.util.Date d = dtFormat.parse(event.getStartTime());
+                if (d != null) startCalendar.setTime(d);
+            } catch (Exception ignored) {}
+        }
+        if (etEndTime != null && event.getEndTime() != null) {
+            etEndTime.setText(event.getEndTime());
+            try {
+                java.util.Date d = dtFormat.parse(event.getEndTime());
+                if (d != null) endCalendar.setTime(d);
+            } catch (Exception ignored) {}
+        }
 
         // Venue
         if (event.getVenueId() != null && !event.getVenueId().isEmpty()) {

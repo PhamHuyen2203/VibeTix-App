@@ -264,13 +264,23 @@ public class HomepageLoader {
      * Nếu không có timestamp → giữ lại (không đủ thông tin để loại).
      */
     private static boolean isUpcomingOrOngoing(QueryDocumentSnapshot doc) {
-        // Dùng end_time nếu có, fallback start_time
-        com.google.firebase.Timestamp ts = doc.getTimestamp("end_time");
-        if (ts == null) ts = doc.getTimestamp("start_time");
-        if (ts == null) return true; // không có ngày → giữ lại
-        long eventMs = ts.toDate().getTime();
-        long todayStart = getTodayStartMs();
-        return eventMs >= todayStart;
+        java.util.Date eventDate = null;
+        // end_time hoặc start_time có thể là String "dd/MM/yyyy HH:mm" hoặc Timestamp
+        for (String field : new String[]{"end_time", "start_time"}) {
+            Object raw = doc.get(field);
+            if (raw instanceof com.google.firebase.Timestamp) {
+                eventDate = ((com.google.firebase.Timestamp) raw).toDate();
+                break;
+            } else if (raw instanceof String) {
+                try {
+                    eventDate = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm",
+                            java.util.Locale.getDefault()).parse((String) raw);
+                    if (eventDate != null) break;
+                } catch (Exception ignored) {}
+            }
+        }
+        if (eventDate == null) return true; // không có ngày → giữ lại
+        return eventDate.getTime() >= getTodayStartMs();
     }
 
     public static long getTodayStartMs() {

@@ -519,14 +519,26 @@ public class EventDetailFragment extends Fragment {
                     java.text.SimpleDateFormat sdfDate = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
                     java.text.SimpleDateFormat sdfTime = new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
 
-                    // Lấy ngày diễn từ event start_time
-                    Timestamp startTs = eventDoc.getTimestamp("start_time");
-                    Timestamp endTs = eventDoc.getTimestamp("end_time");
-                    if (startTs != null) {
-                        currentScheduleDate = sdfDate.format(startTs.toDate());
-                        eventTimeRange = sdfTime.format(startTs.toDate());
-                        if (endTs != null) {
-                            eventTimeRange += " - " + sdfTime.format(endTs.toDate());
+                    // Lấy ngày diễn từ event start_time (có thể là String hoặc Timestamp)
+                    java.util.Date startDate = null, endDate = null;
+                    Object rawStart = eventDoc.get("start_time");
+                    Object rawEnd   = eventDoc.get("end_time");
+                    java.text.SimpleDateFormat storedFmt = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault());
+                    if (rawStart instanceof Timestamp) {
+                        startDate = ((Timestamp) rawStart).toDate();
+                    } else if (rawStart instanceof String) {
+                        try { startDate = storedFmt.parse((String) rawStart); } catch (Exception ignored) {}
+                    }
+                    if (rawEnd instanceof Timestamp) {
+                        endDate = ((Timestamp) rawEnd).toDate();
+                    } else if (rawEnd instanceof String) {
+                        try { endDate = storedFmt.parse((String) rawEnd); } catch (Exception ignored) {}
+                    }
+                    if (startDate != null) {
+                        currentScheduleDate = sdfDate.format(startDate);
+                        eventTimeRange = sdfTime.format(startDate);
+                        if (endDate != null) {
+                            eventTimeRange += " - " + sdfTime.format(endDate);
                         }
                     }
                     eventDates.clear();

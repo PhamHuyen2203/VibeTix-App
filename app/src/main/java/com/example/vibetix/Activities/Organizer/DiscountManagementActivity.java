@@ -20,7 +20,7 @@ import com.example.vibetix.R;
 import com.example.vibetix.Utils.SessionManager;
 import com.example.vibetix.databinding.BottomSheetDiscountBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -39,7 +39,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private RecyclerView rvDiscounts;
-    private FloatingActionButton fabAddDiscount;
+    private ExtendedFloatingActionButton fabAddDiscount;
     private android.widget.LinearLayout layoutEmpty;
 
     private FirebaseFirestore db;
@@ -64,7 +64,7 @@ public class DiscountManagementActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         tabLayout = findViewById(R.id.tabLayout);
         rvDiscounts = findViewById(R.id.rvDiscounts);
-        fabAddDiscount = findViewById(R.id.fabAddDiscount);
+        fabAddDiscount = (ExtendedFloatingActionButton) findViewById(R.id.fabAddDiscount);
         layoutEmpty = findViewById(R.id.layoutEmpty);
 
         toolbar.setNavigationOnClickListener(v -> finish());
@@ -252,14 +252,14 @@ public class DiscountManagementActivity extends AppCompatActivity {
                 return;
             }
 
-            com.google.firebase.Timestamp tsStart = displayToTimestamp(saleStart);
-            com.google.firebase.Timestamp tsEnd   = displayToTimestamp(saleEnd);
+            com.google.firebase.Timestamp tsStart = displayToTimestamp(saleStart, false);
+            com.google.firebase.Timestamp tsEnd   = displayToTimestamp(saleEnd, true);
             if (tsStart == null || tsEnd == null) {
                 Toast.makeText(this, getString(R.string.str_toast_invalid_date), Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (tsEnd.compareTo(tsStart) <= 0) {
+            if (tsEnd.compareTo(tsStart) < 0) {
                 Toast.makeText(this, getString(R.string.str_toast_end_before_start), Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -354,10 +354,23 @@ public class DiscountManagementActivity extends AppCompatActivity {
     }
 
     private com.google.firebase.Timestamp displayToTimestamp(String displayDate) {
+        return displayToTimestamp(displayDate, false);
+    }
+
+    private com.google.firebase.Timestamp displayToTimestamp(String displayDate, boolean endOfDay) {
         if (displayDate == null || displayDate.isEmpty()) return null;
         try {
             java.util.Date d = displayFmt.parse(displayDate);
-            return d != null ? new com.google.firebase.Timestamp(d) : null;
+            if (d == null) return null;
+            if (endOfDay) {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTime(d);
+                cal.set(java.util.Calendar.HOUR_OF_DAY, 23);
+                cal.set(java.util.Calendar.MINUTE, 59);
+                cal.set(java.util.Calendar.SECOND, 59);
+                d = cal.getTime();
+            }
+            return new com.google.firebase.Timestamp(d);
         } catch (Exception e) {
             return null;
         }

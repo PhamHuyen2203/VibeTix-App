@@ -254,10 +254,15 @@ public class EventStarManagementActivity extends AppCompatActivity {
                     }
                     sheetBinding.pbSearchLoading.setVisibility(View.GONE);
                     searchAdapter.updateData(allActiveStars);
-                    
                     if (allActiveStars.isEmpty()) {
                         sheetBinding.tvEmptySearch.setVisibility(View.VISIBLE);
+                    } else {
+                        sheetBinding.tvEmptySearch.setVisibility(View.GONE);
                     }
+                })
+                .addOnFailureListener(e -> {
+                    sheetBinding.pbSearchLoading.setVisibility(View.GONE);
+                    sheetBinding.tvEmptySearch.setVisibility(View.VISIBLE);
                 });
 
         sheetBinding.etSearchStar.addTextChangedListener(new TextWatcher() {
