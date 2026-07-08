@@ -25,3 +25,5 @@ captures/
 
 # Firebase config
 google-services.json
+# Claude AI config
+.claude/
